@@ -1,0 +1,14 @@
+
+jobs:
+  build:
+    name: Build website with rmarkdown
+    runs-on: ubuntu-latest
+    container: stateofther/r-finistr2024:0.1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Additional Packages
+        run: Rscript -e "install.packages(c('tictoc'))"
+      - name: Generate slides
+        run: "quarto render"
