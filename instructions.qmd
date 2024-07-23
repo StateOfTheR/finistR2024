@@ -15,7 +15,17 @@ date: "19 au 23 août 2024"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+## Cloner le dépôt git du bootcamp
 
+Protocole https :
+
+`git clone https://github.com/StateOfTheR/finistR2024.git`
+
+Avec clés SSH :
+`git clone git@github.com:git@github.com:StateOfTheR/finistR2024.git`
+
+### Pour plus d'infos sur l'initialisation de git, la gestion des dépôts distants ...
+(Lien vers une doc complète)[https://docs.github.com/fr/get-started/getting-started-with-git/managing-remote-repositories].
 
 ## Processus de mise en commun des ateliers
 
