@@ -39,13 +39,13 @@ But, this remains limited and to have full flexibility, ones need to build its o
 
 ```{r}
 #| label: example1_data
-
-data_ex1 <- rnbinom(n = 10, prob = 0.4, size = 12)
+data_ex1 <- rnbinom(n = 1000, prob = 0.4, size = 12)
 ```
 
 
 
 ```{r}
+#| label: code_neg_bin
 code_neg_bin <- nimbleCode({
   # Observation model
   for(i in 1:n){# n is never defined before, it will be a constant
@@ -100,15 +100,15 @@ formatted_results <- imap_dfr(posterior_samples_neg_bin,
      }) %>% 
   pivot_longer(cols = -c("Iteration", "Chain"),
                names_to = "Parameter", 
-               values_to = "Value")
+               values_to = "value")
 ```
 
 ```{r}
 #| label: plot
 ggplot(formatted_results) +
-  aes(x = sample_id,
-      y = sample_value, color = chain) +
-  facet_wrap(~parameter, scales = "free") +
+  aes(x = Iteration,
+      y = value, color = Chain) +
+  facet_wrap(~Parameter, scales = "free") +
   geom_line() +
   labs(x = "Sample ID", y = "Parameter value", color = "")
 ```
@@ -116,7 +116,7 @@ ggplot(formatted_results) +
 ## Package for automatic formatting
 
 ```{r}
-#| label: posterior_samples
+#| label: posterior_samples_coda
 #| cache: true
 posterior_samples_neg_bin <- nimbleMCMC(model_neg_bin, 
                                         nchains = 3, 
@@ -140,6 +140,64 @@ formatted_results
 
 ## Alternative MCMC sampler
 
+## Defining a `nimbleFunction`
+
+```{r}
+get_prob <- nimbleFunction(
+    run = function(log_mu = double(0),
+                   log_theta = double(0)) { # type declarations
+        z <- log_theta - log_mu
+        output <- 1 / (1 + exp(-z))
+        return(output)
+        returnType(double(0))  # return type declaration
+    })
+get_prob(log(18), log(12))
+```
+
+
+```{r}
+#| label: code_neg_bin_alternatif
+#| cache: true
+code_alternatif <- nimbleCode({
+  # Observation model
+  for(i in 1:n){# n is never defined before, it will be a constant
+    y[i] ~ dnbinom(prob, theta)
+  }
+  # Alternative vectorized formulation 
+  # y[1:n] ~ dnbinom(prob, theta)
+  # PRIORS
+  log_mu ~ dnorm(0, 1)
+  theta ~ dexp(0.1)
+  # Quantites deterministes
+  log_theta <- log(theta)
+  prob <- get_prob(log_mu = log_mu, log_theta = log_theta)
+})
+
+model_alternatif <- nimbleModel(code = code_alternatif, 
+                    name = "Alternative negative binomial", 
+                    constants = list(n = length(data_ex1)),
+                    data = list(y = data_ex1),
+                    inits = list(mu = 0.5, theta = 1))
+
+posterior_samples_alternatif <- nimbleMCMC(model_alternatif, 
+                                        nchains = 3, 
+                                        niter = 10000, 
+                                        thin = 10, 
+                                        nburnin = 1000,
+                                        monitors = c("prob", "theta"),
+                                        samplesAsCodaMCMC = TRUE)
+```
+
+```{r}
+posterior_samples_alternatif %>% 
+  ggs() %>% 
+  ggplot() +
+  aes(x = Iteration,
+      y = value, color = factor(Chain)) +
+  facet_wrap(~Parameter, scales = "free") +
+  geom_line() +
+  labs(x = "Sample ID", y = "Parameter value", color = "")
+```
 
 
 
