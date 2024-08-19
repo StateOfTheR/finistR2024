@@ -1,7 +1,23 @@
 ---
 title: "Introduction to `nimble`"
 format: html
+editor_options: 
+  chunk_output_type: console
 ---
+
+# Required packages for this tutorial {.unnumbered}
+
+```{r}
+#| label: packages_nimble_section
+#| warning: false
+#| message: false
+#| cache: false
+library(nimble)
+library(tidyverse)
+library(ggmcmc)
+```
+
+
 
 # Short presentation of `nimble`
 
@@ -18,4 +34,65 @@ There is a `nimble` language with the basics for building statistical models (e.
 But, this remains limited and to have full flexibility, ones need to build its own function -> can be very challenging 
 
 # A simple example with functions being available in `nimble`
+
+## Defining a negative binomial model
+
+```{r}
+#| label: example1_data
+
+data_ex1 <- rnbinom(n = 10, prob = 0.4, size = 12)
+```
+
+
+
+```{r}
+code_neg_bin <- nimbleCode({
+  # Observation model
+  for(i in 1:n){# n is never defined before, it will be a constant
+    y[i] ~ dnbinom(prob, theta)
+  }
+  # Alternative vectorized formulation 
+  # y[1:n] ~ dnbinom(prob, theta)
+  # PRIORS
+  prob ~ dunif(0, 1)
+  theta ~ dexp(0.1)
+})
+```
+
+Note that in this code, nothing distinguishes observed data from unknown (or latent variables).
+The order of lines has no importance as everything will be compiled afterwards
+
+## Defining the nimble model
+
+```{r}
+#| label: model_neg_bin
+model_neg_bin <- nimbleModel(code = code_neg_bin, 
+                    name = "Negative binomial", 
+                    constants = list(n = length(data_ex1)),
+                    data = list(y = data_ex1),
+                    inits = list(prob = 0.5, theta = 1))
+```
+
+```{r}
+#| label: posterior_samples
+#| cache: true
+posterior_samples_neg_bin <- nimbleMCMC(model_neg_bin)
+```
+
+## Exploring the results
+
+
+
+## Alternative MCMC sampler
+
+
+
+
+
+
+
+
+
+
+
 
