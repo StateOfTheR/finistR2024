@@ -76,11 +76,66 @@ model_neg_bin <- nimbleModel(code = code_neg_bin,
 ```{r}
 #| label: posterior_samples
 #| cache: true
-posterior_samples_neg_bin <- nimbleMCMC(model_neg_bin)
+posterior_samples_neg_bin <- nimbleMCMC(model_neg_bin, 
+                                        nchains = 3, 
+                                        niter = 10000, 
+                                        thin = 10, 
+                                        nburnin = 1000)
 ```
 
 ## Exploring the results
 
+```{r}
+#| label: str_posterior_samples
+str(posterior_samples_neg_bin)
+```
+
+```{r}
+#| label: custom_formatted_results
+formatted_results <- imap_dfr(posterior_samples_neg_bin, 
+     function(x, nm){
+       as.data.frame(x) %>% 
+         rowid_to_column(var = "Iteration") %>% 
+         mutate(Chain = str_remove(nm, "chain"))
+     }) %>% 
+  pivot_longer(cols = -c("Iteration", "Chain"),
+               names_to = "Parameter", 
+               values_to = "Value")
+```
+
+```{r}
+#| label: plot
+ggplot(formatted_results) +
+  aes(x = sample_id,
+      y = sample_value, color = chain) +
+  facet_wrap(~parameter, scales = "free") +
+  geom_line() +
+  labs(x = "Sample ID", y = "Parameter value", color = "")
+```
+
+## Package for automatic formatting
+
+```{r}
+#| label: posterior_samples
+#| cache: true
+posterior_samples_neg_bin <- nimbleMCMC(model_neg_bin, 
+                                        nchains = 3, 
+                                        niter = 10000, 
+                                        thin = 10, 
+                                        nburnin = 1000,
+                                        samplesAsCodaMCMC = TRUE)
+```
+
+```{r}
+#| label: str_posterior_samples_coda
+str(posterior_samples_neg_bin)
+```
+
+```{r}
+#| label: coda_formatted_results
+formatted_results <- ggs(posterior_samples_neg_bin)
+formatted_results
+```
 
 
 ## Alternative MCMC sampler
