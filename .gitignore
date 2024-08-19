@@ -50,5 +50,7 @@ rsconnect/
 
 /.quarto/
 
+# For niimble branch
 _site/
 01_nimble.html
+local_nimble*.R
