@@ -84,7 +84,7 @@ for (i in 1:nrow(results_template)) {
 DT::datatable(base_r_sim)
 ```
 
-What [**simpr**](https://statisfactions.github.io/simpr/) author advocates is bad:
+What is bad according to [**simpr**](https://statisfactions.github.io/simpr/) authors:
 
 -   Most important pieces (data generating process, model specification, definitions, varying parameters) are hidden;
 -   What if there is an error?
@@ -278,10 +278,12 @@ the directory with 5 files :
 -   model_functions.R : define the models.
 -   writeup.Rmd
 
-```{r }
+```{r simulator-dir}
 library(simulator)
 dir <- "./sims_simulator"
-create(dir)
+if (!file.exists(dir)) {
+  create(dir)
+}
 ```
 
 ```{r}
