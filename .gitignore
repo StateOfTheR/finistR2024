@@ -51,3 +51,4 @@ rsconnect/
 /.quarto/
 
 *.local.R
+*.local.qmd
