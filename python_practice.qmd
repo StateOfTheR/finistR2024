@@ -103,7 +103,7 @@ cat(file_content, sep = "\n")
 Il est possible de supprimer un environnement avec la commande 
 
 ```{r}
-#| echo: false
+#| echo: true
 #| eval: false
 conda remove --name finistrbis --all
 ```
@@ -114,6 +114,121 @@ La liste des commandes conda est disponible dans la [cheatsheet conda](https://d
 
 
 ## Créer un environnement avec virtual env  sous Windows
+Sur un terminal PowerShell de Windows, installer WSL (Windows subsystem for linux) : 
+```{r}
+#| echo: true
+#| eval: false
+wsl --install
+```
+
+Après redémarrage, pour savoir quelle version de linux est installée :
+```{r}
+#| echo: true
+#| eval: false
+wsl -l -v
+```
+
+Il faut ensuite créer un alias python pour python3 :
+```{r}
+#| echo: true
+#| eval: false
+source ~/.bashrc
+alias python=python3alias python=python3
+```
+
+Puis installer pip :
+```{r}
+#| echo: true
+#| eval: false
+sudo apt-get update
+sudo apt install python3-pip
+```
+
+Créer un alias pip pour pip3 :
+```{r}
+#| echo: true
+#| eval: false
+source ~/.bashrc
+alias pip=pip3
+```
+Ou créer un lien symbolique entre pip3 et pip :
+```{r}
+#| echo: true
+#| eval: false
+sudo ln -s /usr/bin/pip3 /usr/bin/pip
+```
+
+Pour vérifier la version de pip qui est installée :
+```{r}
+#| echo: true
+#| eval: false
+pip --version
+```
+
+Installer virtualenv :
+```{r}
+#| echo: true
+#| eval: false
+pip install virtualenv
+```
+
+Et si c'est demandé :
+```{r}
+#| echo: true
+#| eval: false
+sudo apt install python3.10-venv 
+```
+
+On peut ensuite créer un environnement python dans le dossier que l'on souhaite :
+```{r}
+#| echo: true
+#| eval: false
+python -m venv chemin/ou/on/veut/mettre/l/env  
+```
+(si besoin, pour supprimer l'env : rm -rf finistr)
+
+Enfin, pour activer l'environnement python 'finistrEnv' :
+```{r}
+#| echo: true
+#| eval: false
+source chemin/finistrEnv/bin/activate
+```
+
+Pour trouver les packages python : pypi
+```{r}
+#| echo: true
+#| eval: false
+pypi nom-du-package
+```
+
+On peut ensuite créer un script.py dans ubuntu :
+```{r}
+#| echo: true
+#| eval: false
+touch toto.py
+pwd
+```
+
+Puis l'ouvrir dans vscode, préalablement installé dans Windows.
+
+Il faut ensuite dans vscode, préciser le chemin de l'environnement python (situé dans linux).
+
+
+En supplément :
+
+Pour ouvrir l'émulateur linux, à partir d'un terminal windows :
+```{r}
+#| echo: true
+#| eval: false
+start ubuntu.exe
+```
+
+Pour désactiver l'environnement Python activé précédemment :
+```{r}
+#| echo: true
+#| eval: false
+deactivate
+```
 
 
 ## Utiliser un environnement  de développement agréable pour un utilisateur de R
