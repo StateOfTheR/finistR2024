@@ -56,7 +56,7 @@ library(simpr)
 
 ### Usual base R solution
 
-```{r}
+```{r base-r}
 ## Set up parameters
 ns <- c(100L, 150L, 200L)
 mean_diffs <- c(10, 20, 30)
@@ -93,7 +93,7 @@ What [**simpr**](https://statisfactions.github.io/simpr/) author advocates is ba
 
 ### Solution via [**simpr**](https://statisfactions.github.io/simpr/)
 
-```{r}
+```{r simpr-spec}
 ## Specify pre and post scores that differ by a given amount
 specify(
   pre  = ~ rnorm(n, 0, sd), 
@@ -111,7 +111,7 @@ specify(
 
 ### A complete solution with varying parameters
 
-```{r}
+```{r simpr-vary}
 sim_vary <- specify(
   pre  = ~ rnorm(n, 0, sd),
   post = ~ pre + rnorm(n, mean_diff, sd)
@@ -152,7 +152,7 @@ The [**simpr**](https://statisfactions.github.io/simpr/) workflow, inspired by t
 
 #### Filtering full simulation
 
-```{r}
+```{r simpr-full}
 set.seed(500)
 
 specify(a = ~ runif(6)) |> 
@@ -162,7 +162,7 @@ specify(a = ~ runif(6)) |>
 
 #### Simulate subset only
 
-```{r}
+```{r simpr-subset}
 set.seed(500)
 
 specify(a = ~ runif(6)) |> 
@@ -171,7 +171,7 @@ specify(a = ~ runif(6)) |>
 
 #### Benchmarking
 
-```{r}
+```{r simpr-bench}
 set.seed(500)
 
 bench::mark(
@@ -191,7 +191,7 @@ bench::mark(
 
 Add `per_sim() |>` after `generate()` in your simulation pipeline and then any tidyverse function that will apply to every simulation dataset:
 
-```{r}
+```{r simpr-other}
 #| eval: false
 specify(
   pre  = ~ rnorm(n, 0, sd), 
