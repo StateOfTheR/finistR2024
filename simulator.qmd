@@ -35,7 +35,7 @@ library(simpr)
 -   Who developed it?
 -   Philosophy
 
-|                                                                                             | Version | Number of dependencies | Number of reverse dependencies | Date of latest commit | Date of latest release | Documentation quality | On CRAN? | Developers                   |
+| Name  | Version | #deps | #rev deps | Latest commit | Latest release | Doc | On CRAN? | Developers                   |
 |---------------------------------------------------------------------------------------------|---------|------------------------|--------------------------------|-----------------------|------------------------|-----------------------|----------|------------------------------|
 | [**DeclareDesign**](https://declaredesign.org/r/declaredesign/)                             | 1.0.10  | 2                      | 1                              | 2024-04-13            | 2024-04-21             |                       | Yes      | Graeme Blair                 |
 | [**MonteCarlo**](https://github.com/FunWithR/MonteCarlo)                                    | 1.0.6   | 6                      | 0                              | 2019-01-31            | 2019-01-31             |                       | Yes      | Christian Hendrik Leschinski |
