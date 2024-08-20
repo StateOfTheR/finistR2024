@@ -44,7 +44,7 @@ library(simpr)
 | [**simpr**](https://statisfactions.github.io/simpr/)                                        | 0.2.6   | 11    | 0         | 2024-07-16    | 2023-04-26     |     | Yes      | Ethan Brown                  |
 | [**simulator**](https://jacobbien.github.io/simulator/)                                     | 0.2.5   | 1     | 0         | 2023-02-02    | 2023-02-04     |     | Yes      | Jacob Bien                   |
 
-## [**simpr**](https://statisfactions.github.io/simpr/)
+# [**simpr**](https://statisfactions.github.io/simpr/)
 
 ::: callout-note
 ## Problem
@@ -54,7 +54,7 @@ library(simpr)
 -   Method: Paired t-test
 :::
 
-### Usual base R solution
+## Usual base R solution
 
 ```{r base-r}
 ## Set up parameters
@@ -91,7 +91,7 @@ What is bad according to [**simpr**](https://statisfactions.github.io/simpr/) au
 -   What about parallelization?
 -   Is this code sufficiently readable? Without the comments?
 
-### Solution via [**simpr**](https://statisfactions.github.io/simpr/)
+## Solution via [**simpr**](https://statisfactions.github.io/simpr/)
 
 ```{r simpr-spec}
 ## Specify pre and post scores that differ by a given amount
@@ -109,7 +109,7 @@ specify(
   DT::datatable()
 ```
 
-### A complete solution with varying parameters
+## A complete solution with varying parameters
 
 ```{r simpr-vary}
 sim_vary <- specify(
@@ -134,7 +134,7 @@ sim_vary |>
   theme_bw()
 ```
 
-### Philosophy
+## Philosophy
 
 The [**simpr**](https://statisfactions.github.io/simpr/) workflow, inspired by the [**infer**](https://infer.tidymodels.org) package, distills a simulation study into five primary steps:
 
@@ -144,13 +144,13 @@ The [**simpr**](https://statisfactions.github.io/simpr/) workflow, inspired by t
 -   `fit()` models to your data (e.g. `lm()`);
 -   `tidy_fits()` for consolidating results using `broom::tidy()`, such as computing power or Type I Error rates.
 
-### Reproducible workflows
+## Reproducible workflows
 
 -   Same seed, same results;
 -   Can regenerate just a *specific subset* to see what happened in that particular dataset or fit;
 -   Useful in debugging and diagnosing unexpected results, etc.
 
-#### Filtering full simulation
+### Filtering full simulation
 
 ```{r simpr-full}
 set.seed(500)
@@ -160,7 +160,7 @@ specify(a = ~ runif(6)) |>
   dplyr::filter(.sim_id == 3)
 ```
 
-#### Simulate subset only
+### Simulate subset only
 
 ```{r simpr-subset}
 set.seed(500)
@@ -169,7 +169,7 @@ specify(a = ~ runif(6)) |>
   generate(3, .sim_id == 3)
 ```
 
-#### Benchmarking
+### Benchmarking
 
 ```{r simpr-bench}
 set.seed(500)
@@ -184,10 +184,10 @@ bench::mark(
 )
 ```
 
-### Other features
+## Other features
 
 ::: callout-tip
-## Data munging
+### Data munging
 
 Add `per_sim() |>` after `generate()` in your simulation pipeline and then any tidyverse function that will apply to every simulation dataset:
 
@@ -217,14 +217,14 @@ specify(
 :::
 
 ::: callout-tip
-## Error handling
+### Error handling
 
 -   Can change error handling to keep going with simulation, stop simulation, or to skip warnings;
 -   Debug and recovery options to enter into simulation during error.
 :::
 
 ::: callout-tip
-## Built-in parallelization
+### Built-in parallelization
 
 Just add
 
@@ -237,12 +237,12 @@ plan(multisession, workers = 6) # or however many cores are reasonable to use
 and your simulation pipeline (actually the `generate()` function) will run in parallel.
 :::
 
-### Pros & Cons
+## Pros & Cons of simpr
 
 ::: columns
 ::: column
 ::: {.callout-note icon="false"}
-## Pros
+### Pros
 
 -   tidyverse friendly;
 -   beginner friendly;
@@ -253,7 +253,7 @@ and your simulation pipeline (actually the `generate()` function) will run in pa
 
 ::: column
 ::: {.callout-important icon="false"}
-## Cons
+### Cons
 
 -   Likely not as fast/optimized as some alternatives;
 -   Not as customizable/powerful as **DeclareDesign**;
