@@ -1,6 +1,10 @@
 ---
 title: "Introduction to `nimble`"
 format: html
+author:
+  - Baptiste Alglave
+  - Pierre Gloaguen
+  - Emily Walker
 editor_options: 
   chunk_output_type: console
 ---
@@ -142,6 +146,10 @@ formatted_results
 
 ## Defining a `nimbleFunction`
 
+Suppose now we want to perform negative binomial regression.
+In this context, the model links the expectation of the response to some covariates. 
+
+
 ```{r}
 get_prob <- nimbleFunction(
     run = function(log_mu = double(0),
@@ -151,9 +159,8 @@ get_prob <- nimbleFunction(
         return(output)
         returnType(double(0))  # return type declaration
     })
-get_prob(log(18), log(12))
+get_prob(log(18), log(12)) # Works as a usual R function
 ```
-
 
 ```{r}
 #| label: code_neg_bin_alternatif
