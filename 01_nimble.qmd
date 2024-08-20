@@ -13,6 +13,7 @@ editor_options:
 #| message: false
 #| cache: false
 library(nimble)
+library(nimbleHMC)
 library(tidyverse)
 library(ggmcmc)
 ```
@@ -85,14 +86,48 @@ posterior_samples_neg_bin <- nimbleMCMC(model_neg_bin)
 
 ## Alternative MCMC sampler
 
+One big strength of `nimble` are the several samplers that are available in the package.
 
+## Conjuguate priors
 
+First, nimble is able to identify conjugate priors and make the exact computation of the posterior [link](https://r-nimble.org/html_manual/cha-mcmc.html#conjugate-gibbs-samplers).
 
+## HMC algorithm
 
+`nimble` provides support for Hamiltonian Monte Carlo (HMC) and compute the derivatives of the likelihood through automatic differentiation. The `nimbleHMC` package implement two versions of No-U-Turn (NUTS) HMC sampling: the standard one developed in Hoffman and Gelman ([link](https://jmlr.org/papers/volume15/hoffman14a/hoffman14a.pdf)) and an updated on with improved adaptation routines and convergence criteria, which matches the HMC sampler of `STAN`.
 
+In order to allow an algorithm to use AD for a specific model, that model must be created with buildDerivs = TRUE.
 
+```{r}
 
+# Build model with nimble
+model_neg_bin_HMC <- nimbleModel(code = code_neg_bin, 
+                    name = "Negative binomial", 
+                    constants = list(n = length(data_ex1)),
+                    data = list(y = data_ex1),
+                    inits = list(prob = 0.5, theta = 1),
+                    calculate = FALSE, buildDerivs = TRUE) # This is the line required for running HMC
 
+# Build the MCMC algorithm which applies HMC sampling
+HMC <- buildHMC(model_neg_bin_HMC)
 
+# Careful here, when the model has random effects
+# HMC requires to set values in the model before running the algorithm
+# One solution is to simulate with the model and set the model with these values
+# See : https://r-nimble.org/html_manual/cha-mcmc.html#subsec:HMC-example
+# Here, as the model is simple, there is no need for this and everything is handled withing nimble/nimbleHMC
 
+## Then everything is standard in nimble
+CHMC <- compileNimble(HMC, project = model_neg_bin_HMC) # Compile the model/algo
+samples <- runMCMC(CHMC, niter = 1000, nburnin = 500) # Short run for illustration
+summary(coda::as.mcmc(samples)) # Summary of the estimates
+```
+
+And there are plenty of others samplers:
+
+- Particle filters / sequential Monte Carlo and iterated filtering (package `nimbleSMC`)
+
+- Monte Carlo Expectation Maximization (MCEM)
+
+- Laplace approximation and adaptive Gauss-Hermite quadrature
 
