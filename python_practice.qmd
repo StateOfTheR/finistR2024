@@ -21,7 +21,7 @@ Lorsque l'on utilise Python, une bonne pratique consiste à créer un environnem
 L'environnement contient la version de Python que l'on souhaite utiliser ainsi que les packages/modules utiles au projet. 
 Cette façon de faire permet de faire coexister différentes versions de python ou de packages au sein du même ordinateur.
 Cette pratique n'est pas spécifique à Python, on pourrait imaginer créer des environnements pour utiliser des versions différentes de R.
-Si le programme ou la librairie n'est pas installée dans l'environnement mais est disponible dans l'installation globale de la machine, c'est cette version glbale qui sera utilisée. Il faut donc bien vérifier ce qui est dispo dans l'environnement et globalement.
+Si le programme ou la librairie n'est pas installée dans l'environnement mais est disponible dans l'installation globale de la machine, c'est cette version globale qui sera utilisée. Il faut donc bien vérifier ce qui est dispo dans l'environnement et globalement.
 
 Nous avons exploré deux manières de gérer les environnements soit avec `conda` soit avec `virtual env`. Nous avons testé sous Linux et sous Windows.
 
@@ -180,19 +180,26 @@ Et si c'est demandé :
 sudo apt install python3.10-venv 
 ```
 
-On peut ensuite créer un environnement python dans le dossier que l'on souhaite :
+On peut ensuite créer un environnement python dans le dossier que l'on souhaite, par exemple ici l'environnement finistrEnv :
 ```{r}
 #| echo: true
 #| eval: false
-python -m venv chemin/ou/on/veut/mettre/l/env  
+python -m venv chemin/finistrEnv  
 ```
-(si besoin, pour supprimer l'env : rm -rf finistr)
+(si besoin, pour supprimer l'env : rm -rf finistrEnv)
 
 Enfin, pour activer l'environnement python 'finistrEnv' :
 ```{r}
 #| echo: true
 #| eval: false
 source chemin/finistrEnv/bin/activate
+```
+
+ou alternativement
+```{r}
+#| echo: true
+#| eval: false
+. chemin/finistrEnv/bin/activate
 ```
 
 Pour trouver les packages python : pypi
