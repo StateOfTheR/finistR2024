@@ -617,3 +617,162 @@ There is a vignette on advanced functionality such as complex results or simulat
 ## Simulation-based power calculation
 
 A [specific vignette] is available on [the author's website](https://avi-kenny.github.io/SimEngine/articles/example_1.html)
+
+
+
+## simChef
+
+This document describes a simulation experiment using the `simChef` package in R, including data generation, method application, evaluation, and visualization.
+
+A [specific vignette](https://yu-group.github.io/simChef/articles/simChef.html) is available on the author's website for more detailed instructions and examples on using thesimChefpackage.
+
+## Setup
+
+First, make sure to install and load the `simChef` package:
+
+```{r}
+# Install simChef package if not already installed
+# devtools::install_github("Yu-Group/simChef")
+library(simChef)
+```
+
+In simChef, a simulation experiment is divided into four components:
+
+-   DGP(): the data-generating processes (DGPs) from which to generate data
+
+-   Method(): the methods (or models) to fit on the data in the experiment
+
+-   Evaluator(): the evaluation metrics used to evaluate the methods' performance
+
+-   Visualizer(): the visualization procedures used to visualize outputs from the method fits or evaluation results (can be tables, plots, or even R Markdown snippets to display)
+
+## Step 1: Define the Data-Generating Process, Methods, and Evaluation Functions
+
+### Data-Generating Process
+
+The following function generates pre- and post-treatment data:
+
+```{r}
+dgp_fun <- function(n, sd, mean_diff) {
+  pre  <- rnorm(n, 0, sd)
+  post <- pre + rnorm(n, mean_diff, sd)
+  data_list <- list(
+    pre = pre,
+    post = post
+  )
+  return(data_list)
+}
+```
+
+### Method
+
+The following function applies a paired t-test to the data:
+
+```{r}
+method_fun <- function(pre, post) {
+  test <- t.test(post, pre, paired = TRUE)
+  return(test)
+}
+```
+
+### Evaluation
+
+The following function evaluates the power of the test:
+
+```{r}
+evaluation_fun <- function(fit_results){
+  Power <- fit_results |> 
+    dplyr::group_by(n, mean_diff, sd) |> 
+    dplyr::summarize(Power = mean(p.value < 0.05)) 
+ return(Power)
+}
+```
+
+### Visualization
+
+The following function creates a plot to visualize the power:
+
+```{r}
+power_plot_fun <- function(fit_results, eval_results){
+  out_plot <- fit_results |> 
+    dplyr::group_by(n, mean_diff, sd) |> 
+    dplyr::summarize(Power = mean(p.value < 0.05)) |> 
+    ggplot(aes(n, Power)) + 
+    geom_col() + 
+    facet_grid(rows = vars(sd), cols = vars(mean_diff)) + 
+    theme_bw()
+  return(out_plot)
+}
+```
+
+## Step 2: Convert Functions into simChef Class Objects
+
+```{r}
+dgp <- create_dgp(
+  .dgp_fun = dgp_fun, .name = "DGP"
+)
+
+method <- create_method(
+  .method_fun = method_fun, .name = "T-test"
+)
+
+evaluation <- create_evaluator(
+  .eval_fun = evaluation_fun , .name = 'P.value'
+)
+
+power_plot <- create_visualizer(
+  .viz_fun = power_plot_fun, .name = 'Power plot'
+)
+```
+
+## Step 3: Assemble the Simulation Experiment
+
+```{r}
+experiment <- create_experiment(name = "Example Experiment") %>%
+  add_dgp(dgp) %>%
+  add_method(method) %>%
+  add_evaluator(evaluation) %>%
+  add_visualizer(power_plot)
+
+##For vary the simulation parameters
+experiment <- experiment %>%
+  add_vary_across(.dgp = "DGP",
+                  n = c(100, 150, 200),
+                  mean_diff = c(10, 20, 30),
+                  sd = c(50, 100))
+
+print(experiment)
+```
+
+## Step 4: Run the Experiment
+
+```{r}
+results <- run_experiment(experiment, n_reps = 100, save = TRUE)
+results$fit_results %>% DT::datatable()
+results$viz_results
+```
+
+## Pros & Cons of simChef
+
+::: columns
+::: column
+::: {.callout-note icon="false"}
+### Pros
+
+-   Automated generation of an interactive R Markdown document (see init_docs() and render_docs() functions);
+-   Beginner friendly;
+-   Computing experimental replicates in parallel easily with future by adding plan(multisession, workers = n_workers) before run_experiment(experiment,...);
+-   Flexibility of the return fitting results of the simulation (not necessarily the same outputs for all methods);
+-   We can change the evaluation metrics and the visualization without re-fitting all the simulations by saving the fit_results tibble;
+:::
+:::
+
+::: column
+::: {.callout-important icon="false"}
+### Cons
+
+-   Likely not as fast/optimized as some alternatives;
+-   Only save the simulation results computed from the evaluation functions. We cannot debug a strange simulation result;
+:::
+:::
+:::
