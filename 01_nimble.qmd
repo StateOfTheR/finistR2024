@@ -20,10 +20,12 @@ editor_options:
 #| warning: false
 #| message: false
 #| cache: false
+library(compareMCMCs)
+library(ggmcmc)
 library(nimble)
 library(nimbleHMC)
 library(tidyverse)
-library(ggmcmc)
+
 ```
 
 
@@ -34,13 +36,13 @@ First, a very good reference: https://r-nimble.org/html_manual/cha-welcome-nimbl
 
 The `nimble` package is:
 
-- A system for writing statistical models flexibly (based on bugs).
-- A library of inference algorithms (MCMC, Laplace approximation).
+- A system for writing statistical models flexibly (based on `bugs` and `jags`).
+- A library of inference algorithms (MCMC, HMC, Laplace approximation).
 - A compiler that generates and compiles C++ for your models and algorithms without knowing it is C++.
 
 There is a `nimble` language with the basics for building statistical models (e.g. the key probability distributions, some key transformation functions).
 
-But, this remains limited and to have full flexibility, ones need to build its own functions, which can be very challenging. 
+But, this remains limited and to have full flexibility, ones need to build its own functions, which **can be very challenging**. 
 
 # Fitting a model in a bayesian framework with nimble
 
@@ -339,30 +341,34 @@ First, nimble is able to identify conjugate priors and make the exact computatio
 
 In order to allow an algorithm to use AD for a specific model, that model must be created with `buildDerivs = TRUE`.
 
-# ```{r}
-# # Build model with nimble
-# model_neg_bin_HMC <- nimbleModel(code = code_neg_bin, 
-#                                  name = "Negative binomial", 
-#                                  constants = list(n = length(data_ex1)),
-#                                  data = list(y = data_ex1),
-#                                  inits = list(prob = 0.5, theta = 1),
-#                                  calculate = FALSE, 
-#                                  buildDerivs = TRUE) # This is the line required for running HMC
-# 
-# # Build the MCMC algorithm which applies HMC sampling
-# HMC <- buildHMC(model_neg_bin_HMC)
-# 
-# # Careful here, when the model has random effects
-# # HMC requires to set values in the model before running the algorithm
-# # One solution is to simulate with the model and set the model with these values
-# # See : https://r-nimble.org/html_manual/cha-mcmc.html#subsec:HMC-example
-# # Here, as the model is simple, there is no need for this and everything is handled withing nimble/nimbleHMC
-# 
-# ## Then everything is standard in nimble
-# CHMC <- compileNimble(HMC) # Compile the model/algo
-# samples <- runMCMC(CHMC, niter = 1000, nburnin = 500) # Short run for illustration
-# summary(coda::as.mcmc(samples)) # Summary of the estimates
-# ```
+```{r}
+#| label: HMC_code
+#| cache: true
+
+# Build model with nimble
+model_neg_bin_HMC <- nimbleModel(code = code_neg_bin, 
+                                 name = "Negative binomial", 
+                                 constants = list(n = length(data_ex1)),
+                                 data = list(y = data_ex1),
+                                 inits = list(prob = 0.5, theta = 1),
+                                 calculate = FALSE, buildDerivs = TRUE) # This is the line required for running HMC
+
+C_model_neg_bin_HMC <- compileNimble(model_neg_bin_HMC) # Compile the model (they require this for the compilation of the HMC object)
+
+# Build the MCMC algorithm which applies HMC sampling
+HMC <- buildHMC(C_model_neg_bin_HMC)
+
+# Careful here, when the model has random effects
+# HMC requires to set values in the model before running the algorithm
+# One solution is to simulate with the model and set the model with these values
+# See : https://r-nimble.org/html_manual/cha-mcmc.html#subsec:HMC-example
+# Here, as the model is simple, there is no need for this and everything is handled withing nimble/nimbleHMC
+
+## Then everything is standard in nimble
+CHMC <- compileNimble(HMC) # Compile the HMC model/algo
+samples <- runMCMC(CHMC, niter = 1000, nburnin = 500) # Short run for illustration
+summary(coda::as.mcmc(samples)) # Summary of the estimates
+```
 
 And there are plenty of others samplers:
 
@@ -370,5 +376,76 @@ And there are plenty of others samplers:
 
 - Monte Carlo Expectation Maximization (MCEM)
 
-- Laplace approximation and adaptive Gauss-Hermite quadrature
+See [link](https://r-nimble.org/html_manual/cha-algos-provided.html#cha-algos-provided)
 
+
+## The laplace approximation
+
+`nimble` also implements the Laplace approximation. But be careful, it performs maximum likelihood estimation. This is not the same as `INLA` (fully bayesian approach), but more like `TMB` (or `glmmTMB`- maximum likelihood estimation through Laplace approximation and automatic differentiation).
+
+```{r}
+#| label: Laplace_code
+#| cache: true
+
+# We need the derivatives to build the Laplace algorithm
+# so we take the object model_neg_bin_HMC built previously
+model_laplace <- buildLaplace(model_neg_bin_HMC)
+Cmodel_laplace <- compileNimble(model_laplace)
+
+# Get the Laplace approximation for one set of parameter values.
+Cmodel_laplace$calcLaplace(c(0.5,0.5)) 
+
+ # Get the corresponding gradient.
+Cmodel_laplace$gr_Laplace(c(0.5,0.5))
+
+# Search the (approximate) MLE
+MLE <- Cmodel_laplace$findMLE(c(0.5,0.5)) # Find the (approximate) MLE.
+MLE$par
+
+# Get log-likelihood value
+MLE$value
+# And output summaries
+Cmodel_laplace$summary(MLE)
+
+```
+
+N.b this example is only for illustration of the code. The Laplace approximation is relevant only when there are random effects in the model (which is not the case here).
+
+For a full example see [link](https://r-nimble.org/html_manual/cha-AD.html#sec:AD-laplace)
+
+## Comparing MCMC algorithms
+
+One can compare several algorithms through the package `compareMCMCs`. It is possible to compare several algorithms internal to `nimble` with those from `jags` (or even `STAN`) algorithms. An example below for `nimble` and `STAN`.
+
+```{r}
+#| label: compareMCMC_code
+#| cache: true
+
+# This model code will be used for both nimble and JAGS
+modelInfo <- list(
+  code = code_neg_bin,
+  constants = list(n = length(data_ex1)),
+  data = list(y = data_ex1),
+  inits = list(prob = 0.5, theta = 1)
+)
+
+# Here is a custom MCMC configuration function for nimble
+configure_nimble_slice <- function(model) {
+  configureMCMC(model, onlySlice = TRUE)
+}
+
+# Here is the call to compareMCMCs
+res <- compareMCMCs(modelInfo,
+                    MCMCs = c('nimble',       # nimble with default samplers
+                              'nimble_slice' # nimble with slice samplers
+                              ),
+                    nimbleMCMCdefs = 
+                      list(nimble_slice = 'configure_nimble_slice'),
+                    MCMCcontrol = list(inits = list(prob = 0.5, theta = 1),
+                                       niter = 10000,
+                                       burnin = 1000))
+
+make_MCMC_comparison_pages(res, modelName = 'code_neg_bin',dir = "/tmp/",
+                           control = list(res = 75))
+
+```
