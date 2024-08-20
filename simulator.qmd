@@ -5,6 +5,7 @@ author:
   - Caroline Cognot
   - Annaïg De Walsche
   - Cédric Midoux
+  - Pierre Neuvial
   - Aymeric Stamm
   - Florian Teste
 date: 2024-08-19
@@ -43,6 +44,12 @@ library(simpr)
 | [**simEngine**](https://cran.r-project.org/web/packages/SimEngine/vignettes/SimEngine.html) | 1.4.0   | 6     | 0         | 2024-04-13    | 2024-04-04     |     | Yes      | Avi Kenny, Charles Wolock    |
 | [**simpr**](https://statisfactions.github.io/simpr/)                                        | 0.2.6   | 11    | 0         | 2024-07-16    | 2023-04-26     |     | Yes      | Ethan Brown                  |
 | [**simulator**](https://jacobbien.github.io/simulator/)                                     | 0.2.5   | 1     | 0         | 2023-02-02    | 2023-02-04     |     | Yes      | Jacob Bien                   |
+
+# [**DeclareDesign**](https://declaredesign.org/r/declaredesign/)
+
+The `DeclareDesign` package is dedicated to *experimental design*. It also makes it possible to simulate an experimental design of interest, in order to understand the properties of this design. As its goal is not to evaluate computational methods via simulations, it does not address the question of interest and we did not evaluate it further.
+
+The underlying experimental design principles are described in the companion book: https://book.declaredesign.org/
 
 # [**simpr**](https://statisfactions.github.io/simpr/)
 
