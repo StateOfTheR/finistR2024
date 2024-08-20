@@ -15,9 +15,15 @@ date: 2024-08-19
 #| include: false
 library(ggplot2)
 library(simpr)
+library(SimEngine)
 ```
 
-## List of packages for data simulation
+## Overview
+
+We explore several R packages for generate or structure simulations. 
+Most statistical simulations studies includes different steps : generate data/ run one or several methods using simulated data / compare results.
+
+List of packages for data simulation
 
 -   [**simulator**](https://jacobbien.github.io/simulator/)
 -   [**simpr**](https://statisfactions.github.io/simpr/)
@@ -137,7 +143,7 @@ sim_vary |>
   dplyr::summarize(Power = mean(p.value < 0.05)) |> 
   ggplot(aes(n, Power)) + 
   geom_col() + 
-  facet_grid(rows = vars(sd), cols = vars(mean_diff)) + 
+  facet_grid(rows = dplyr::vars(sd), cols = dplyr::vars(mean_diff)) + 
   theme_bw()
 ```
 
@@ -455,3 +461,159 @@ files
 :::
 :::
 :::
+
+# {SimEngine}
+
+[{SimEngine}](https://cran.r-project.org/web/packages/SimEngine/) is an open-source R package for structuring, maintaining, running, and debugging statistical simulations on both local and cluster-based computing environments.
+The paper describing the package is available [here](https://arxiv.org/pdf/2403.05698).
+
+
+## Example
+
+1. Create a simulation object `SimEngine::new_sim()`
+
+```{r}
+# library(SimEngine)
+sim <- new_sim()
+```
+
+2. Create functions to generate data 
+```{r}
+create_data <- function(n) {
+ return(rpois(n=n, lambda=20))
+}
+est_lambda <- function(dat, type) {
+ if (type=="M") { return(mean(dat)) }
+ if (type=="V") { return(var(dat)) }
+ }
+```
+
+3. Simulation set-up
+
+One run = one simulation replicate.
+Features varying across simulation = simulation levels. Possible values = level values.
+By default, SimEngine runs one simulation replicate for each combination of level value.
+
+```{r}
+sim %<>% set_levels(
+ estimator = c("M", "V"),
+ n = c(10, 100, 1000))
+sim
+```
+
+4. Create a simulation script
+
+i.e. generation, analysis and return results
+```{r}
+sim %<>% set_script(function() {
+ dat <- create_data(n=L$n)
+ lambda_hat <- est_lambda(dat=dat, type=L$estimator)
+ return (list("lambda_hat"=lambda_hat))
+ })
+```
+
+5. Configure and run the simulation
+Using the `SimEngine::set_config()` it is possible to specify the number of replicates `num_sim`, the parallelization type `n_cores`, `parallel`,... and the required packages `packages` argument.
+
+And we run the simulation with the `run` function.
+```{r}
+### Configuration
+ sim %<>% set_config(
+ num_sim = 100,
+ packages = c("ggplot2", "stringr")
+ )
+### Run
+sim %<>% run()
+```
+
+The package implements a `summarize` function to calculate usual summary statistics such as bias, variance, MSE.
+```{r}
+sim %>% summarize(
+  list(stat="bias", name="bias_lambda", estimate="lambda_hat", truth=20),
+  list(stat="mse", name="mse_lambda", estimate="lambda_hat", truth=20)
+)
+```
+We can have information on individual simulation including runtime.
+```{r}
+head(sim$results)
+```
+It is possible to update simulation with more replicates or a new level. It keeps the old simulations and run only needed ones.
+```{r}
+sim %<>% set_config(num_sim = 200)
+sim %<>% set_levels(
+  estimator = c("M", "V"),
+  n = c(10, 100, 1000, 10000)
+)
+sim %<>% update_sim()
+```
+## Parallelization
+
+[A specific vignette](https://avi-kenny.github.io/SimEngine/articles/parallelization.html) is available and the introduction precises the terminology for parallel computing (node, core, task, job etc.).
+
+There are two modes of parallelizing code : `local` or `cluster`. The first thing is to specify `set_config(parallel = TRUE)`. Local = split calculations on several cores of a single computer.
+If the user’s computer has $n$ cores available, `{SimEngine}` will use n-1 cores by default.
+
+cluster parallelization : function `run_on_cluster()`. To use the function, the user needs to break the code into three blocks : `first` (code run only once, set-up simulation object), `main` (a single call to `run()`) and `last` (the code will run after all simulation replicates have finished running and after SimEngine has automatically compiled the results into the simulation object.).
+
+```{r}
+run_on_cluster(
+  first = {
+    sim <- new_sim()
+    create_data <- function(n) { return(rpois(n=n, lambda=20)) }
+    est_lambda <- function(dat, type) {
+      if (type=="M") { return(mean(dat)) }
+      if (type=="V") { return(var(dat)) }
+    }
+    sim %<>% set_levels(estimator = c("M","V"), n = c(10,100,1000))
+    sim %<>% set_script(function() {
+      dat <- create_data(L$n)
+      lambda_hat <- est_lambda(dat=dat, type=L$estimator)
+      return(list("lambda_hat"=lambda_hat))
+    })
+    sim %<>% set_config(num_sim=100, n_cores=20)
+  },
+  main = {
+    sim %<>% run()
+  },
+  last = {
+    sim %>% summarize()
+  },
+  cluster_config = list(js="slurm")
+)        
+```
+The `cluster_config` argument enables to specify options such as the choice of the scheduler.
+
+Example on how to give instruction to the job scheduler is on the vignette.
+
+Be caution : the number of cores cannot exceed the total number of simulation replicates
+
+Function to update simulation on a CSS :`update_sim_on_cluster`. Difference is we do not need to create a new simulation config but load the existing simulation using `readRDS()` and use `set_config` or `set_levels` and `update_sim()` in the main block.
+
+There is a vignette on advanced functionality such as complex results or simulation levels. It exists the `batch()` function to share data or objects between simulation replicates.
+
+## Pros & Cons of {SimEngine}
+
+::: columns
+::: column
+::: {.callout-note icon="false"}
+### Pros
+
+-   beginner friendly;
+-   local and cluster-based computing environments;
+-   well-written documentations and website with vignettes (with stat. formula of terminology for parallel computing)
+-   information-sharing across simulation replicates (not tested)
+-   automatic calculation of Monte Carlo error (not tested)
+:::
+:::
+
+::: column
+::: {.callout-important icon="false"}
+### Cons
+
+:::
+:::
+:::
+
+## Simulation-based power calculation
+
+A [specific vignette] is available on [the author's website](https://avi-kenny.github.io/SimEngine/articles/example_1.html)
