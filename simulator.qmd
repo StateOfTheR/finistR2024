@@ -35,14 +35,14 @@ library(simpr)
 -   Who developed it?
 -   Philosophy
 
-| Name  | Version | #deps | #rev deps | Latest commit | Latest release | Doc | On CRAN? | Developers                   |
-|---------------------------------------------------------------------------------------------|---------|------------------------|--------------------------------|-----------------------|------------------------|-----------------------|----------|------------------------------|
-| [**DeclareDesign**](https://declaredesign.org/r/declaredesign/)                             | 1.0.10  | 2                      | 1                              | 2024-04-13            | 2024-04-21             |                       | Yes      | Graeme Blair                 |
-| [**MonteCarlo**](https://github.com/FunWithR/MonteCarlo)                                    | 1.0.6   | 6                      | 0                              | 2019-01-31            | 2019-01-31             |                       | Yes      | Christian Hendrik Leschinski |
-| [**simChef**](https://yu-group.github.io/simChef/index.html)                                | 0.1.0   | 22                     | 0                              | 2024-03-20            | NA                     |                       | No       | Tiffany Tang, James Duncan   |
-| [**simEngine**](https://cran.r-project.org/web/packages/SimEngine/vignettes/SimEngine.html) | 1.4.0   | 6                      | 0                              | 2024-04-13            | 2024-04-04             |                       | Yes      | Avi Kenny, Charles Wolock    |
-| [**simpr**](https://statisfactions.github.io/simpr/)                                        | 0.2.6   | 11                     | 0                              | 2024-07-16            | 2023-04-26             |                       | Yes      | Ethan Brown                  |
-| [**simulator**](https://jacobbien.github.io/simulator/)                                     | 0.2.5   | 1                      | 0                              | 2023-02-02            | 2023-02-04             |                       | Yes      | Jacob Bien                   |
+| Name                                                                                        | Version | #deps | #rev deps | Latest commit | Latest release | Doc | On CRAN? | Developers                   |
+|--------------|--------|--------|--------|--------|--------|--------|--------|--------|
+| [**DeclareDesign**](https://declaredesign.org/r/declaredesign/)                             | 1.0.10  | 2     | 1         | 2024-04-13    | 2024-04-21     |     | Yes      | Graeme Blair                 |
+| [**MonteCarlo**](https://github.com/FunWithR/MonteCarlo)                                    | 1.0.6   | 6     | 0         | 2019-01-31    | 2019-01-31     |     | Yes      | Christian Hendrik Leschinski |
+| [**simChef**](https://yu-group.github.io/simChef/index.html)                                | 0.1.0   | 22    | 0         | 2024-03-20    | NA             |     | No       | Tiffany Tang, James Duncan   |
+| [**simEngine**](https://cran.r-project.org/web/packages/SimEngine/vignettes/SimEngine.html) | 1.4.0   | 6     | 0         | 2024-04-13    | 2024-04-04     |     | Yes      | Avi Kenny, Charles Wolock    |
+| [**simpr**](https://statisfactions.github.io/simpr/)                                        | 0.2.6   | 11    | 0         | 2024-07-16    | 2023-04-26     |     | Yes      | Ethan Brown                  |
+| [**simulator**](https://jacobbien.github.io/simulator/)                                     | 0.2.5   | 1     | 0         | 2023-02-02    | 2023-02-04     |     | Yes      | Jacob Bien                   |
 
 ## [**simpr**](https://statisfactions.github.io/simpr/)
 
@@ -264,13 +264,11 @@ and your simulation pipeline (actually the `generate()` function) will run in pa
 
 # Simulator
 
-This is a package on the CRAN. It is described in a 2016 paper by Jacob Bien.
-Last update on GitHub : last year (so, 2023).
+This is a package on the CRAN. It is described in a 2016 paper by Jacob Bien. Last update on GitHub : last year (so, 2023).
 
 ## Getting started
 
-The function "create", with a directory that does not exist, will create
-the directory with 5 files :
+The function "create", with a directory that does not exist, will create the directory with 5 files :
 
 -   eval_functions.R : contains metrics to be evaluated
 -   main.R : main code to run
@@ -292,19 +290,9 @@ setwd(dir)
 list.files()
 ```
 
-"On a typical project, one starts by defining a model in
-model_functions.R, one or two methods in method_functions.R, and a few
-metrics in eval_functions.R, and then one runs the code in main.R. After
-looking at some of the results, one might add an additional model or
-method or metric. One then returns to main.R, adds some additional lines
-specifying that the additional components should be run as well and
-looks at some more results.
+"On a typical project, one starts by defining a model in model_functions.R, one or two methods in method_functions.R, and a few metrics in eval_functions.R, and then one runs the code in main.R. After looking at some of the results, one might add an additional model or method or metric. One then returns to main.R, adds some additional lines specifying that the additional components should be run as well and looks at some more results.
 
-The simplest way to look at results is by using the plot functions
-"plot_eval", "plot_evals" and "plot_evals_by." In situations where you
-wish to investigate results more deeply than just looking at aggregated
-plots, one can use the functions "model", "draws", "output", and "evals"
-to get at all objects generated through the course of the simulation."
+The simplest way to look at results is by using the plot functions "plot_eval", "plot_evals" and "plot_evals_by." In situations where you wish to investigate results more deeply than just looking at aggregated plots, one can use the functions "model", "draws", "output", and "evals" to get at all objects generated through the course of the simulation."
 
 The "create" function also create the template in the different files :
 
@@ -333,8 +321,7 @@ Define a model from its different components with "new_model" :
 -   name
 -   label : what will be printed in the tables later probably ?
 -   param : a list of different parameters for the model
--   simulate : a function of the parameters, that returns nsim
-    simulations.
+-   simulate : a function of the parameters, that returns nsim simulations.
 
 ### what is in method_functions
 
@@ -351,9 +338,7 @@ their_method <- new_method("their-method", "Their Method",
 
 ```
 
-Define methods to be used on the model. The function "new_method" has
-for arguments a name (for R), a pretty name, and the "method" named arg
-for the computation we want.
+Define methods to be used on the model. The function "new_method" has for arguments a name (for R), a pretty name, and the "method" named arg for the computation we want.
 
 ### what is in eval_functions
 
@@ -370,8 +355,7 @@ her_loss <- new_metric("herloss", "Her loss function",
 
 ```
 
-Metric objects : shows how to compare model object and output of the
-method (method used on sim) object.
+Metric objects : shows how to compare model object and output of the method (method used on sim) object.
 
 ### what is in main
 
@@ -416,53 +400,51 @@ tabulate_eval(sim, "herloss", output_type = "markdown",
 
 main calls the different files.
 
-? Can plot_eval_by be used for different metrics at once ? ? Can
-tabulate_eval be used for different metrics at once ?
+? Can plot_eval_by be used for different metrics at once ? ? Can tabulate_eval be used for different metrics at once ?
 
 ## Important functions :
 
-- new_model()
-- new_method()
-- new_metric()
-- new_simulation
-- generate_model
--  simulate_from_model
-- run_method
--  evaluate
-- plot_eval, plot_eval_by, tabulate_eval.
-
-
+-   new_model()
+-   new_method()
+-   new_metric()
+-   new_simulation
+-   generate_model
+-   simulate_from_model
+-   run_method
+-   evaluate
+-   plot_eval, plot_eval_by, tabulate_eval.
 
 ## Final notes :
 
-This is not really a package that codes a method, but instead it
-proposes an architecture to store your codes, output simulations,
-results, etc.
+This is not really a package that codes a method, but instead it proposes an architecture to store your codes, output simulations, results, etc.
 
-
-
-PROs :
+::: columns
+::: column
+::: {.callout-note icon="false"}
+## Pros
 
 -   any model possible, if you can write it !
 -   possible to iterate over parameter with pretty pipes
 -   parallel possible, because you choose what you use
 -   stores all results in the storage with increasing depth:
 
-  - *files*
-  
-    -   *name_of_model*
-    
-        -   *name_of_first_param\_value*
-        
-            -   *name_of2nd_param\_value ... model.Rdata* out :
-                stores all sims
-                
-                -   *r?.Rdata*
+``` txt
+files
+└── name_of_model
+    └── name_of_first_param_value
+        └── name_of2nd_param_value ... model.Rdata out stores all sims
+            └── r?.Rdata
+```
+:::
+:::
 
-CONs :
+::: column
+::: {.callout-important icon="false"}
+## Cons
 
--   Not an usual way to code in R, and not easy to explain. create the
-    directory with the "create" function. Then, add the different
-    functions, methods, models... in the corresponding files.
+-   Not an usual way to code in R, and not easy to explain. create the directory with the "create" function. Then, add the different functions, methods, models... in the corresponding files.
 -   Mixes the code of the package/template with your own code.
 -   stores all results in this neat way BUT if too many parameters, may exceed the depth allowed.
+:::
+:::
+:::

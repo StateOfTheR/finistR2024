@@ -13,8 +13,8 @@ website:
     right:
       - text: Themes to be developped
         menu:
-        - text: List to discussed
-          href: theme.qmd
+        - text: Simulations
+          href: simulator.qmd
         aria-label: GitHub
 
 
