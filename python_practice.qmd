@@ -1,0 +1,117 @@
+---
+title: "Bien démarrer avec Python"
+lang: fr
+author: 
+  - Sophie Donnet
+  - Marie-Pierre Etienne
+  - Tristan Mary-Huard
+  - Emily Walker
+format: html
+toc: true
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Lorsque l'on utilise Python, une bonne pratique consiste à créer un environnement spécifique par projet. 
+L'environnement contient la version de Python que l'on souhaite utiliser ainsi que les packages utiles au projet. 
+Cette façon de faire permet de faire coexister différentes versions de python de package au sein du même ordinateur.
+Cette pratique n'est pas spécifique à Python, on pourrait imaginer créer des environnements pour utiliser des versions différentes de R.
+Si le programme ou la librairie n'est pas installée dans l'environnement mais est disponible dans l'installation globale de la machine, c'est cette version glbale qui sera utilisée. Il faut donc bie vérifier ce qui est dispo dans l'environnement et globalement.
+
+Nous avons explorer deux manièrers de gérer les environnements soit avec conda soit avec virtual env. Nous avons testé sous Linux et sous Windows.
+
+## Installation python et problèmes potentiels
+
+on cree un lien symbolique pour que python 3 soit le python par defaut
+## installation de python
+sudo ln -sf /usr/bin/python3 /usr/bin/python
+sudo ln -sf /usr/bin/pip3 /usr/bin/pip
+
+
+## Gestion des Environnements
+
+### Avec conda sous Linux
+
+Cette partie suppose que la commande conda est disponible (installée avec anaconda ou miniconda)
+
+La liste des environnement disponible est donnée par 
+
+`conda env list`
+
+*Pour créer un nouvel environnement nommé finistr contenant uniquement python et pip*
+
+Il suffit de lancer la commande 
+`conda create --name finistr python=3.11 pip`
+
+
+En listant les environnements disponibles, vous devez voir l'environnement finistr créé.
+
+`conda env list`
+
+Il est très important d'installer pip en meme temps, sinon c'est le pip global du systeme qui est utilisé et toutes les commades pip install lancées depuis l'environnement feront en fait des installations globales et non locales à  l'environnement ( plus de détails [ici](https://datumorphism.leima.is/til/programming/python/python-anaconda-install-requirements/) )
+
+Pour utiliser cette installation, il faut activer l'environnement 
+
+`conda activate finistr`
+
+On peut maintenant installer les packages de son choix avec des commandes type 
+`conda install` ou `pip install`
+
+Par exemple 
+`pip install numpy`
+
+Pour avoir la liste des packages installés dans l'environnemnet courant
+`conda list`
+
+
+On quitte l'environnement avec la commande 
+`conda deactivate`
+
+Il est possible de fournir une liste de packages à installer dans l'environnement sous forme d'un fichier txt. 
+
+```{r}
+#| echo: true
+#| eval: false
+conda create --name finistrbis python=3.11 pip 
+conda activate finistrbis
+pip install -r requirements.txt
+```
+
+le fichier `requirement.txt` a la forme suivante
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: true
+#| 
+file_content <- readLines("requirement.txt")
+cat(file_content, sep = "\n")
+```
+
+Il est possible de supprimer un environnement avec la commande 
+
+```{r}
+#| echo: false
+#| eval: true
+#| conda remove --name finistrbis --all
+```
+
+
+La liste des commandes conda est disponible dans la [cheatsheet conda](https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html)
+
+
+
+### Avec virtual env  sous Windows
+
+
+## Utiliser un environnement  de développement agréable pour un utilisateur de R
+
+## Avec Visual Studio Code
+ipython
+
+## Avec Positron
+
