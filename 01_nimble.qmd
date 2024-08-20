@@ -22,6 +22,7 @@ editor_options:
 #| cache: false
 library(compareMCMCs)
 library(ggmcmc)
+library(mvtnorm)
 library(nimble)
 library(nimbleHMC)
 library(tidyverse)
@@ -448,4 +449,144 @@ res <- compareMCMCs(modelInfo,
 make_MCMC_comparison_pages(res, modelName = 'code_neg_bin',dir = "/tmp/",
                            control = list(res = 75))
 
+```
+
+# A multivariate example
+
+We consider a multivariate Gaussian model with zero inflation, where the probability in the zero inflation can depend on the variable.
+
+\begin{equation}
+    \begin{array}{rcl}
+    Y_{ij} | W_{i} & = & W_{ij} \delta_0 + (1 - W_{ij}) \, \mathcal{N}\left(\mu_j, \Omega^{-1} \right) \\
+    W_{i} & \sim & \otimes_j \mathcal{B}(\pi_j) \\
+    \end{array}
+\end{equation}
+
+## Data generation
+
+We consider a simple settings in dimension $p=5$, with Toeplitz-like covariance. Here are some data (100 points):
+
+```{r}
+#| label: data-generation
+
+N <- 100
+p <- 5
+d <- 1:p
+Dsqrt <- diag(sqrt(d))
+Sigma <- Dsqrt %*% toeplitz(0.75^(0:(p-1))) %*% Dsqrt
+Omega <- solve(Sigma)
+mu <- 5 + 1:p
+pi <- c(0.25, 0, 0.8, 0.1, .5)
+
+W <- t(replicate(N, rbinom(p, prob = pi, size = 1)))
+Y <- (1 - W) * rmvnorm(N, mu, Sigma)
+hist(Y)
+```
+
+## Auxiliary functions 
+
+We need some auxialiry function to handle the density and generation of the random binomial vector $W$:
+
+```{r}
+#| label: vector-binomial
+dbinom_vector <- nimbleFunction(
+  run = function( x = double(1),
+                  size = double(1),
+                  prob = double(1), 
+                  log = integer(0, default = 0)
+  ) {
+    returnType(double(0))
+    logProb <- sum(dbinom(x, prob = prob, size = size, log = TRUE))
+    if(log) return(logProb) else return(exp(logProb))
+  })
+
+rbinom_vector <- nimbleFunction(
+  run = function( n = integer(0, default = 1),
+                  size = double(1),
+                  prob = double(1)
+  ) {
+    returnType(double(1))
+    return(rbinom(length(size), prob = prob, size = size))
+  })
+```
+
+## Nimble code and model for ZI-normal: V1
+
+Rather than defining a probability density function for this model (which is in fact a bit complicated...), we adopt a generative approach:
+
+```{r}
+#| label: ZI-normal-code
+ZInormal_code <- nimbleCode({
+  
+  for (j in 1:p) {
+    mean[j] ~ dnorm(0,1)  
+  }
+  for (j in 1:p) {
+    zeroProb[j] ~ dunif(0,1)
+  }
+  
+  prec[1:p,1:p] ~ dwish(Ip[1:p,1:p], p)
+
+  for (i in 1:N) {
+    w[i, 1:p] ~ dbinom_vector(onep[1:p], zeroProb[1:p])
+    z[i, 1:p] ~ dmnorm(mean[1:p], prec[1:p,1:p])
+    ytilde[i, 1:p] <- (1 - w[i,1:p]) * z[i,1:p]
+    ## Pierre Barbillon a une astuce en zero 
+    ## a.k.a "I got a trick at zero"
+    y[i, 1:p] ~ dmnorm(ytilde[i, 1:p], prec_inf[1:p,1:p])
+  }
+  
+})
+```
+
+We can now define the `Nimble` model for the ZI-normal model. We give some sound intial values for the parameters and latent variable, define some constants and provide the data:
+
+```{r}
+#| label: ZInormal-model
+ZInormal_model <- nimbleModel(
+  ZInormal_code, 
+  constants = list(N = N, p = p, Ip = diag(1,p,p), onep = rep(1,p), prec_inf = diag(1e5,p,p)),
+  data = list(y = Y, w = W),
+  inits = list(mean = rep(5,p), prec = diag(1,p,p), zeroProb=rep(0.5,p), z = Y))
+```
+
+## MCMC estimation
+
+Let us run a simple 2-chain MCMC estimation
+
+```{r}
+#| label: ZI-normal-MCMC
+#| cache: true
+my_MCMC <- nimbleMCMC(
+  ZInormal_model, 
+  monitors = c("mean", "prec", "zeroProb"),
+  nchains = 2, 
+  niter = 1000, 
+  samplesAsCodaMCMC = TRUE,
+  nburnin=100)
+```
+
+
+```{r echo=FALSE}
+#| label: posterior-mean
+#| fig-cap: 'Estimation of the mean $\mu$'
+
+ggs(my_MCMC) %>% filter(stringr::str_detect(Parameter, "mean")) %>% 
+  ggplot() + aes(x = Iteration, color = factor(Chain), y = value) + facet_wrap(~Parameter) + geom_line()
+```
+
+```{r echo=FALSE}
+#| label: posterior-zeroProb
+#| fig-cap: 'Estimation of the zero inflation probabilities $\pi$'
+
+ggs(my_MCMC) %>% filter(stringr::str_detect(Parameter, "zeroProb")) %>% 
+  ggplot() + aes(x = Iteration, color = factor(Chain), y = value) + facet_wrap(~Parameter) + geom_line()
+```
+
+```{r echo=FALSE}
+#| label: posterior-prec
+#| fig-cap: 'Estimation of the precision matrix $\Omega$'
+
+ggs(my_MCMC) %>% filter(stringr::str_detect(Parameter, "prec")) %>% 
+  ggplot() + aes(x = Iteration, color = factor(Chain), y = value) + facet_wrap(~Parameter) + geom_line()
 ```
