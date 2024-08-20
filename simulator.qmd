@@ -427,7 +427,7 @@ main calls the different files.
 -   evaluate
 -   plot_eval, plot_eval_by, tabulate_eval.
 
-## Pros & Cons of simpr
+## Pros & Cons of simulator
 
 This is not really a package that codes a method, but instead it proposes an architecture to store your codes, output simulations, results, etc.
 
