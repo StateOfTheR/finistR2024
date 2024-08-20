@@ -1,6 +1,6 @@
 ---
 title: "Solutions institutionnelles de déploiement d'applications shiny avec kubernetes"
-author: Cédric Midoux, Pierre Neuvial, Cédric Midoux, Emily Walker 
+author: Cédric Midoux, Pierre Neuvial, Aymeric Stamm, Emily Walker 
 editor: source
 bibliography: refs_shiny-deployment.bib
 ---
