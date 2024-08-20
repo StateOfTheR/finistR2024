@@ -414,7 +414,50 @@ tabulate_eval(sim, "herloss", output_type = "markdown",
 main calls the different files.
 
 ? Can plot_eval_by be used for different metrics at once ? ? Can tabulate_eval be used for different metrics at once ?
+## Example: power curve of the equality t-test
+Here is the copy-paste of the "main" file in the folder *equality_test*.
 
+
+```{r}
+library(simulator) # this file was created under simulator version 0.2.5
+
+source("equality_test/model_functions.R")
+source("equality_test/method_functions.R")
+source("equality_test/eval_functions.R")
+
+## @knitr init
+
+name_of_simulation <- "normal-mean-test"
+
+## @knitr main
+
+sim <- new_simulation(name = name_of_simulation,
+                      label = "Test of mean") %>%
+  generate_model(make_my_model_normal, seed = 13,
+                 n = 20,
+                 mu2 = as.list(seq(0,10,by=0.5)),
+                 mu1=0,
+                 sig=5,
+                 vary_along="mu2")                 %>%
+  simulate_from_model(nsim = 1000) %>%
+  run_method(list(t_test)) %>%
+  evaluate(list(pval_loss))
+
+## @knitr plots
+
+
+## @knitr tables
+
+tabulate_eval(sim, "p_value", output_type = "markdown",
+              format_args = list(digits = 5))
+
+plot_eval_by(sim, "p_value", varying = "mu2", main = "Power curve with mu1=0 and varying mu2")
+
+```
+ToDo :
+
+- vary n
+- vary both n and mu2
 ## Important functions :
 
 -   new_model()
