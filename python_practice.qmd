@@ -5,6 +5,7 @@ author:
   - Sophie Donnet
   - Marie-Pierre Etienne
   - Tristan Mary-Huard
+  - Francois Victor
   - Emily Walker
 format: html
 toc: true
