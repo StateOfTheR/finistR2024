@@ -1,0 +1,24 @@
+---
+title: "Packaging et test, R & Python"
+lang: fr
+author: 
+  - Louis Lacoste
+  - Armand Favrot
+  - Tristan Mary-Huard
+  - Francois Victor
+format: html
+toc: true
+---
+
+## Python packaging
+
+Voici un workflow de développement de package python en intégration continue (CI) à l'aide de git et GitLab.
+
+### 1ère étape: création d'un git repository
+
+-   initialisation du repo \`git init\`\`
+-   ajouter un fichier `.gitignore`
+-   associer avec un repo sur gitlab avec `git remote add origin`
+-   `git push`
+
+### 2ème étape: installation d'un pre
