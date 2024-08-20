@@ -414,14 +414,14 @@ main calls the different files.
 -   evaluate
 -   plot_eval, plot_eval_by, tabulate_eval.
 
-## Final notes :
+## Pros & Cons of simpr
 
 This is not really a package that codes a method, but instead it proposes an architecture to store your codes, output simulations, results, etc.
 
 ::: columns
 ::: column
 ::: {.callout-note icon="false"}
-## Pros
+### Pros
 
 -   any model possible, if you can write it !
 -   possible to iterate over parameter with pretty pipes
@@ -440,7 +440,7 @@ files
 
 ::: column
 ::: {.callout-important icon="false"}
-## Cons
+### Cons
 
 -   Not an usual way to code in R, and not easy to explain. create the directory with the "create" function. Then, add the different functions, methods, models... in the corresponding files.
 -   Mixes the code of the package/template with your own code.
