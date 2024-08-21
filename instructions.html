@@ -329,7 +329,10 @@ jobs:
         run: |
           Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
       - name: Additional Python packages
-        run: pip install torch torch_geometric numpy scikit-learn scikit-network networkx matplotlib tqdm openpyxl pandas
+        run: |
+          pip install torch torch_geometric 
+          pip install numpy==1.26.1
+          pip install scikit-learn scikit-network networkx matplotlib tqdm openpyxl pandas
       - name: Generate slides
         run: "quarto render"
       - name: GitHub Pages action
