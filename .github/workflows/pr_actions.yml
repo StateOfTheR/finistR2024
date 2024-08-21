@@ -3,7 +3,7 @@ name: pr_check
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   pull_request:
-    types: [opened, reopened, edited]
+    branches: [main, master]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 
