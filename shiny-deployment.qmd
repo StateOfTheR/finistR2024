@@ -24,16 +24,19 @@ bibliography: refs_shiny-deployment.bib
 
 Ces trois outils sont dédiés au déploiement d'applications shiny via [Kubernetes](https://kubernetes.io/) (aka K8s). Le développeur de l'application shiny doit fournir un dépôt git contenant le code source de l'application et spécifier les dépendances (via un fichier csv dédié pour shiny-K8s et plmshift, ou automatiquement via renv pour SK8).
 
+```{r, echo=FALSE, fig.cap="Etapes pour le déploiement d'une application shiny via SK8 (INRAE)."}
+knitr::include_graphics("images/SK8_user-workflow.png")
+```
+
+
 ## Configuration du serveur shiny
 
 C'est ici que les trois solutions se différencient:
 
 - Pour [plmshift](https://plmshift.pages.math.cnrs.fr/), on demande également au développeur de l'application de configurer et d'administrer lui-même son instance ShinyServer, via l'interface d'OpenShift. Ces étapes sont documentées [ici](https://plmshift.pages.math.cnrs.fr/exemples_de_deploiement/deployer_shinyr/)  
 - Idem pour [Shiny-K8s](https://gitlab.pasteur.fr/hub/shiny-k8s)), avec (semble-t-il) un peu moins de compétences techniques requises. Ces étapes sont documentées [ici](https://hub.pages.pasteur.fr/shiny-k8s/user_guide/index.html)
-- ([SK8](https://sk8.inrae.fr/) propose une interface simplifiée pour la configuration du serveur shiny, qui permet au développeur de l'application shiny spécifier directement les paramètres (RAM, CPU) sans avoir besoin de compétences en déploiement. 
+- [SK8](https://sk8.inrae.fr/) propose une interface simplifiée pour la configuration du serveur shiny, qui permet au développeur de l'application shiny spécifier directement les paramètres (RAM, CPU) sans avoir besoin de compétences en déploiement. 
 
-**TODO Emily/Cédric ajouter un screenshot de l'appli shiny de SK8?**
- 
 ## Accessibilité ?
 
 [plmshift](https://plmshift.pages.math.cnrs.fr/), [SK8](https://sk8.inrae.fr/) et [Shiny-K8s](https://gitlab.pasteur.fr/hub/shiny-k8s) sont respectivement accessibles seulement pour des projets développés par le CNRS, INRAE et l'Institut Pasteur. 
