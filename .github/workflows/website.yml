@@ -14,8 +14,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Additional Packages
-        run: Rscript -e "install.packages(c('tictoc'))"
+      - name: Additional R packages
+        run: |
+          Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
+      - name: Additional Python packages
+        run: pip install torch torch_geometric numpy scikit-learn scikit-network networkx matplotlib tqdm openpyxl pandas
       - name: Generate slides
         run: "quarto render"
       - name: GitHub Pages action
