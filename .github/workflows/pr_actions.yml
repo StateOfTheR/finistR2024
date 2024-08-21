@@ -19,6 +19,7 @@ jobs:
       - name: Additional Packages
         run: |
           Rscript -e "install.packages(c('tictoc'))"
-          pip install torch torch_geometric numpy scikit-learn scikit-network networkx matplotlib tqdm openpyxl pandas time
+      - name: Additional Python Packages
+        run: pip install torch torch_geometric numpy scikit-learn scikit-network networkx matplotlib tqdm openpyxl pandas time
       - name: Generate slides
         run: "quarto render"
