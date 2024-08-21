@@ -1,0 +1,217 @@
+---
+title: "packages simulators"
+author: "Caroline Cognot"
+date: "2024-08-19"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Simulator
+
+This is a package on the CRAN. It is described in a 2016 paper by Jacob Bien.
+Last update on GitHub : last year (so, 2023).
+
+## Getting started
+
+The function "create", with a directory that does not exist, will create
+the directory with 5 files :
+
+-   eval_functions.R : contains metrics to be evaluated
+-   main.R : main code to run
+-   method_functions.R : methods to run
+-   model_functions.R : define the models.
+-   writeup.Rmd
+
+```{r }
+library(simulator)
+dir <- "./sims_simulator"
+# create(dir)
+```
+
+```{r}
+setwd(dir)
+
+list.files()
+```
+
+"On a typical project, one starts by defining a model in
+model_functions.R, one or two methods in method_functions.R, and a few
+metrics in eval_functions.R, and then one runs the code in main.R. After
+looking at some of the results, one might add an additional model or
+method or metric. One then returns to main.R, adds some additional lines
+specifying that the additional components should be run as well and
+looks at some more results.
+
+The simplest way to look at results is by using the plot functions
+"plot_eval", "plot_evals" and "plot_evals_by." In situations where you
+wish to investigate results more deeply than just looking at aggregated
+plots, one can use the functions "model", "draws", "output", and "evals"
+to get at all objects generated through the course of the simulation."
+
+The "create" function also create the template in the different files :
+
+### what is in model_functions
+
+```{r}
+
+make_my_model <- function(n, prob) {
+  new_model(name = "contaminated-normal",
+            label = sprintf("Contaminated normal (n = %s, prob = %s)", n, prob),
+            params = list(n = n, mu = 2, prob = prob),
+            simulate = function(n, mu, prob, nsim) {
+              # this function must return a list of length nsim
+              contam <- runif(n * nsim) < prob
+              x <- matrix(rep(NA, n * nsim), n, nsim)
+              x[contam] <- rexp(sum(contam))
+              x[!contam] <- rnorm(sum(!contam))
+              x <- mu + x # true mean is mu
+              return(split(x, col(x))) # make each col its own list element
+            })
+}
+```
+
+Define a model from its different components with "new_model" :
+
+-   name
+-   label : what will be printed in the tables later probably ?
+-   param : a list of different parameters for the model
+-   simulate : a function of the parameters, that returns nsim
+    simulations.
+
+### what is in method_functions
+
+```{r}
+my_method <- new_method("my-method", "My Method",
+                        method = function(model, draw) {
+                          list(fit = median(draw))
+                        })
+
+their_method <- new_method("their-method", "Their Method",
+                           method = function(model, draw) {
+                             list(fit = mean(draw))
+                           })
+
+```
+
+Define methods to be used on the model. The function "new_method" has
+for arguments a name (for R), a pretty name, and the "method" named arg
+for the computation we want.
+
+### what is in eval_functions
+
+```{r}
+his_loss <- new_metric("hisloss", "His loss function",
+                        metric = function(model, out) {
+                          return((model$mu - out$fit)^2)
+})
+
+her_loss <- new_metric("herloss", "Her loss function",
+                        metric = function(model, out) {
+                          return(abs(model$mu - out$fit))
+                        })
+
+```
+
+Metric objects : shows how to compare model object and output of the
+method (method used on sim) object.
+
+### what is in main
+
+```{r}
+setwd(dir)
+
+# This is the main simulator file
+
+
+library(simulator) # this file was created under simulator version 0.2.5
+
+source("model_functions.R")
+source("method_functions.R")
+source("eval_functions.R")
+
+## @knitr init
+
+name_of_simulation <- "normal-mean-estimation-with-contamination"
+
+## @knitr main
+
+sim <- new_simulation(name = name_of_simulation,
+                      label = "Mean estimation under contaminated normal") %>%
+  generate_model(make_my_model, seed = 123,
+                 n = 50,
+                 prob = as.list(seq(0, 1, length = 6)),
+                 vary_along = "prob") %>%
+  simulate_from_model(nsim = 10) %>%
+  run_method(list(my_method, their_method)) %>%
+  evaluate(list(his_loss, her_loss))
+
+## @knitr plots
+
+plot_eval_by(sim, "hisloss", varying = "prob")
+
+## @knitr tables
+
+tabulate_eval(sim, "herloss", output_type = "markdown",
+              format_args = list(digits = 1))
+
+```
+
+main calls the different files.
+
+? Can plot_eval_by be used for different metrics at once ? ? Can
+tabulate_eval be used for different metrics at once ?
+
+## Important functions :
+
+- new_model()
+- new_method()
+- new_metric()
+- new_simulation
+- generate_model
+-  simulate_from_model
+- run_method
+-  evaluate
+- plot_eval, plot_eval_by, tabulate_eval.
+
+
+
+## Final notes :
+
+This is not really a package that codes a method, but instead it
+proposes an architecture to store your codes, output simulations,
+results, etc.
+
+
+
+PROs :
+
+-   any model possible, if you can write it !
+-   possible to iterate over parameter with pretty pipes
+-   parallel possible, because you choose what you use
+-   stores all results in the storage with increasing depth:
+
+  - *files*
+  
+    -   *name_of_model*
+    
+        -   *name_of_first_param\_value*
+        
+            -   *name_of2nd_param\_value ... model.Rdata* out :
+                stores all sims
+                
+                -   *r?.Rdata*
+
+CONs :
+
+-   Not an usual way to code in R, and not easy to explain. create the
+    directory with the "create" function. Then, add the different
+    functions, methods, models... in the corresponding files.
+-   Mixes the code of the package/template with your own code.
+-   stores all results in this neat way BUT if too many parameters, may exceed the depth allowed.
+
