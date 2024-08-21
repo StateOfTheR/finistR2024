@@ -51,10 +51,11 @@ But, this remains limited and to have full flexibility, ones need to build its o
 
 We observe a sample $Y_1,\dots, Y_n$ of i.i.d. random variables having a negative binomial distribution with parameter $p \in [0, 1]$ and $\theta \in \mathbb{R}_+^*$.
 Formally, for $i \in \lbrace 1,\dots, n\rbrace$, and $k \in \mathbb{N}$, we have that:
-$$
-\mathbb{P}\left(Y_i = k \vert p, \theta\right) = \frac{\Gamma(k + \theta)}{k!\Gamma(\theta)}p^\theta(1 - p)^k\,.
 
 $$
+\mathbb{P}\left(Y_i = k \vert p, \theta\right) = \frac{\Gamma(k + \theta)}{k!\Gamma(\theta)}p^\theta(1 - p)^k\,.
+$$
+
 Let's simulate data from this model with $n = 100, p = 0.4$ and $\theta = 12$:
 ```{r}
 #| label: example1_data
@@ -66,7 +67,7 @@ Our goal is to estimate $p$ and $\theta$ from these observations, within a Bayes
 For this tutorial, we assume the following priors:
 \begin{align*}
 \theta &\sim \mathcal{E}(0.1)\,,\\
-p &\sim \mathcal{U}\left[0, 1\right]\.
+p &\sim \mathcal{U}\left[0, 1\right]\,.\\
 \end{align*}
 
 ## Defining a negative binomial model in `nimble`
@@ -451,23 +452,26 @@ make_MCMC_comparison_pages(res, modelName = 'code_neg_bin',dir = "/tmp/",
 
 ```
 
-# A multivariate example
+# Another example: multivariate normal with zero inflated component
 
-We consider a multivariate Gaussian model with zero inflation, where the probability in the zero inflation can depend on the variable.
+We consider a multivariate Gaussian model with zero inflation, where the probability in the zero inflation can depend on the variable. The vector of observations $Y_i$ lives in $\mathbb{R}^p$, and its distribution is defined conditionnally on a (multivariate) Bernoulli $W_i \in {0,1}^p$ and a multivariate Gaussian variable $Z_i\in\mathbb{R}^p$: 
 
 \begin{equation}
     \begin{array}{rcl}
-    Y_{ij} | W_{i} & = & W_{ij} \delta_0 + (1 - W_{ij}) \, \mathcal{N}\left(\mu_j, \Omega^{-1} \right) \\
+    Y_{ij} | Z_i, W_{i} & = & W_{ij} \delta_0 + (1 - W_{ij}) Z_{ij}\\
     W_{i} & \sim & \otimes_j \mathcal{B}(\pi_j) \\
+    Z_i & \sim \, \mathcal{N}\left(\mu, \Omega^{-1} \right) \\
     \end{array}
 \end{equation}
 
+The parameters to estimate are $\theta = \{\mu, \Omega, \pi\}$.
+
 ## Data generation
 
-We consider a simple settings in dimension $p=5$, with Toeplitz-like covariance. Here are some data (100 points):
+We consider a simple settings in dimension $p=5$, with Toeplitz-like covariance. 
 
 ```{r}
-#| label: data-generation
+#| label: data-settings
 
 N <- 100
 p <- 5
@@ -477,15 +481,20 @@ Sigma <- Dsqrt %*% toeplitz(0.75^(0:(p-1))) %*% Dsqrt
 Omega <- solve(Sigma)
 mu <- 5 + 1:p
 pi <- c(0.25, 0, 0.8, 0.1, .5)
+```
 
+Here are some data (100 points):
+
+```{r, warnings=FALSE, message=FALSE}
+#| label: data-generation
 W <- t(replicate(N, rbinom(p, prob = pi, size = 1)))
 Y <- (1 - W) * rmvnorm(N, mu, Sigma)
-hist(Y)
+ggplot(data.frame(y = c(Y))) + aes(x=y) + geom_histogram()
 ```
 
 ## Auxiliary functions 
 
-We need some auxialiry function to handle the density and generation of the random binomial vector $W$:
+We need some auxiliary `nimble` functions to handle the density and generation of the random binomial vector $W$:
 
 ```{r}
 #| label: vector-binomial
@@ -531,7 +540,7 @@ ZInormal_code <- nimbleCode({
     w[i, 1:p] ~ dbinom_vector(onep[1:p], zeroProb[1:p])
     z[i, 1:p] ~ dmnorm(mean[1:p], prec[1:p,1:p])
     ytilde[i, 1:p] <- (1 - w[i,1:p]) * z[i,1:p]
-    ## Pierre Barbillon a une astuce en zero 
+    ## P. Barbillon/M.-P. Étienne: astuce en zero 
     ## a.k.a "I got a trick at zero"
     y[i, 1:p] ~ dmnorm(ytilde[i, 1:p], prec_inf[1:p,1:p])
   }
@@ -539,13 +548,15 @@ ZInormal_code <- nimbleCode({
 })
 ```
 
-We can now define the `Nimble` model for the ZI-normal model. We give some sound intial values for the parameters and latent variable, define some constants and provide the data:
+We can now define the `nimble` model for the ZI-normal model. We give some sound intial values for the parameters and latent variable, define some constants and provide the data:
 
 ```{r}
 #| label: ZInormal-model
 ZInormal_model <- nimbleModel(
   ZInormal_code, 
-  constants = list(N = N, p = p, Ip = diag(1,p,p), onep = rep(1,p), prec_inf = diag(1e5,p,p)),
+  constants = 
+    list(N = N, p = p, Ip = diag(1,p,p),
+         onep = rep(1,p), prec_inf = diag(1e5,p,p)),
   data = list(y = Y, w = W),
   inits = list(mean = rep(5,p), prec = diag(1,p,p), zeroProb=rep(0.5,p), z = Y))
 ```
@@ -575,12 +586,22 @@ ggs(my_MCMC) %>% filter(stringr::str_detect(Parameter, "mean")) %>%
   ggplot() + aes(x = Iteration, color = factor(Chain), y = value) + facet_wrap(~Parameter) + geom_line()
 ```
 
+```{r}
+#| label: true-mean
+print(mu)
+```
+
 ```{r echo=FALSE}
 #| label: posterior-zeroProb
 #| fig-cap: 'Estimation of the zero inflation probabilities $\pi$'
 
 ggs(my_MCMC) %>% filter(stringr::str_detect(Parameter, "zeroProb")) %>% 
   ggplot() + aes(x = Iteration, color = factor(Chain), y = value) + facet_wrap(~Parameter) + geom_line()
+```
+
+```{r}
+#| label: true-pi
+print(pi)
 ```
 
 ```{r echo=FALSE}
@@ -590,3 +611,131 @@ ggs(my_MCMC) %>% filter(stringr::str_detect(Parameter, "zeroProb")) %>%
 ggs(my_MCMC) %>% filter(stringr::str_detect(Parameter, "prec")) %>% 
   ggplot() + aes(x = Iteration, color = factor(Chain), y = value) + facet_wrap(~Parameter) + geom_line()
 ```
+
+```{r}
+#| label: true-precision
+print(round(Omega,3))
+```
+
+
+# Zero inflated multivariate normal revisited
+
+All the above code uses a workaround to avoid defining a new distribution in Nimble which is a ZI multivariate normal.
+
+Let $Y$ be a random vector.
+We denote $\mathbf{i}_*$ the set of indexes for which $Y$ is non zero, and $\mathbf{i}_0$ the set of indices for which $Y$ is 0.
+
+For the zero inflated normal distribution, the p.d.f. is given by:
+$$
+p(y \vert \mu, \Sigma, \pi) = \varphi(y_{\mathbf{i}_*}\vert \mu_{\mathbf{i}_*}, \Sigma_{\mathbf{i}_*;\mathbf{i}_*})\prod_{j\in \mathbf{i_0}}\pi_j \prod_{k\in \mathbf{i}_*}(1 - \pi_k)\,,
+$$
+where $\varphi(y_{\mathbf{i}_*}\vert \mu_{\mathbf{i}_*}, \Sigma_{\mathbf{i}_*;\mathbf{i}_*})$ is the p.d.f. of a multivariate normal distribution restricted to the indexes where $y$ is non 0 (and to the corresponding parameters).
+This distribution can be coded as a `nimbleFunction`.
+It is important here that the first argument must correspond to the value at which the density is evaluated, and that the `log` argument is mandatory.
+
+```{r}
+#| label: dZInormal
+dZInormal <- nimbleFunction(
+  run = function(x = double(1),
+                 prob = double(1),
+                 mu = double(1),
+                 sigma = double(2),
+                 log = integer(0, default = 0)){
+    returnType(double(0))
+    non_nul_indexes <- which(x!=0)
+    nul_indexes <- which(x == 0)
+    p_term <- sum(log(prob[nul_indexes])) +
+      sum(log(1 - prob[non_nul_indexes])) 
+    mu_term <- 0
+    if(length(non_nul_indexes) > 0){
+      chol_mat <- chol(sigma[non_nul_indexes, non_nul_indexes])
+      restricted_x = x[non_nul_indexes]
+      restricted_mu = mu[non_nul_indexes]
+      mu_term <- dmnorm_chol(restricted_x,
+                             restricted_mu,
+                             chol_mat, prec_param = FALSE, log = TRUE)
+    }
+    log_output <- p_term + mu_term
+    if(log){
+      return(log_output)
+    }
+    else{
+      return(exp(log_output))
+    }
+  }
+)
+```
+
+From my experience, it is better to register this distribution to avoid any confusion about its parameters, nature and dimension of output, etc...
+
+```{r}
+registerDistributions(list(
+  dZInormal = list(BUGSdist = "dZInormal(prob, mu, sigma)", # How to call in nimble
+                   discrete = FALSE, # Distribution is not discrete
+                   pqAvail = FALSE, # CDF and quantile function are not available
+                   types = c('value = double(1)', # The random variable is a vector
+                             'prob = double(1)', # a vector
+                             'mu = double(1)', # vector
+                             'sigma = double(2)')) # double(2) is a matrix
+))
+```
+
+Note that it tells us that we do not provide any way of simulating from this distribution. This is not a problem to run a standard MCMC. 
+Moreover, providing CDF and quantile function could allow some gain in efficiency (at least, that what the help pages says).
+
+The code for the model is then direct:
+
+```{r}
+my_code <- nimbleCode({
+  for(j in 1:p){
+    prob[j] ~ dunif(0, 1)
+    mu[j] ~ dnorm(0, 1)
+  }
+  sigma[1:p, 1:p] ~ dwish(Ip[1:p, 1:p], p)
+  for(i in 1:n){
+    # I put my custom distribution
+    Y[i, 1:p] ~ dZInormal(prob[1:p], mu[1:p], sigma[1:p, 1:p])
+  }
+})
+```
+
+And now, let's run it!
+
+
+```{r}
+# Generating data
+set.seed(123)
+n_obs <- 1000
+n_species <- 3
+# Values
+U <- mixtools::rmvnorm(n = n_obs, 
+                       mu = 0:(n_species - 1), 
+                       sigma = diag(1, n_species))
+# Mask (matrix of zeros and ones)
+Z <- rbinom(n = n_obs * n_species, size = 1, prob = .8) %>% 
+  matrix(nrow = n_obs)
+# Observations
+Y <- round(U * Z, 9)
+
+
+
+my_model <- nimbleModel(code = my_code,
+                        constants = list(p = n_species,
+                                         n = n_obs,
+                                         Ip = diag(1, n_species)),
+                        data = list(Y = Y),
+                        inits = list(mu = rep(0, n_species),
+                                     prob = rep(0.5, n_species),
+                                     sigma = diag(1, n_species)))
+results <- nimbleMCMC(my_model,
+                      samplesAsCodaMCMC = TRUE,
+                      nchains = 2, niter = 10000,
+                      nburnin = 1000, thin = 10)
+
+ggs(results) %>% 
+  ggplot(aes(x = Iteration, y = value, color = factor(Chain))) +
+  facet_wrap(~Parameter, scales = "free") +
+  geom_line()
+```
+
+
