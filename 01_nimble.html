@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Baptiste Alglave">
+<meta name="author" content="Julien Chiquet">
+<meta name="author" content="Pierre Gloaguen">
+<meta name="author" content="Emily Walker">
+
+<title>Finist’R 2024 - Introduction to nimble</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Finist’R 2024</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/StateOfTheR/finistR2024"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./instructions.html"> 
+<span class="menu-text">Instructions</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-algorithme" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Algorithme</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-algorithme">    
+        <li>
+    <a class="dropdown-item" href="./01_nimble.html">
+ <span class="dropdown-text">Initiation à <code>Nimble</code></span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-themes-to-be-developped" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Themes to be developped</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-themes-to-be-developped">    
+        <li>
+    <a class="dropdown-item" href="./theme.qmd">
+ <span class="dropdown-text">List to discussed</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#required-packages-for-this-tutorial" id="toc-required-packages-for-this-tutorial" class="nav-link active" data-scroll-target="#required-packages-for-this-tutorial">Required packages for this tutorial</a></li>
+  <li><a href="#short-presentation-of-nimble" id="toc-short-presentation-of-nimble" class="nav-link" data-scroll-target="#short-presentation-of-nimble">Short presentation of <code>nimble</code></a></li>
+  <li><a href="#fitting-a-model-in-a-bayesian-framework-with-nimble" id="toc-fitting-a-model-in-a-bayesian-framework-with-nimble" class="nav-link" data-scroll-target="#fitting-a-model-in-a-bayesian-framework-with-nimble">Fitting a model in a bayesian framework with nimble</a>
+  <ul class="collapse">
+  <li><a href="#toy-model" id="toc-toy-model" class="nav-link" data-scroll-target="#toy-model">Toy model</a></li>
+  <li><a href="#defining-a-negative-binomial-model-in-nimble" id="toc-defining-a-negative-binomial-model-in-nimble" class="nav-link" data-scroll-target="#defining-a-negative-binomial-model-in-nimble">Defining a negative binomial model in <code>nimble</code></a></li>
+  <li><a href="#defining-the-nimble-model" id="toc-defining-the-nimble-model" class="nav-link" data-scroll-target="#defining-the-nimble-model">Defining the nimble model</a></li>
+  <li><a href="#basic-mcmc-sampling" id="toc-basic-mcmc-sampling" class="nav-link" data-scroll-target="#basic-mcmc-sampling">Basic MCMC sampling</a></li>
+  <li><a href="#exploring-the-results" id="toc-exploring-the-results" class="nav-link" data-scroll-target="#exploring-the-results">Exploring the results</a>
+  <ul class="collapse">
+  <li><a href="#package-for-automatic-formatting-of-results" id="toc-package-for-automatic-formatting-of-results" class="nav-link" data-scroll-target="#package-for-automatic-formatting-of-results">Package for automatic formatting of results</a></li>
+  </ul></li>
+  <li><a href="#defining-a-nimblefunction" id="toc-defining-a-nimblefunction" class="nav-link" data-scroll-target="#defining-a-nimblefunction">Defining a <code>nimbleFunction</code></a>
+  <ul class="collapse">
+  <li><a href="#alternative-parameterization-of-the-negative-binomial" id="toc-alternative-parameterization-of-the-negative-binomial" class="nav-link" data-scroll-target="#alternative-parameterization-of-the-negative-binomial">Alternative parameterization of the negative binomial</a></li>
+  </ul></li>
+  <li><a href="#defining-new-distribution" id="toc-defining-new-distribution" class="nav-link" data-scroll-target="#defining-new-distribution">Defining new distribution</a></li>
+  <li><a href="#alternative-mcmc-sampler" id="toc-alternative-mcmc-sampler" class="nav-link" data-scroll-target="#alternative-mcmc-sampler">Alternative MCMC sampler</a></li>
+  <li><a href="#conjuguate-priors" id="toc-conjuguate-priors" class="nav-link" data-scroll-target="#conjuguate-priors">Conjuguate priors</a></li>
+  <li><a href="#hmc-algorithm" id="toc-hmc-algorithm" class="nav-link" data-scroll-target="#hmc-algorithm">HMC algorithm</a></li>
+  <li><a href="#the-laplace-approximation" id="toc-the-laplace-approximation" class="nav-link" data-scroll-target="#the-laplace-approximation">The laplace approximation</a></li>
+  <li><a href="#comparing-mcmc-algorithms" id="toc-comparing-mcmc-algorithms" class="nav-link" data-scroll-target="#comparing-mcmc-algorithms">Comparing MCMC algorithms</a></li>
+  </ul></li>
+  <li><a href="#another-example-multivariate-normal-with-zeri-inflated-component" id="toc-another-example-multivariate-normal-with-zeri-inflated-component" class="nav-link" data-scroll-target="#another-example-multivariate-normal-with-zeri-inflated-component">Another example: multivariate normal with zeri inflated component</a>
+  <ul class="collapse">
+  <li><a href="#data-generation" id="toc-data-generation" class="nav-link" data-scroll-target="#data-generation">Data generation</a></li>
+  <li><a href="#auxiliary-functions" id="toc-auxiliary-functions" class="nav-link" data-scroll-target="#auxiliary-functions">Auxiliary functions</a></li>
+  <li><a href="#nimble-code-and-model-for-zi-normal-v1" id="toc-nimble-code-and-model-for-zi-normal-v1" class="nav-link" data-scroll-target="#nimble-code-and-model-for-zi-normal-v1">Nimble code and model for ZI-normal: V1</a></li>
+  <li><a href="#mcmc-estimation" id="toc-mcmc-estimation" class="nav-link" data-scroll-target="#mcmc-estimation">MCMC estimation</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Introduction to <code>nimble</code></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Authors</div>
+    <div class="quarto-title-meta-contents">
+             <p>Baptiste Alglave </p>
+             <p>Julien Chiquet </p>
+             <p>Pierre Gloaguen </p>
+             <p>Emily Walker </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="required-packages-for-this-tutorial" class="level1 unnumbered">
+<h1 class="unnumbered">Required packages for this tutorial</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(compareMCMCs)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggmcmc)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mvtnorm)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nimble)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nimbleHMC)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="short-presentation-of-nimble" class="level1">
+<h1>Short presentation of <code>nimble</code></h1>
+<p>First, a very good reference: https://r-nimble.org/html_manual/cha-welcome-nimble.html</p>
+<p>The <code>nimble</code> package is:</p>
+<ul>
+<li>A system for writing statistical models flexibly (based on <code>bugs</code> and <code>jags</code>).</li>
+<li>A library of inference algorithms (MCMC, HMC, Laplace approximation).</li>
+<li>A compiler that generates and compiles C++ for your models and algorithms without knowing it is C++.</li>
+</ul>
+<p>There is a <code>nimble</code> language with the basics for building statistical models (e.g.&nbsp;the key probability distributions, some key transformation functions).</p>
+<p>But, this remains limited and to have full flexibility, ones need to build its own functions, which <strong>can be very challenging</strong>.</p>
+</section>
+<section id="fitting-a-model-in-a-bayesian-framework-with-nimble" class="level1">
+<h1>Fitting a model in a bayesian framework with nimble</h1>
+<section id="toy-model" class="level2">
+<h2 class="anchored" data-anchor-id="toy-model">Toy model</h2>
+<p>We observe a sample <span class="math inline">\(Y_1,\dots, Y_n\)</span> of i.i.d. random variables having a negative binomial distribution with parameter <span class="math inline">\(p \in [0, 1]\)</span> and <span class="math inline">\(\theta \in \mathbb{R}_+^*\)</span>. Formally, for <span class="math inline">\(i \in \lbrace 1,\dots, n\rbrace\)</span>, and <span class="math inline">\(k \in \mathbb{N}\)</span>, we have that:</p>
+<p><span class="math display">\[
+\mathbb{P}\left(Y_i = k \vert p, \theta\right) = \frac{\Gamma(k + \theta)}{k!\Gamma(\theta)}p^\theta(1 - p)^k\,.
+\]</span></p>
+<p>Let’s simulate data from this model with <span class="math inline">\(n = 100, p = 0.4\)</span> and <span class="math inline">\(\theta = 12\)</span>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co">#&nbsp;For reproducibility</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>data_ex1 <span class="ot">&lt;-</span> <span class="fu">rnbinom</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">prob =</span> <span class="fl">0.4</span>, <span class="at">size =</span> <span class="dv">12</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Our goal is to estimate <span class="math inline">\(p\)</span> and <span class="math inline">\(\theta\)</span> from these observations, within a Bayesian framework. For this tutorial, we assume the following priors: <span class="math display">\[\begin{align*}
+\theta &amp;\sim \mathcal{E}(0.1)\,,\\
+p &amp;\sim \mathcal{U}\left[0, 1\right]\,.\\
+\end{align*}\]</span></p>
+</section>
+<section id="defining-a-negative-binomial-model-in-nimble" class="level2">
+<h2 class="anchored" data-anchor-id="defining-a-negative-binomial-model-in-nimble">Defining a negative binomial model in <code>nimble</code></h2>
+<p>Basically, as in <code>BUGS</code>or <code>JAGS</code>, the user’s role is to write the way to simulate the data and to give the prior distributions of the unkown. This is done within the <code>nimbleCode</code> function. This function will typically need to use built-in distributions that can be seen in the native documentation. All random variables must be assigned using the <code>~</code> symbol while deterministic quantities are assigned using the <code>&lt;-</code> or <code>=</code> as in <code>R</code>. Overall, the syntax is quite similar to <code>R</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>code_neg_bin <span class="ot">&lt;-</span> <span class="fu">nimbleCode</span>({</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Observation model</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){<span class="co"># n is never defined before, it will be a constant</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    y[i] <span class="sc">~</span> <span class="fu">dnbinom</span>(prob, theta)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># PRIORS</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  prob <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  theta <span class="sc">~</span> <span class="fu">dexp</span>(<span class="fl">0.1</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note that in this code, nothing distinguishes observed data from unknown (or latent variables). The order of lines has no importance as everything will be compiled afterwards.</p>
+</section>
+<section id="defining-the-nimble-model" class="level2">
+<h2 class="anchored" data-anchor-id="defining-the-nimble-model">Defining the nimble model</h2>
+<p>Now that the code exists, we define the model. That’s here that data and constants will be provided. Typically, data are quantities which are considered as realizations of random variables in the code, while constants are not.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>model_neg_bin <span class="ot">&lt;-</span> <span class="fu">nimbleModel</span>(<span class="at">code =</span> code_neg_bin, </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">name =</span> <span class="st">"Negative binomial"</span>, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">constants =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">length</span>(data_ex1)),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">data =</span> <span class="fu">list</span>(<span class="at">y =</span> data_ex1))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Defining model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Building model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Setting data and initial values</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Running calculate on model
+  [Note] Any error reports that follow may simply reflect missing values in model variables.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Checking model sizes and dimensions</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  [Note] This model is not fully initialized. This is not an error.
+         To see which variables are not initialized, use model$initializeInfo().
+         For more information on model initialization, see help(modelInitialization).</code></pre>
+</div>
+</div>
+<p>Note that the code points that we did not give initial guesses (which would typically be starting points for MCMC sampling algorithms). We will do it in the sampling step.</p>
+</section>
+<section id="basic-mcmc-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="basic-mcmc-sampling">Basic MCMC sampling</h2>
+<p>A direct way to proceed is to use the <code>nimbleMCMC</code> function that provides basic Metropolis Hastings within Gibbs sampling.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>posterior_samples_neg_bin <span class="ot">&lt;-</span> <span class="fu">nimbleMCMC</span>(model_neg_bin,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">inits =</span> <span class="fu">list</span>(<span class="at">prob =</span> <span class="fl">0.5</span>, <span class="at">theta =</span> <span class="dv">1</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">nchains =</span> <span class="dv">2</span>, <span class="co"># Number of independent chains </span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">niter =</span> <span class="dv">10000</span>, <span class="co"># Number of it. per chain</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">thin =</span> <span class="dv">10</span>, <span class="co"># Thinning</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">nburnin =</span> <span class="dv">1000</span>) <span class="co"># Number of initial iterations discarded</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 1...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 2...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+</div>
+</section>
+<section id="exploring-the-results" class="level2">
+<h2 class="anchored" data-anchor-id="exploring-the-results">Exploring the results</h2>
+<p>Now that we have performed MCMC sampling, we can access the results, which are lists (one element per chain) of matrices having <span class="math inline">\(n_{\text{iter}}\)</span> rows and <span class="math inline">\(n_{\text{parameters}}\)</span> columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(posterior_samples_neg_bin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>List of 2
+ $ chain1: num [1:900, 1:2] 0.334 0.328 0.333 0.334 0.315 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : NULL
+  .. ..$ : chr [1:2] "prob" "theta"
+ $ chain2: num [1:900, 1:2] 0.343 0.363 0.379 0.336 0.352 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : NULL
+  .. ..$ : chr [1:2] "prob" "theta"</code></pre>
+</div>
+</div>
+<p>To perform any post processing or plotting results, a bit of formatting must be done.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>formatted_results <span class="ot">&lt;-</span> <span class="fu">imap_dfr</span>(posterior_samples_neg_bin, </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                              <span class="cf">function</span>(x, nm){</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">as.data.frame</span>(x) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">rowid_to_column</span>(<span class="at">var =</span> <span class="st">"Iteration"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">mutate</span>(<span class="at">Chain =</span> <span class="fu">str_remove</span>(nm, <span class="st">"chain"</span>))</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                              }) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span><span class="fu">c</span>(<span class="st">"Iteration"</span>, <span class="st">"Chain"</span>),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"Parameter"</span>, </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"value"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can then perform usual plots.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(formatted_results) <span class="sc">+</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> Iteration,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> value, <span class="at">color =</span> Chain) <span class="sc">+</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Parameter, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Sample ID"</span>, <span class="at">y =</span> <span class="st">"Parameter value"</span>, <span class="at">color =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_nimble_files/figure-html/plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="package-for-automatic-formatting-of-results" class="level3">
+<h3 class="anchored" data-anchor-id="package-for-automatic-formatting-of-results">Package for automatic formatting of results</h3>
+<p>For <code>ggplot</code>users, the <code>ggmcmc</code> package provide useful tools for plots and formatting of MCMC outputs in <code>R</code> (not necessarily for the <code>nimble</code> package). This package is suited for any <code>coda</code> object, which is an historic format for MCMC outputs in <code>R</code>. We can specify during the sampling that we want outputs to be in <code>coda</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>posterior_samples_neg_bin <span class="ot">&lt;-</span> <span class="fu">nimbleMCMC</span>(model_neg_bin, </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">nchains =</span> <span class="dv">2</span>, </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">niter =</span> <span class="dv">10000</span>, </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">thin =</span> <span class="dv">10</span>, </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">nburnin =</span> <span class="dv">1000</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">samplesAsCodaMCMC =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 1...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 2...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+</div>
+<p>We can see that this modifies the type of output:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(posterior_samples_neg_bin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>List of 2
+ $ chain1: 'mcmc' num [1:900, 1:2] 0.286 0.31 0.301 0.304 0.348 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : NULL
+  .. ..$ : chr [1:2] "prob" "theta"
+  ..- attr(*, "mcpar")= num [1:3] 1 900 1
+ $ chain2: 'mcmc' num [1:900, 1:2] 0.398 0.412 0.419 0.429 0.433 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : NULL
+  .. ..$ : chr [1:2] "prob" "theta"
+  ..- attr(*, "mcpar")= num [1:3] 1 900 1
+ - attr(*, "class")= chr "mcmc.list"</code></pre>
+</div>
+</div>
+<p>Now, we can use the <code>ggs</code>function which performs the post processing that we made above.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>formatted_results <span class="ot">&lt;-</span> <span class="fu">ggs</span>(posterior_samples_neg_bin)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>formatted_results <span class="co"># same as above</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3,600 × 4
+   Iteration Chain Parameter value
+       &lt;int&gt; &lt;int&gt; &lt;fct&gt;     &lt;dbl&gt;
+ 1         1     1 prob      0.286
+ 2         2     1 prob      0.310
+ 3         3     1 prob      0.301
+ 4         4     1 prob      0.304
+ 5         5     1 prob      0.348
+ 6         6     1 prob      0.325
+ 7         7     1 prob      0.308
+ 8         8     1 prob      0.346
+ 9         9     1 prob      0.358
+10        10     1 prob      0.383
+# ℹ 3,590 more rows</code></pre>
+</div>
+</div>
+<p>Then, everything works as before!.</p>
+</section>
+</section>
+<section id="defining-a-nimblefunction" class="level2">
+<h2 class="anchored" data-anchor-id="defining-a-nimblefunction">Defining a <code>nimbleFunction</code></h2>
+<p>What makes <code>nimble</code>’s popularity is it suitability for statistical programming.</p>
+<p>As your specific model will certainly requires specific functions, we cannot expect to find all our tools in the built-in function.</p>
+<p>However, we can define new functions in a syntax which is pretty similar to <code>R</code>.</p>
+<section id="alternative-parameterization-of-the-negative-binomial" class="level3">
+<h3 class="anchored" data-anchor-id="alternative-parameterization-of-the-negative-binomial">Alternative parameterization of the negative binomial</h3>
+<p>Suppose now we want to perform negative binomial regression. In this context, we model the expectation (typically through a link to some covariates) of the response variable. Typically, if we denote, for all <span class="math inline">\(1\leq i \leq n\)</span>, <span class="math inline">\(\mu = \mathbb{E}\left[Y_i\right]\)</span>, we assume the following prior:</p>
+<p><span class="math display">\[
+\ln \mu \sim \mathcal{N}\left(0, 1\right)\,.
+\]</span> Sadly, in <code>nimble</code>, we do not have access to an implementation of the negative binomial distribution parameterized by <span class="math inline">\((\mu,  \theta)\)</span>. However, we know that: <span class="math display">\[
+\mu = \theta \times \frac{1 - p}{p}\,,
+\]</span> or, equivalently, that: <span class="math display">\[
+p = \frac{\theta}{\theta + \mu}
+\]</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>get_p_from_mu <span class="ot">&lt;-</span> <span class="fu">nimbleFunction</span>(</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">run =</span> <span class="cf">function</span>(<span class="at">mu =</span> <span class="fu">double</span>(<span class="dv">0</span>),</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">theta =</span> <span class="fu">double</span>(<span class="dv">0</span>)) { <span class="co"># type declarations</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">returnType</span>(<span class="fu">double</span>(<span class="dv">0</span>))  <span class="co"># return type declaration</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    output <span class="ot">&lt;-</span> theta <span class="sc">/</span> (theta <span class="sc">+</span> mu)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(output)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="fu">get_p_from_mu</span>(<span class="dv">18</span>, <span class="dv">12</span>) <span class="co"># Works as a usual R function</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>code_alternatif <span class="ot">&lt;-</span> <span class="fu">nimbleCode</span>({</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Observation model</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){<span class="co"># n is never defined before, it will be a constant</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    y[i] <span class="sc">~</span> <span class="fu">dnbinom</span>(prob, theta)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Alternative vectorized formulation </span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># y[1:n] ~ dnbinom(prob, theta)</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># PRIORS</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  log_mu <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  theta <span class="sc">~</span> <span class="fu">dexp</span>(<span class="fl">0.1</span>)</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Quantites deterministes</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>  mu <span class="ot">&lt;-</span> <span class="fu">exp</span>(log_mu)</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  prob <span class="ot">&lt;-</span> <span class="fu">get_p_from_mu</span>(<span class="at">mu =</span> mu, <span class="at">theta =</span> theta)</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>model_alternatif <span class="ot">&lt;-</span> <span class="fu">nimbleModel</span>(<span class="at">code =</span> code_alternatif, </span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>                                <span class="at">name =</span> <span class="st">"Alternative negative binomial"</span>, </span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>                                <span class="at">constants =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">length</span>(data_ex1)),</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>                                <span class="at">data =</span> <span class="fu">list</span>(<span class="at">y =</span> data_ex1),</span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>                                <span class="at">inits =</span> <span class="fu">list</span>(<span class="at">mu =</span> <span class="fl">0.5</span>, <span class="at">theta =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Defining model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Building model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Setting data and initial values</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Running calculate on model
+  [Note] Any error reports that follow may simply reflect missing values in model variables.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Checking model sizes and dimensions</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  [Note] This model is not fully initialized. This is not an error.
+         To see which variables are not initialized, use model$initializeInfo().
+         For more information on model initialization, see help(modelInitialization).</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>posterior_samples_alternatif <span class="ot">&lt;-</span> <span class="fu">nimbleMCMC</span>(model_alternatif, </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">nchains =</span> <span class="dv">2</span>, </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">niter =</span> <span class="dv">10000</span>, </span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">thin =</span> <span class="dv">10</span>, </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">nburnin =</span> <span class="dv">1000</span>,</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">monitors =</span> <span class="fu">c</span>(<span class="st">"prob"</span>, <span class="st">"theta"</span>),</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">samplesAsCodaMCMC =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 1...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 2...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="defining-new-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="defining-new-distribution">Defining new distribution</h2>
+<p>An alternative is to define a new distribution.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>dmynegbin <span class="ot">&lt;-</span> <span class="fu">nimbleFunction</span>(</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">run =</span> <span class="cf">function</span>(<span class="at">x =</span> <span class="fu">double</span>(<span class="dv">0</span>), </span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">mu =</span> <span class="fu">double</span>(<span class="dv">0</span>),</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">theta =</span> <span class="fu">double</span>(<span class="dv">0</span>),</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">log =</span> <span class="fu">integer</span>(<span class="dv">0</span>, <span class="at">default =</span> <span class="dv">0</span>)) {</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">returnType</span>(<span class="fu">double</span>(<span class="dv">0</span>))</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    prob <span class="ot">=</span> <span class="fu">get_p_from_mu</span>(mu, theta)</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>    output <span class="ot">&lt;-</span> <span class="fu">dnbinom</span>(x, <span class="at">size =</span> theta, <span class="at">prob =</span> prob, <span class="at">log =</span> log)</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(output)</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDistributions</span>(<span class="fu">list</span>(</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">dmynegbin =</span> <span class="fu">list</span>(<span class="at">BUGSdist =</span> <span class="st">"dmynegbin(mu, theta)"</span>,</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>                   <span class="at">discrete =</span> <span class="cn">TRUE</span>, <span class="at">pqAvail =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  [Warning] Random generation function for dmynegbin is not available. NIMBLE is generating a placeholder function, rmynegbin, that will invoke an error if an algorithm needs to simulate from this distribution. Some algorithms (such as random-walk Metropolis MCMC sampling) will work without the ability to simulate from the distribution.  If simulation is needed, provide a nimbleFunction (with no setup code) to do it.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>code_with_my_dist <span class="ot">&lt;-</span> <span class="fu">nimbleCode</span>({</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Observation model</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){<span class="co"># n is never defined before, it will be a constant</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    y[i] <span class="sc">~</span> <span class="fu">dmynegbin</span>(mu, theta) <span class="co"># my distribution</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># PRIORS</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  log_mu <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  mu <span class="ot">&lt;-</span> <span class="fu">exp</span>(log_mu)</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>  theta <span class="sc">~</span> <span class="fu">dexp</span>(<span class="fl">0.1</span>)</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>model_with_my_dist <span class="ot">&lt;-</span> <span class="fu">nimbleModel</span>(<span class="at">code =</span> code_with_my_dist, </span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">name =</span> <span class="st">"Alternative negative binomial"</span>, </span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">constants =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">length</span>(data_ex1)),</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">y =</span> data_ex1),</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">inits =</span> <span class="fu">list</span>(<span class="at">log_mu =</span> <span class="fl">0.5</span>, <span class="at">theta =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Defining model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Building model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Setting data and initial values</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Running calculate on model
+  [Note] Any error reports that follow may simply reflect missing values in model variables.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Checking model sizes and dimensions</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compileNimble</span>(model_with_my_dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Derived CmodelBaseClass created by buildModelInterface for model Alternative negative binomial</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>posterior_samples_alternatif <span class="ot">&lt;-</span> <span class="fu">nimbleMCMC</span>(model_with_my_dist, </span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">nchains =</span> <span class="dv">2</span>, </span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">niter =</span> <span class="dv">10000</span>, </span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">thin =</span> <span class="dv">10</span>, </span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">nburnin =</span> <span class="dv">1000</span>, </span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">monitors =</span> <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"theta"</span>),</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">samplesAsCodaMCMC =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 1...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 2...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>posterior_samples_alternatif <span class="sc">%&gt;%</span> </span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggs</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> Iteration,</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> value, <span class="at">color =</span> <span class="fu">factor</span>(Chain)) <span class="sc">+</span></span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Parameter, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Iteration"</span>, <span class="at">y =</span> <span class="st">"Parameter value"</span>, <span class="at">color =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_nimble_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="alternative-mcmc-sampler" class="level2">
+<h2 class="anchored" data-anchor-id="alternative-mcmc-sampler">Alternative MCMC sampler</h2>
+<p>One big strength of <code>nimble</code> are the several samplers that are available in the package.</p>
+</section>
+<section id="conjuguate-priors" class="level2">
+<h2 class="anchored" data-anchor-id="conjuguate-priors">Conjuguate priors</h2>
+<p>First, nimble is able to identify conjugate priors and make the exact computation of the posterior <a href="https://r-nimble.org/html_manual/cha-mcmc.html#conjugate-gibbs-samplers">link</a>.</p>
+</section>
+<section id="hmc-algorithm" class="level2">
+<h2 class="anchored" data-anchor-id="hmc-algorithm">HMC algorithm</h2>
+<p><code>nimble</code> provides support for Hamiltonian Monte Carlo (HMC) and compute the derivatives of the likelihood through automatic differentiation. The <code>nimbleHMC</code> package implement two versions of No-U-Turn (NUTS) HMC sampling: the standard one developed in Hoffman and Gelman (<a href="https://jmlr.org/papers/volume15/hoffman14a/hoffman14a.pdf">link</a>) and an updated one with improved adaptation routines and convergence criteria, which matches the HMC sampler of <code>STAN</code>.</p>
+<p>In order to allow an algorithm to use AD for a specific model, that model must be created with <code>buildDerivs = TRUE</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build model with nimble</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>model_neg_bin_HMC <span class="ot">&lt;-</span> <span class="fu">nimbleModel</span>(<span class="at">code =</span> code_neg_bin, </span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">name =</span> <span class="st">"Negative binomial"</span>, </span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">constants =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">length</span>(data_ex1)),</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">data =</span> <span class="fu">list</span>(<span class="at">y =</span> data_ex1),</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">inits =</span> <span class="fu">list</span>(<span class="at">prob =</span> <span class="fl">0.5</span>, <span class="at">theta =</span> <span class="dv">1</span>),</span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">calculate =</span> <span class="cn">FALSE</span>, <span class="at">buildDerivs =</span> <span class="cn">TRUE</span>) <span class="co"># This is the line required for running HMC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Defining model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Building model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Setting data and initial values</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Checking model sizes and dimensions</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>C_model_neg_bin_HMC <span class="ot">&lt;-</span> <span class="fu">compileNimble</span>(model_neg_bin_HMC) <span class="co"># Compile the model (they require this for the compilation of the HMC object)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the MCMC algorithm which applies HMC sampling</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>HMC <span class="ot">&lt;-</span> <span class="fu">buildHMC</span>(C_model_neg_bin_HMC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>===== Monitors =====
+thin = 1: prob, theta
+===== Samplers =====
+NUTS sampler (1)
+  - prob, theta </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Careful here, when the model has random effects</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a><span class="co"># HMC requires to set values in the model before running the algorithm</span></span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a><span class="co"># One solution is to simulate with the model and set the model with these values</span></span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a><span class="co"># See : https://r-nimble.org/html_manual/cha-mcmc.html#subsec:HMC-example</span></span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Here, as the model is simple, there is no need for this and everything is handled withing nimble/nimbleHMC</span></span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Then everything is standard in nimble</span></span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a>CHMC <span class="ot">&lt;-</span> <span class="fu">compileNimble</span>(HMC) <span class="co"># Compile the HMC model/algo</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">runMCMC</span>(CHMC, <span class="at">niter =</span> <span class="dv">1000</span>, <span class="at">nburnin =</span> <span class="dv">500</span>) <span class="co"># Short run for illustration</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 1...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [Note] NUTS sampler (nodes: prob, theta) is using 500 warmup iterations.
+         Since `warmupMode` is 'default' and `nburnin` &gt; 0,
+         the number of warmup iterations is equal to `nburnin`.
+         The burnin samples will be discarded, and all samples returned will be post-warmup.
+|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(coda<span class="sc">::</span><span class="fu">as.mcmc</span>(samples)) <span class="co"># Summary of the estimates</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Iterations = 1:500
+Thinning interval = 1 
+Number of chains = 1 
+Sample size per chain = 500 
+
+1. Empirical mean and standard deviation for each variable,
+   plus standard error of the mean:
+
+         Mean      SD Naive SE Time-series SE
+prob   0.3714 0.04763  0.00213       0.005035
+theta 10.9433 2.20934  0.09880       0.232706
+
+2. Quantiles for each variable:
+
+       2.5%    25%     50%     75%   97.5%
+prob  0.284 0.3349  0.3756  0.4048  0.4671
+theta 7.074 9.2270 10.7757 12.3756 15.7634</code></pre>
+</div>
+</div>
+<p>And there are plenty of others samplers:</p>
+<ul>
+<li><p>Particle filters / sequential Monte Carlo and iterated filtering (package <code>nimbleSMC</code>)</p></li>
+<li><p>Monte Carlo Expectation Maximization (MCEM)</p></li>
+</ul>
+<p>See <a href="https://r-nimble.org/html_manual/cha-algos-provided.html#cha-algos-provided">link</a></p>
+</section>
+<section id="the-laplace-approximation" class="level2">
+<h2 class="anchored" data-anchor-id="the-laplace-approximation">The laplace approximation</h2>
+<p><code>nimble</code> also implements the Laplace approximation. But be careful, it performs maximum likelihood estimation. This is not the same as <code>INLA</code> (fully bayesian approach), but more like <code>TMB</code> (or <code>glmmTMB</code>- maximum likelihood estimation through Laplace approximation and automatic differentiation).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We need the derivatives to build the Laplace algorithm</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="co"># so we take the object model_neg_bin_HMC built previously</span></span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>model_laplace <span class="ot">&lt;-</span> <span class="fu">buildLaplace</span>(model_neg_bin_HMC)</span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>Cmodel_laplace <span class="ot">&lt;-</span> <span class="fu">compileNimble</span>(model_laplace)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the Laplace approximation for one set of parameter values.</span></span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>Cmodel_laplace<span class="sc">$</span><span class="fu">calcLaplace</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -1499.737</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Get the corresponding gradient.</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>Cmodel_laplace<span class="sc">$</span><span class="fu">gr_Laplace</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -3552.0000   409.7602</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Search the (approximate) MLE</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>MLE <span class="ot">&lt;-</span> Cmodel_laplace<span class="sc">$</span><span class="fu">findMLE</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>)) <span class="co"># Find the (approximate) MLE.</span></span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>MLE<span class="sc">$</span>par</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  0.366619 10.569421</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get log-likelihood value</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>MLE<span class="sc">$</span>value</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -333.2813</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="co"># And output summaries</span></span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>Cmodel_laplace<span class="sc">$</span><span class="fu">summary</span>(MLE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>nimbleList object of type AGHQuad_summary
+Field "params":
+nimbleList object of type AGHQuad_params
+Field "names":
+[1] "prob"  "theta"
+Field "estimates":
+[1]  0.366619 10.569421
+Field "stdErrors":
+[1] 0.05242939 2.35119020
+Field "randomEffects":
+nimbleList object of type AGHQuad_params
+Field "names":
+character(0)
+Field "estimates":
+numeric(0)
+Field "stdErrors":
+numeric(0)
+Field "vcov":
+&lt;0 x 0 matrix&gt;
+Field "scale":
+[1] "original"</code></pre>
+</div>
+</div>
+<p>N.b this example is only for illustration of the code. The Laplace approximation is relevant only when there are random effects in the model (which is not the case here).</p>
+<p>For a full example see <a href="https://r-nimble.org/html_manual/cha-AD.html#sec:AD-laplace">link</a></p>
+</section>
+<section id="comparing-mcmc-algorithms" class="level2">
+<h2 class="anchored" data-anchor-id="comparing-mcmc-algorithms">Comparing MCMC algorithms</h2>
+<p>One can compare several algorithms through the package <code>compareMCMCs</code>. It is possible to compare several algorithms internal to <code>nimble</code> with those from <code>jags</code> (or even <code>STAN</code>) algorithms. An example below for <code>nimble</code> and <code>STAN</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This model code will be used for both nimble and JAGS</span></span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>modelInfo <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">code =</span> code_neg_bin,</span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">constants =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="fu">length</span>(data_ex1)),</span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">y =</span> data_ex1),</span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">inits =</span> <span class="fu">list</span>(<span class="at">prob =</span> <span class="fl">0.5</span>, <span class="at">theta =</span> <span class="dv">1</span>)</span>
+<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-9"><a href="#cb92-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Here is a custom MCMC configuration function for nimble</span></span>
+<span id="cb92-10"><a href="#cb92-10" aria-hidden="true" tabindex="-1"></a>configure_nimble_slice <span class="ot">&lt;-</span> <span class="cf">function</span>(model) {</span>
+<span id="cb92-11"><a href="#cb92-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">configureMCMC</span>(model, <span class="at">onlySlice =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb92-12"><a href="#cb92-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb92-13"><a href="#cb92-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-14"><a href="#cb92-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Here is the call to compareMCMCs</span></span>
+<span id="cb92-15"><a href="#cb92-15" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">compareMCMCs</span>(modelInfo,</span>
+<span id="cb92-16"><a href="#cb92-16" aria-hidden="true" tabindex="-1"></a>                    <span class="at">MCMCs =</span> <span class="fu">c</span>(<span class="st">'nimble'</span>,       <span class="co"># nimble with default samplers</span></span>
+<span id="cb92-17"><a href="#cb92-17" aria-hidden="true" tabindex="-1"></a>                              <span class="st">'nimble_slice'</span> <span class="co"># nimble with slice samplers</span></span>
+<span id="cb92-18"><a href="#cb92-18" aria-hidden="true" tabindex="-1"></a>                              ),</span>
+<span id="cb92-19"><a href="#cb92-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">nimbleMCMCdefs =</span> </span>
+<span id="cb92-20"><a href="#cb92-20" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">list</span>(<span class="at">nimble_slice =</span> <span class="st">'configure_nimble_slice'</span>),</span>
+<span id="cb92-21"><a href="#cb92-21" aria-hidden="true" tabindex="-1"></a>                    <span class="at">MCMCcontrol =</span> <span class="fu">list</span>(<span class="at">inits =</span> <span class="fu">list</span>(<span class="at">prob =</span> <span class="fl">0.5</span>, <span class="at">theta =</span> <span class="dv">1</span>),</span>
+<span id="cb92-22"><a href="#cb92-22" aria-hidden="true" tabindex="-1"></a>                                       <span class="at">niter =</span> <span class="dv">10000</span>,</span>
+<span id="cb92-23"><a href="#cb92-23" aria-hidden="true" tabindex="-1"></a>                                       <span class="at">burnin =</span> <span class="dv">1000</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>building nimble model...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Defining model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Building model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Setting data and initial values</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Running calculate on model
+  [Note] Any error reports that follow may simply reflect missing values in model variables.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Checking model sizes and dimensions</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>===== Monitors =====
+thin = 1: prob, theta
+===== Samplers =====
+RW sampler (2)
+  - prob
+  - theta
+===== Monitors =====
+thin = 1: prob, theta
+===== Samplers =====
+slice sampler (2)
+  - prob
+  - theta</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|
+|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_MCMC_comparison_pages</span>(res, <span class="at">modelName =</span> <span class="st">'code_neg_bin'</span>,<span class="at">dir =</span> <span class="st">"/tmp/"</span>,</span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">control =</span> <span class="fu">list</span>(<span class="at">res =</span> <span class="dv">75</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required namespace: xtable</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="another-example-multivariate-normal-with-zeri-inflated-component" class="level1">
+<h1>Another example: multivariate normal with zeri inflated component</h1>
+<p>We consider a multivariate Gaussian model with zero inflation, where the probability in the zero inflation can depend on the variable. The vector of observations <span class="math inline">\(Y_i\)</span> lives in <span class="math inline">\(\mathbb{R}^p\)</span>, and its distribution is defined conditionnally on a (multivariate) Bernoulli <span class="math inline">\(W_i \in {0,1}^p\)</span> and a multivariate Gaussian variable <span class="math inline">\(Z_i\in\mathbb{R}^p\)</span>:</p>
+<p><span class="math display">\[\begin{equation}
+    \begin{array}{rcl}
+    Y_{ij} | Z_i, W_{i} &amp; = &amp; W_{ij} \delta_0 + (1 - W_{ij}) Z_{ij}\\
+    W_{i} &amp; \sim &amp; \otimes_j \mathcal{B}(\pi_j) \\
+    Z_i &amp; \sim \, \mathcal{N}\left(\mu, \Omega^{-1} \right) \\
+    \end{array}
+\end{equation}\]</span></p>
+<p>The parameters to estimate are <span class="math inline">\(\theta = \{\mu, \Omega, \pi\}\)</span>.</p>
+<section id="data-generation" class="level2">
+<h2 class="anchored" data-anchor-id="data-generation">Data generation</h2>
+<p>We consider a simple settings in dimension <span class="math inline">\(p=5\)</span>, with Toeplitz-like covariance.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span>p</span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>Dsqrt <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="fu">sqrt</span>(d))</span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>Sigma <span class="ot">&lt;-</span> Dsqrt <span class="sc">%*%</span> <span class="fu">toeplitz</span>(<span class="fl">0.75</span><span class="sc">^</span>(<span class="dv">0</span><span class="sc">:</span>(p<span class="dv">-1</span>))) <span class="sc">%*%</span> Dsqrt</span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>Omega <span class="ot">&lt;-</span> <span class="fu">solve</span>(Sigma)</span>
+<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="dv">5</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">:</span>p</span>
+<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a>pi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.25</span>, <span class="dv">0</span>, <span class="fl">0.8</span>, <span class="fl">0.1</span>, .<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here are some data (100 points):</p>
+<div class="cell" data-warnings="false">
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">replicate</span>(N, <span class="fu">rbinom</span>(p, <span class="at">prob =</span> pi, <span class="at">size =</span> <span class="dv">1</span>)))</span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> W) <span class="sc">*</span> <span class="fu">rmvnorm</span>(N, mu, Sigma)</span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">y =</span> <span class="fu">c</span>(Y))) <span class="sc">+</span> <span class="fu">aes</span>(<span class="at">x=</span>y) <span class="sc">+</span> <span class="fu">geom_histogram</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_nimble_files/figure-html/data-generation-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="auxiliary-functions" class="level2">
+<h2 class="anchored" data-anchor-id="auxiliary-functions">Auxiliary functions</h2>
+<p>We need some auxiliary <code>nimble</code> functions to handle the density and generation of the random binomial vector <span class="math inline">\(W\)</span>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>dbinom_vector <span class="ot">&lt;-</span> <span class="fu">nimbleFunction</span>(</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">run =</span> <span class="cf">function</span>( <span class="at">x =</span> <span class="fu">double</span>(<span class="dv">1</span>),</span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">size =</span> <span class="fu">double</span>(<span class="dv">1</span>),</span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">prob =</span> <span class="fu">double</span>(<span class="dv">1</span>), </span>
+<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">log =</span> <span class="fu">integer</span>(<span class="dv">0</span>, <span class="at">default =</span> <span class="dv">0</span>)</span>
+<span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a>  ) {</span>
+<span id="cb107-7"><a href="#cb107-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">returnType</span>(<span class="fu">double</span>(<span class="dv">0</span>))</span>
+<span id="cb107-8"><a href="#cb107-8" aria-hidden="true" tabindex="-1"></a>    logProb <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dbinom</span>(x, <span class="at">prob =</span> prob, <span class="at">size =</span> size, <span class="at">log =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb107-9"><a href="#cb107-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(log) <span class="fu">return</span>(logProb) <span class="cf">else</span> <span class="fu">return</span>(<span class="fu">exp</span>(logProb))</span>
+<span id="cb107-10"><a href="#cb107-10" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb107-11"><a href="#cb107-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-12"><a href="#cb107-12" aria-hidden="true" tabindex="-1"></a>rbinom_vector <span class="ot">&lt;-</span> <span class="fu">nimbleFunction</span>(</span>
+<span id="cb107-13"><a href="#cb107-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">run =</span> <span class="cf">function</span>( <span class="at">n =</span> <span class="fu">integer</span>(<span class="dv">0</span>, <span class="at">default =</span> <span class="dv">1</span>),</span>
+<span id="cb107-14"><a href="#cb107-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">size =</span> <span class="fu">double</span>(<span class="dv">1</span>),</span>
+<span id="cb107-15"><a href="#cb107-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">prob =</span> <span class="fu">double</span>(<span class="dv">1</span>)</span>
+<span id="cb107-16"><a href="#cb107-16" aria-hidden="true" tabindex="-1"></a>  ) {</span>
+<span id="cb107-17"><a href="#cb107-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">returnType</span>(<span class="fu">double</span>(<span class="dv">1</span>))</span>
+<span id="cb107-18"><a href="#cb107-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">rbinom</span>(<span class="fu">length</span>(size), <span class="at">prob =</span> prob, <span class="at">size =</span> size))</span>
+<span id="cb107-19"><a href="#cb107-19" aria-hidden="true" tabindex="-1"></a>  })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="nimble-code-and-model-for-zi-normal-v1" class="level2">
+<h2 class="anchored" data-anchor-id="nimble-code-and-model-for-zi-normal-v1">Nimble code and model for ZI-normal: V1</h2>
+<p>Rather than defining a probability density function for this model (which is in fact a bit complicated…), we adopt a generative approach:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>ZInormal_code <span class="ot">&lt;-</span> <span class="fu">nimbleCode</span>({</span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p) {</span>
+<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>    mean[j] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>,<span class="dv">1</span>)  </span>
+<span id="cb108-5"><a href="#cb108-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb108-6"><a href="#cb108-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p) {</span>
+<span id="cb108-7"><a href="#cb108-7" aria-hidden="true" tabindex="-1"></a>    zeroProb[j] <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb108-8"><a href="#cb108-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb108-9"><a href="#cb108-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb108-10"><a href="#cb108-10" aria-hidden="true" tabindex="-1"></a>  prec[<span class="dv">1</span><span class="sc">:</span>p,<span class="dv">1</span><span class="sc">:</span>p] <span class="sc">~</span> <span class="fu">dwish</span>(Ip[<span class="dv">1</span><span class="sc">:</span>p,<span class="dv">1</span><span class="sc">:</span>p], p)</span>
+<span id="cb108-11"><a href="#cb108-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb108-12"><a href="#cb108-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) {</span>
+<span id="cb108-13"><a href="#cb108-13" aria-hidden="true" tabindex="-1"></a>    w[i, <span class="dv">1</span><span class="sc">:</span>p] <span class="sc">~</span> <span class="fu">dbinom_vector</span>(onep[<span class="dv">1</span><span class="sc">:</span>p], zeroProb[<span class="dv">1</span><span class="sc">:</span>p])</span>
+<span id="cb108-14"><a href="#cb108-14" aria-hidden="true" tabindex="-1"></a>    z[i, <span class="dv">1</span><span class="sc">:</span>p] <span class="sc">~</span> <span class="fu">dmnorm</span>(mean[<span class="dv">1</span><span class="sc">:</span>p], prec[<span class="dv">1</span><span class="sc">:</span>p,<span class="dv">1</span><span class="sc">:</span>p])</span>
+<span id="cb108-15"><a href="#cb108-15" aria-hidden="true" tabindex="-1"></a>    ytilde[i, <span class="dv">1</span><span class="sc">:</span>p] <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> w[i,<span class="dv">1</span><span class="sc">:</span>p]) <span class="sc">*</span> z[i,<span class="dv">1</span><span class="sc">:</span>p]</span>
+<span id="cb108-16"><a href="#cb108-16" aria-hidden="true" tabindex="-1"></a>    <span class="do">## P. Barbillon/M.-P. Étienne: astuce en zero </span></span>
+<span id="cb108-17"><a href="#cb108-17" aria-hidden="true" tabindex="-1"></a>    <span class="do">## a.k.a "I got a trick at zero"</span></span>
+<span id="cb108-18"><a href="#cb108-18" aria-hidden="true" tabindex="-1"></a>    y[i, <span class="dv">1</span><span class="sc">:</span>p] <span class="sc">~</span> <span class="fu">dmnorm</span>(ytilde[i, <span class="dv">1</span><span class="sc">:</span>p], prec_inf[<span class="dv">1</span><span class="sc">:</span>p,<span class="dv">1</span><span class="sc">:</span>p])</span>
+<span id="cb108-19"><a href="#cb108-19" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb108-20"><a href="#cb108-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb108-21"><a href="#cb108-21" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can now define the <code>nimble</code> model for the ZI-normal model. We give some sound intial values for the parameters and latent variable, define some constants and provide the data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>ZInormal_model <span class="ot">&lt;-</span> <span class="fu">nimbleModel</span>(</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>  ZInormal_code, </span>
+<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">constants =</span> </span>
+<span id="cb109-4"><a href="#cb109-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">N =</span> N, <span class="at">p =</span> p, <span class="at">Ip =</span> <span class="fu">diag</span>(<span class="dv">1</span>,p,p),</span>
+<span id="cb109-5"><a href="#cb109-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">onep =</span> <span class="fu">rep</span>(<span class="dv">1</span>,p), <span class="at">prec_inf =</span> <span class="fu">diag</span>(<span class="fl">1e5</span>,p,p)),</span>
+<span id="cb109-6"><a href="#cb109-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">y =</span> Y, <span class="at">w =</span> W),</span>
+<span id="cb109-7"><a href="#cb109-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">inits =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">5</span>,p), <span class="at">prec =</span> <span class="fu">diag</span>(<span class="dv">1</span>,p,p), <span class="at">zeroProb=</span><span class="fu">rep</span>(<span class="fl">0.5</span>,p), <span class="at">z =</span> Y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Defining model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  [Note] Registering 'dbinom_vector' as a distribution based on its use in BUGS code. If you make changes to the nimbleFunctions for the distribution, you must call 'deregisterDistributions' before using the distribution in BUGS code for those changes to take effect.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Building model</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Setting data and initial values</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Running calculate on model
+  [Note] Any error reports that follow may simply reflect missing values in model variables.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Checking model sizes and dimensions</code></pre>
+</div>
+</div>
+</section>
+<section id="mcmc-estimation" class="level2">
+<h2 class="anchored" data-anchor-id="mcmc-estimation">MCMC estimation</h2>
+<p>Let us run a simple 2-chain MCMC estimation</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>my_MCMC <span class="ot">&lt;-</span> <span class="fu">nimbleMCMC</span>(</span>
+<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>  ZInormal_model, </span>
+<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">monitors =</span> <span class="fu">c</span>(<span class="st">"mean"</span>, <span class="st">"prec"</span>, <span class="st">"zeroProb"</span>),</span>
+<span id="cb116-4"><a href="#cb116-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">nchains =</span> <span class="dv">2</span>, </span>
+<span id="cb116-5"><a href="#cb116-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">niter =</span> <span class="dv">1000</span>, </span>
+<span id="cb116-6"><a href="#cb116-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">samplesAsCodaMCMC =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb116-7"><a href="#cb116-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">nburnin=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 1...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>running chain 2...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>|-------------|-------------|-------------|-------------|
+|-------------------------------------------------------|</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="01_nimble_files/figure-html/posterior-mean-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Estimation of the mean <span class="math inline">\(\mu\)</span></figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(mu)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  6  7  8  9 10</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="01_nimble_files/figure-html/posterior-zeroProb-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Estimation of the zero inflation probabilities <span class="math inline">\(\pi\)</span></figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.25 0.00 0.80 0.10 0.50</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="01_nimble_files/figure-html/posterior-prec-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Estimation of the precision matrix <span class="math inline">\(\Omega\)</span></figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">round</span>(Omega,<span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       [,1]   [,2]   [,3]   [,4]   [,5]
+[1,]  2.286 -1.212  0.000  0.000  0.000
+[2,] -1.212  1.786 -0.700  0.000  0.000
+[3,]  0.000 -0.700  1.190 -0.495  0.000
+[4,]  0.000  0.000 -0.495  0.893 -0.383
+[5,]  0.000  0.000  0.000 -0.383  0.457</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
