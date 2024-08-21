@@ -141,6 +141,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="./01_nimble.html">
  <span class="dropdown-text">Initiation à <code>Nimble</code></span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="./c_python.html">
+ <span class="dropdown-text">C++ depuis Python</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -519,7 +523,7 @@ We use the dataset KarateClub() which is organized as the typical object used by
 <span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, M)</span>
 <span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>plt.imshow(m[np.argsort(W1),:][:,np.argsort(W2)],cmap<span class="op">=</span><span class="st">"gray_r"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;matplotlib.image.AxesImage object at 0x7fb8606fe680&gt;</code></pre>
+<pre><code>&lt;matplotlib.image.AxesImage object at 0x7f20dd4005b0&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>edge_index <span class="op">=</span> torch.LongTensor(([np.where(m)[<span class="dv">0</span>],np.where(m)[<span class="dv">1</span>]]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -650,7 +654,7 @@ We use the dataset KarateClub() which is organized as the typical object used by
 </div>
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"AUC 2 : "</span>,roc_auc_score(W2[test_mask2],y_pred2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>AUC 2 :  0.9</code></pre>
+<pre><code>AUC 2 :  0.7</code></pre>
 </div>
 </div>
 </section>
@@ -845,17 +849,17 @@ We use the dataset KarateClub() which is organized as the typical object used by
 <div class="cell-output cell-output-stdout">
 <pre><code>
   0%|          | 0/20 [00:00&lt;?, ?it/s]
- 15%|#5        | 3/20 [00:00&lt;00:00, 21.45it/s]
- 30%|###       | 6/20 [00:00&lt;00:00, 21.32it/s]
- 45%|####5     | 9/20 [00:00&lt;00:00, 21.48it/s]
- 60%|######    | 12/20 [00:00&lt;00:00, 21.38it/s]
- 75%|#######5  | 15/20 [00:00&lt;00:00, 21.35it/s]
- 90%|######### | 18/20 [00:00&lt;00:00, 21.53it/s]
-100%|##########| 20/20 [00:00&lt;00:00, 21.46it/s]</code></pre>
+ 15%|#5        | 3/20 [00:00&lt;00:00, 20.73it/s]
+ 30%|###       | 6/20 [00:00&lt;00:00, 21.10it/s]
+ 45%|####5     | 9/20 [00:00&lt;00:00, 21.03it/s]
+ 60%|######    | 12/20 [00:00&lt;00:00, 20.89it/s]
+ 75%|#######5  | 15/20 [00:00&lt;00:00, 21.05it/s]
+ 90%|######### | 18/20 [00:00&lt;00:00, 21.20it/s]
+100%|##########| 20/20 [00:00&lt;00:00, 21.12it/s]</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>plt.plot(loss_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[&lt;matplotlib.lines.Line2D object at 0x7fb852a11e40&gt;]</code></pre>
+<pre><code>[&lt;matplotlib.lines.Line2D object at 0x7f20ce9a3a90&gt;]</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>loader_train <span class="op">=</span> DataLoader(data_train, batch_size<span class="op">=</span><span class="bu">len</span>(data_train))</span>
 <span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> batch <span class="kw">in</span> loader_train:</span>
