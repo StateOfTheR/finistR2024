@@ -11,13 +11,17 @@ website:
       - text: "Instructions"
         href: instructions.qmd
     right:
+      - text: Algorithme
+        menu:
+        - text: Initiation à `Nimble`
+          href: 01_nimble.qmd
+        - text: C++ depuis Python
+          href: c_python.qmd
       - text: Themes to be developped
         menu:
         - text: List to discussed
           href: theme.qmd
         aria-label: GitHub
-
-
 format:
   html:
     theme: flatly
