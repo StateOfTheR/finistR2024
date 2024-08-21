@@ -1,0 +1,92 @@
+---
+title: "Packaging et test"
+lang: fr
+format: html
+toc: true
+---
+
+## Sources
+
+-   [R Packages (2e)](https://r-pkgs.org/)
+
+Un package est un projet (`.Rproj`) versionné `usethis::use_git()`. On peut contrôler l'environnement avec `{renv}`.
+
+:warning: sur windows il faut installer [RTools](https://cran.r-project.org/bin/windows/Rtools/) (la bonne version)
+
+### Créer un package
+
+``` r
+usethis::create_package("~/path/to/mypkg")
+```
+
+-   `.Rbuildignore` liste des fichiers ignoré pour le build
+-   `.gitignore`
+-   `DESCRIPTION` package metadata
+-   `NAMESPACE`import et export des fonctions
+-   `R` main folder
+-   `mypkg.Rproj`
+
+### Versionning
+
+``` r
+usethis::use_git()
+```
+
+### Écrire des fonctions
+
+``` r
+usethis::use_r(name)
+```
+
+Les fonctions sont définies dans des fichiers `R/name.R`.
+
+Pour prévoir la documentation, il est essentiel d'utiliser `roxygen2` (*Code \> Insert Roxygen Skeleton*).
+
+``` txt
+#' Add together two numbers
+#' 
+#' @param x A number.
+#' @param y A number.
+#' @returns A numeric vector.
+#' @examples
+#' add(1, 1)
+#' add(10, 1)
+add <- function(x, y) {
+  x + y
+}
+```
+
+Pour contrôler les @imports dans le Roxygen Skeleton, on peut utiliser [`{autoimport}`](https://github.com/DanChaltiel/autoimport)
+
+### Check
+
+``` r
+check()
+```
+
+``` txt
+── R CMD check results ─────────────────── mypgk 0.0.0.9000 ────
+Duration: 8.4s
+
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+```
+
+Si le *check* est bon, on peut installer le package :
+
+``` r
+devtools::install()
+```
+
+## Tests
+
+``` r
+usethis::use_testthat()
+
+usethis::use_test()
+
+devtools::test()
+```
+
+## Aller plus loin
+
+-   [D'autres tests avant soumission](https://github.com/ThinkR-open/prepare-for-cran)
