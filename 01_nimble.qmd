@@ -51,10 +51,11 @@ But, this remains limited and to have full flexibility, ones need to build its o
 
 We observe a sample $Y_1,\dots, Y_n$ of i.i.d. random variables having a negative binomial distribution with parameter $p \in [0, 1]$ and $\theta \in \mathbb{R}_+^*$.
 Formally, for $i \in \lbrace 1,\dots, n\rbrace$, and $k \in \mathbb{N}$, we have that:
-$$
-\mathbb{P}\left(Y_i = k \vert p, \theta\right) = \frac{\Gamma(k + \theta)}{k!\Gamma(\theta)}p^\theta(1 - p)^k\,.
 
 $$
+\mathbb{P}\left(Y_i = k \vert p, \theta\right) = \frac{\Gamma(k + \theta)}{k!\Gamma(\theta)}p^\theta(1 - p)^k\,.
+$$
+
 Let's simulate data from this model with $n = 100, p = 0.4$ and $\theta = 12$:
 ```{r}
 #| label: example1_data
@@ -66,7 +67,7 @@ Our goal is to estimate $p$ and $\theta$ from these observations, within a Bayes
 For this tutorial, we assume the following priors:
 \begin{align*}
 \theta &\sim \mathcal{E}(0.1)\,,\\
-p &\sim \mathcal{U}\left[0, 1\right]\.
+p &\sim \mathcal{U}\left[0, 1\right]\,.\\
 \end{align*}
 
 ## Defining a negative binomial model in `nimble`
@@ -451,23 +452,26 @@ make_MCMC_comparison_pages(res, modelName = 'code_neg_bin',dir = "/tmp/",
 
 ```
 
-# A multivariate example
+# Another example: multivariate normal with zeri inflated component
 
-We consider a multivariate Gaussian model with zero inflation, where the probability in the zero inflation can depend on the variable.
+We consider a multivariate Gaussian model with zero inflation, where the probability in the zero inflation can depend on the variable. The vector of observations $Y_i$ lives in $\mathbb{R}^p$, and its distribution is defined conditionnally on a (multivariate) Bernoulli $W_i \in {0,1}^p$ and a multivariate Gaussian variable $Z_i\in\mathbb{R}^p$: 
 
 \begin{equation}
     \begin{array}{rcl}
-    Y_{ij} | W_{i} & = & W_{ij} \delta_0 + (1 - W_{ij}) \, \mathcal{N}\left(\mu_j, \Omega^{-1} \right) \\
+    Y_{ij} | Z_i, W_{i} & = & W_{ij} \delta_0 + (1 - W_{ij}) Z_{ij}\\
     W_{i} & \sim & \otimes_j \mathcal{B}(\pi_j) \\
+    Z_i & \sim \, \mathcal{N}\left(\mu, \Omega^{-1} \right) \\
     \end{array}
 \end{equation}
 
+The parameters to estimate are $\theta = \{\mu, \Omega, \pi\}$.
+
 ## Data generation
 
-We consider a simple settings in dimension $p=5$, with Toeplitz-like covariance. Here are some data (100 points):
+We consider a simple settings in dimension $p=5$, with Toeplitz-like covariance. 
 
 ```{r}
-#| label: data-generation
+#| label: data-settings
 
 N <- 100
 p <- 5
@@ -477,15 +481,20 @@ Sigma <- Dsqrt %*% toeplitz(0.75^(0:(p-1))) %*% Dsqrt
 Omega <- solve(Sigma)
 mu <- 5 + 1:p
 pi <- c(0.25, 0, 0.8, 0.1, .5)
+```
 
+Here are some data (100 points):
+
+```{r, warnings=FALSE, message=FALSE}
+#| label: data-generation
 W <- t(replicate(N, rbinom(p, prob = pi, size = 1)))
 Y <- (1 - W) * rmvnorm(N, mu, Sigma)
-hist(Y)
+ggplot(data.frame(y = c(Y))) + aes(x=y) + geom_histogram()
 ```
 
 ## Auxiliary functions 
 
-We need some auxialiry function to handle the density and generation of the random binomial vector $W$:
+We need some auxiliary `nimble` functions to handle the density and generation of the random binomial vector $W$:
 
 ```{r}
 #| label: vector-binomial
@@ -531,7 +540,7 @@ ZInormal_code <- nimbleCode({
     w[i, 1:p] ~ dbinom_vector(onep[1:p], zeroProb[1:p])
     z[i, 1:p] ~ dmnorm(mean[1:p], prec[1:p,1:p])
     ytilde[i, 1:p] <- (1 - w[i,1:p]) * z[i,1:p]
-    ## Pierre Barbillon a une astuce en zero 
+    ## P. Barbillon/M.-P. Étienne: astuce en zero 
     ## a.k.a "I got a trick at zero"
     y[i, 1:p] ~ dmnorm(ytilde[i, 1:p], prec_inf[1:p,1:p])
   }
@@ -539,13 +548,15 @@ ZInormal_code <- nimbleCode({
 })
 ```
 
-We can now define the `Nimble` model for the ZI-normal model. We give some sound intial values for the parameters and latent variable, define some constants and provide the data:
+We can now define the `nimble` model for the ZI-normal model. We give some sound intial values for the parameters and latent variable, define some constants and provide the data:
 
 ```{r}
 #| label: ZInormal-model
 ZInormal_model <- nimbleModel(
   ZInormal_code, 
-  constants = list(N = N, p = p, Ip = diag(1,p,p), onep = rep(1,p), prec_inf = diag(1e5,p,p)),
+  constants = 
+    list(N = N, p = p, Ip = diag(1,p,p),
+         onep = rep(1,p), prec_inf = diag(1e5,p,p)),
   data = list(y = Y, w = W),
   inits = list(mean = rep(5,p), prec = diag(1,p,p), zeroProb=rep(0.5,p), z = Y))
 ```
@@ -575,6 +586,11 @@ ggs(my_MCMC) %>% filter(stringr::str_detect(Parameter, "mean")) %>%
   ggplot() + aes(x = Iteration, color = factor(Chain), y = value) + facet_wrap(~Parameter) + geom_line()
 ```
 
+```{r}
+#| label: true-mean
+print(mu)
+```
+
 ```{r echo=FALSE}
 #| label: posterior-zeroProb
 #| fig-cap: 'Estimation of the zero inflation probabilities $\pi$'
@@ -583,10 +599,20 @@ ggs(my_MCMC) %>% filter(stringr::str_detect(Parameter, "zeroProb")) %>%
   ggplot() + aes(x = Iteration, color = factor(Chain), y = value) + facet_wrap(~Parameter) + geom_line()
 ```
 
+```{r}
+#| label: true-pi
+print(pi)
+```
+
 ```{r echo=FALSE}
 #| label: posterior-prec
 #| fig-cap: 'Estimation of the precision matrix $\Omega$'
 
 ggs(my_MCMC) %>% filter(stringr::str_detect(Parameter, "prec")) %>% 
   ggplot() + aes(x = Iteration, color = factor(Chain), y = value) + facet_wrap(~Parameter) + geom_line()
+```
+
+```{r}
+#| label: true-precision
+print(round(Omega,3))
 ```
