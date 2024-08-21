@@ -3,7 +3,7 @@ name: pr_check
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, edited]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 
@@ -20,6 +20,5 @@ jobs:
         run: |
           Rscript -e "install.packages(c('tictoc'))"
       - name: Additional Python Packages
-        run: pip install torch torch_geometric numpy scikit-learn scikit-network networkx matplotlib tqdm openpyxl pandas time
-      - name: Generate slides
+        run: pip install torch torch_geometric numpy scikit-learn scikit-network networkx matplotlib tqdm openpyxl pandas      - name: Generate slides
         run: "quarto render"
