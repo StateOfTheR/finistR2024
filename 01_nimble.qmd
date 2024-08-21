@@ -703,13 +703,15 @@ And now, let's run it!
 
 
 ```{r}
+#| label: fit-ZI-normal
+#| cache: true
 # Generating data
 set.seed(123)
 n_obs <- 1000
 n_species <- 3
 # Values
-U <- mixtools::rmvnorm(n = n_obs, 
-                       mu = 0:(n_species - 1), 
+U <- mvtnorm::rmvnorm(n = n_obs, 
+                       mean = 0:(n_species - 1), 
                        sigma = diag(1, n_species))
 # Mask (matrix of zeros and ones)
 Z <- rbinom(n = n_obs * n_species, size = 1, prob = .8) %>% 
