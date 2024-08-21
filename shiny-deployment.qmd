@@ -32,7 +32,7 @@ Ces trois outils sont dédiés au déploiement d'applications shiny via [Kuberne
 C'est ici que les trois solutions se différencient:
 
 - Pour [plmshift](https://plmshift.pages.math.cnrs.fr/), on demande également au développeur de l'application de configurer et d'administrer lui-même son instance ShinyServer, via l'interface d'OpenShift. Ces étapes sont documentées [ici](https://plmshift.pages.math.cnrs.fr/exemples_de_deploiement/deployer_shinyr/)  
-- Idem pour [Shiny-K8s](https://gitlab.pasteur.fr/hub/shiny-k8s)), avec (semble-t-il) un peu moins de compétences techniques requises. Ces étapes sont documentées [ici](https://hub.pages.pasteur.fr/shiny-k8s/user_guide/index.html)
+- Idem pour [Shiny-K8s](https://gitlab.pasteur.fr/hub/shiny-k8s), avec (semble-t-il) moins de compétences techniques requises. Ces étapes sont documentées [ici](https://hub.pages.pasteur.fr/shiny-k8s/user_guide/index.html)
 - [SK8](https://sk8.inrae.fr/) propose une interface simplifiée pour la configuration du serveur shiny, qui permet au développeur de l'application shiny spécifier directement les paramètres (RAM, CPU) sans avoir besoin de compétences en déploiement. 
 
 ## Accessibilité ?
