@@ -480,24 +480,45 @@ L'environnement va définir la version de Python ainsi que les
 packages/modules que l'on souhaite utiliser pour le projet. Par défaut
 la version de python de l'environnement nouvellement créé est la version
 de python utilisée pour créer l'environnement (ce que l'on peut vérifier
-avec `python --version`). Il reste donc à installer les packages nécessaires 
-au projet, ce qui se fait avec pip. Un exemple avec le package numpy:
+avec `python --version`). Il reste donc à installer les packages
+nécessaires au projet, ce qui se fait avec pip. Un exemple avec le
+package numpy:
+
 ```{bash}
 #| echo: true
 #| eval: false
 pip install numpy
 ```
-Il est possible de lister à tout moment les packages déjà inclus dans un projet avec l'instruction `pip list`
-Une fois l'environnement configuré, on "sort" de l'environnement avec l'instruction `deactivate`.
+
+Il est possible de lister à tout moment les packages déjà inclus dans un
+projet avec l'instruction `pip list` Une fois l'environnement configuré,
+on "sort" de l'environnement avec l'instruction `deactivate`.
 
 ### Programmer, exécuter... dans un environnement python
 
-L'environnement NomEnv étant maintenant disponible, on peut se placer dedans pour travailler et écrire nos premières lignes de code. Il suffit pour cela d'ouvrir/créer un fichier python (toujours dans VSC). 
-
+L'environnement NomEnv étant maintenant disponible, on peut se placer
+dedans pour travailler et écrire nos premières lignes de code. Il suffit
+pour cela d'ouvrir/créer un fichier python (toujours dans VSC).
 
 #### Execution en ligne de commande
 
-Tout est prêt mais l'execution du code ligne à ligne n'est pas directement accessible sur python. Pour y avoir accès il suffit d'installer le package ipython dans l'environnement python (cf paragraphe précédent) d'une part, et d'installer l'extention "iPython for VS Code" dans VSC. Une fois ces deux étapes réalisées, l'execution de la commande `iphyton` dans le terminal à l'execution en ligne.
+Tout est prêt mais l'execution du code ligne à ligne n'est pas
+directement accessible sur python. Pour y avoir accès il suffit
+d'installer le package ipython dans l'environnement python (cf
+paragraphe précédent) d'une part, et d'installer l'extention "iPython
+for VS Code" dans VSC. Une fois ces deux étapes réalisées, l'execution
+de la commande `iPython` dans le terminal à l'execution en ligne.
 
-**RMQ** 
+**REMARQUE:** Afin de retrouver la fonctionnalité d'exécution d'une
+ligne de code avec `shift + enter` dans la console de R studio, il est
+nécéssaire de modifier le fichier `settings.json` de VSC (en mode WSL).
+Pour cela, taper `ctrl + shift + P` et rechercher
+`Open User Settings (JSON)`. Rajouter à la suite des options existantes:
 
+``` json
+"python.terminal.launchArgs": [
+     "-m",
+    "IPython",
+    "--no-autoindent"
+],
+```
