@@ -19,6 +19,8 @@ jobs:
       - name: Additional R packages
         run: |
           Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
+          Rscript -e "install.packages(c('ggplot2', 'dplyr', 'simulator', 'simpr', 'simEngine', 'DT', 'withr', 'bench', 'remotes'))"
+          Rscript -e "remotes::install_github('Yu-Group/simChef')"
       - name: Additional Python packages
         run: |
           pip install torch torch_geometric 
