@@ -10,13 +10,74 @@ bibliography: references.bib
 
 We consider three options to reproduce Armand's Computo paper: @favrot2024
 
-- locally, using only `renv`
-- using `docker` + `renv`
-- using `rix`
+-   locally, using only `renv`
+-   using `docker` + `renv`
+-   using `rix`
 
-# renv
+# rig + renv
 
 # docker + renv
+
+### dockerfile
+
+``` docker
+FROM rocker/verse:4.2.2
+RUN git clone https://github.com/computorg/published-202312-favrot-hierarchical.git /home/favrot
+WORKDIR /home/favrot
+
+ARG QUARTO_VERSION="1.5.56"
+RUN curl -L -o /tmp/quarto-linux-amd64.deb https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb
+RUN sudo apt install /tmp/quarto-linux-amd64.deb
+RUN rm /tmp/quarto-linux-amd64.deb
+
+RUN quarto add --no-prompt computorg/computo-quarto-extension
+RUN Rscript -e 'renv::install("pak")'
+RUN Rscript -e 'pak::pak("rjags")'
+RUN Rscript -e 'renv::restore()'
+
+RUN quarto render
+EXPOSE 80
+
+CMD ["python3", "-m", "http.server", "80"]
+```
+
+-   We use the `rocker/verse:4.2.2` image as base image (https://rocker-project.org/images/).
+
+> Install R from source and set RSPM as default CRAN mirror\
+> Adds tidyverse packages & devtools\
+> Adds tex & publishing-related package
+
+We manually select the R version from the `renv.lock` file (this should be optimized).
+
+-   We clone the repository and set the working directory.
+
+-   We install a newest version of Quarto for the `computo-quarto-extension`.
+
+-   The `rjags` package requires specific syslibs, so we use `pak` to install it.
+
+-   We can now easily restore the environment using the lock file.
+
+-   `quarto render`
+
+-   The website is served on port 80 with Python's HTTP.
+
+### Step-by-Step
+
+1.  **Build the Docker image:**
+
+    ``` bash
+    docker build --pull --tag cmidoux/favrot .
+    ```
+
+2.  **Run the Docker container:**
+
+    ``` bash
+    docker run -p 80:80 cmidoux/favrot
+    ```
+
+3.  **Open the website:**
+
+    -   Go to <http://localhost/_site> in your web browser.
 
 # rix
 
@@ -122,11 +183,9 @@ The following objects are masked from ‘package:base’:
 
 ```
 
-
 ## Case study: reproducing Armand's Computo paper
 
 We clone the repo of the paper (in a temporary directory in order to avoid nested R projects and nested git projects)
-
 
 ```{bash, eval=FALSE}
 $ cd /tmp/
@@ -182,10 +241,10 @@ The R packages used in this publication are managed using the R package `renv`. 
 ```
 
 We save this info on disk for later use:
+
 ```{r eval=FALSE}
 saveRDS(list(version = R_version, pkgs = pkgs), file = "repro_favrot.rds")
 ```
-
 
 ```{r}
 info <- readRDS("repro_favrot.rds")
@@ -205,7 +264,7 @@ rix(
 )
 ```
 
-Note that the above triggers the following warning because an `.Rprofile``` file already exists.  In this case this file is only used by `renv` and we will not need `renv` so we do not follow the advice to 'append' and instead choose to 'overwrite':
+Note that the above triggers the following warning because an ```` .Rprofile``` file already exists.  In this case this file is only used by ````renv`and we will not need`renv\` so we do not follow the advice to 'append' and instead choose to 'overwrite':
 
 ```{r eval=FALSE}
 library("rix")
@@ -246,7 +305,6 @@ Calls: .main ... loadNamespace -> withRestarts -> withOneRestart -> doWithOneRes
 
 Execution halted
 ```
-
 
 Note that it is not possible to install packages directly from within Nix
 
