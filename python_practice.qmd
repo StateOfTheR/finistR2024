@@ -499,3 +499,5 @@ L'environnement NomEnv étant maintenant disponible, on peut se placer dedans po
 
 Tout est prêt mais l'execution du code ligne à ligne n'est pas directement accessible sur python. Pour y avoir accès il suffit d'installer le package ipython dans l'environnement python (cf paragraphe précédent) d'une part, et d'installer l'extention "iPython for VS Code" dans VSC. Une fois ces deux étapes réalisées, l'execution de la commande `iphyton` dans le terminal à l'execution en ligne.
 
+**RMQ** 
+
