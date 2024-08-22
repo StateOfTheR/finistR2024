@@ -1,0 +1,231 @@
+---
+title: "Du C++ depuis Python"
+format: html
+toc: true
+author: 
+  - Hugo Gangloff
+date: 21/08/2024
+---
+
+# FinistR : bootcamp à Roscoff
+
+## Objectifs
+
+On propose dans ce tutoriel une méthode pour l'utilisation de code C / C++
+depuis Python. Les ressources à ce sujet sont très nombreuses, aussi nous
+allons nous placer dans un cas un peu particulier et moins étudié, c'est à dire :
+
+- Nous découvrirons [bazel](https://bazel.build/) comme outil de compilation.
+- Nous utiliserons la bibliothèque
+  [pybind11_bazel](https://github.com/pybind/pybind11_bazel) et plus précisément
+  les objets [PyCapsule](https://docs.python.org/3/c-api/capsule.html) de cette
+  bibliothèque.
+- Nous ouvrirons la PyCapsule côté Python en la reconstruisant avec la
+  bibliothèque [ctypes](https://docs.python.org/3/library/ctypes.html).
+
+*Note*: Ces choix sont motivés par l'objectif à plus long terme d'étendre la
+bibliothèque
+JAX avec du code C / C++ personnel, non couvert dans ce tutoriel. Voir par
+exemple
+[https://github.com/dfm/extending-jax](https://github.com/dfm/extending-jax/tree/main?tab=readme-ov-file)
+pour l'ancienne pipeline. Depuis JAX 0.4.31 sortie le 29 juillet 2024,
+l'intégration d'appel à du code C / C++ perso a été simplifié par
+`jax.extend.ffi`, voir par exemple
+[https://jax.readthedocs.io/en/latest/ffi.html](https://jax.readthedocs.io/en/latest/ffi.html).
+
+## Arborescence du projet
+
+Nous allons travailler dans un projet structuré tel que :
+
+```bash
+c_python/
+|___bazel-bin/
+||______ ...
+|___bazel-c_python/
+||______ ...
+|___bazel-out/
+||______ ...
+|___bazel-testlogs/
+||______ ...
+|___lib/
+||______BUILD.bazel
+||______loop.cpp
+|___loop.py
+|___MODULE.bazel
+|___WORKSPACE.bazel
+```
+
+Nous allons détailler la création et le contenu de chacun des éléments de
+l'arborescence.
+
+## Installations
+
+- Nous avons besoin d'un environnement Python simple dont nous ne détaillons pas
+  l'installation.
+- Pour les utilisateurs linux, [bazelisk](https://github.com/bazelbuild/bazelisk)
+est l'approche la plus simple pour installer `bazel`.
+- `pybind11_bazel` fournira `pybind11`.
+
+## Code C++
+
+Soit le fichier `loop.cpp` :
+
+```Cpp
+#include <pybind11/pybind11.h>
+#include <cstdint>
+#include <cmath>
+
+template <typename T>
+void loop_a_lot(const std::int64_t L, T* result) {
+    *result = 0;
+    for (int l1 = 0; l1 < L; ++l1) {
+        for (int l2 = 0; l2 < L; ++l2) {
+            for (int l3 = 0; l3 < L; ++l3) {
+                for (int l4 = 0; l4 < L; ++l4) {
+                    *result += exp(3.14);
+                }
+            }
+        }
+    }
+  }
+
+pybind11::dict Registrations() {
+  pybind11::dict dict;
+  dict["loop_f32_plain"] = pybind11::capsule(reinterpret_cast<void*>(loop_a_lot<float>), "loop_plain");
+  dict["loop_f64_plain"] = pybind11::capsule(reinterpret_cast<void*>(loop_a_lot<double>), "loop_plain");
+  return dict;
+}
+
+PYBIND11_MODULE(pyloop, m) {   // please match the pybind_extension target name
+  m.def("registrations", &Registrations); 
+}
+```
+
+Les premières lignes définissent la fonction `loop_a_lot` simpliste que nous voulons appeler depuis
+Python. La deuxième partie du code utilise la bibliothèque `pybind11`. Nous
+créons un module `pyloop` auquel on donne une fonction `registrations` qui
+retournera un dictionnaire avec deux entrées : une fonction
+`loop_a_lot` pour chacun des types `float` et `double`. Au détail près que nous
+encapsulons ces fonctions dans des PyCapsules, un object Python opaque, que
+Python ne semble pas être censé lire (*...useful for C extension modules who need
+to pass an opaque value (as a `void *` pointer) through Python code to other C
+code...*
+[https://docs.python.org/3/c-api/capsule.html](https://docs.python.org/3/c-api/capsule.html))
+
+## Compilation en un module accessible depuis Python
+
+Nous donnons l'origine des règles de compilations `bazel` dans le fichier
+`WORKSPACE.bazel` :
+
+```bash
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+http_archive(
+  name = "pybind11_bazel",
+  strip_prefix = "pybind11_bazel-2.12.0",
+  urls = ["https://github.com/pybind/pybind11_bazel/archive/refs/tags/v2.12.0.zip"],
+)
+# We still require the pybind library.
+http_archive(
+  name = "pybind11",
+  build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
+  strip_prefix = "pybind11-2.13.0",
+  urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v2.13.0.zip"],
+)
+```
+
+`MODULE.bazel` contient : 
+
+```bash
+bazel_dep(name = "rules_python", version = "0.33.2")
+```
+
+Le fichier `BUILD.bazel` utilise la règle `pybind_extension` de
+`pybind11_bazel` :
+
+```bash
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension")
+
+pybind_extension(
+    name = "pyloop", # please match the PYBIND MODULE NAME
+    srcs = ["loop.cpp"],
+)
+```
+
+En se plaçant à la racine du projet et en exécutant `bazel build //lib:pyloop`
+nous obtenons directement le module Python voulu. Toute la complexité de la
+compilation est cachée par `bazel`. On voit que l'appel à `build` crée les
+quatre fichiers `bazel-bin`, `bazel-c_python`, `bazel-out` et `bazel-testlogs`.
+En particulier, le module d'intêret se situe dans `bazel-bin/lib/`.
+
+## Code Python
+
+Nous allons maintenant ouvrir les PyCapsules que nous avons à disposition dans
+le module `pyloop` fraîchement compilé, avec l'aide de la bibliothèque
+`ctypes`.
+
+- On rappelle que nous nous imposons les PyCapsules car ce sont les objets
+  que nous devons manipuler pour exposer des fonctions C / C++ à JAX (notre
+  objectif futur !). Voir par exemple
+  (https://jax.readthedocs.io/en/latest/_autosummary/jax.extend.ffi.register_ffi_target.html)[https://jax.readthedocs.io/en/latest/_autosummary/jax.extend.ffi.register_ffi_target.html].
+  
+- On note d'emblée que la manipulation de PyCapsule dans Python est
+compliquée par rapport à d'autres méthodes par lesquelles nous pouvons exposer
+des objets C / C++ à Python avec `pybind11` (voir les tutoriels dans
+[https://github.com/tdegeus/pybind11_examples](https://github.com/tdegeus/pybind11_examples)).
+En effet, ces objets ne semblent pas être voués à être utilisés dans Python.
+Ouvrir la capsule avec `ctypes` constitue néanmoins un bon exercice avec cette
+bibliothèque.
+
+
+```Python
+import sys
+sys.path.insert(0, 'bazel-bin/lib/')
+
+import ctypes
+import numpy as np
+
+import pyloop
+
+registrations = pyloop.registrations()
+
+loop_f32_plain_capsule = registrations["loop_f32_plain"]
+loop_f64_plain_capsule = registrations["loop_f64_plain"]
+
+# Following is adapted from https://stackoverflow.com/questions/59887319/python-c-extension-exposing-a-capsule-to-ctypes-in-order-to-use-third-party-c-co
+PyCapsule_GetPointer = ctypes.pythonapi.PyCapsule_GetPointer
+PyCapsule_GetPointer.restype = ctypes.c_void_p
+PyCapsule_GetPointer.argtypes = [ctypes.py_object, ctypes.c_char_p]
+
+loop_f32_plain_ptr = PyCapsule_GetPointer(loop_f32_plain_capsule, b"loop_plain")
+loop_f64_plain_ptr = PyCapsule_GetPointer(loop_f64_plain_capsule, b"loop_plain")
+
+# This defines the functions signature
+loop_f32_plain_fn_c = ctypes.CFUNCTYPE(None, ctypes.c_int64,
+        ctypes.POINTER(ctypes.c_float))(loop_f32_plain_ptr)
+
+loop_f64_plain_fn_c = ctypes.CFUNCTYPE(None, ctypes.c_int64,
+        ctypes.POINTER(ctypes.c_double))(loop_f64_plain_ptr)
+
+L = ctypes.c_int64(10)
+
+result_f32 = ctypes.c_float()
+result_f64 = ctypes.c_double()
+
+out_buf_f32 = ctypes.pointer(result_f32)
+out_buf_f64 = ctypes.pointer(result_f64)
+
+loop_f32_plain_fn_c(L, out_buf_f32)
+loop_f64_plain_fn_c(L, out_buf_f64)
+
+# Print the results
+print("Result (float):", result_f32.value)
+print("Result (double):", result_f64.value)
+```
+
+        Result (float): 231057.875
+        Result (double): 231038.66858726053
+
+
+
+
+
