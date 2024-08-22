@@ -47,3 +47,7 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+.quarto/
+01_nimble_files/
+_site/
+local_*.R
