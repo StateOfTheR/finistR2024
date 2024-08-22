@@ -1,0 +1,299 @@
+---
+title: "Reproducibility with renv, docker+renv, and rix"
+author: Armand Favrot, Cédric Midoux, Pierre Neuvial
+format: html
+editor: source
+bibliography: references.bib
+---
+
+# Introduction
+
+We consider three options to reproduce Armand's Computo paper: @favrot2024
+
+- locally, using only `renv`
+- using `docker` + `renv`
+- using `rix`
+
+# renv
+
+# docker + renv
+
+# rix
+
+## Installation
+
+First `Nix` should be installed, see [dedicated vignette](https://b-rodrigues.github.io/rix/articles/b1-setting-up-and-using-rix-on-linux-and-windows.html).
+
+Then the R package `rix` should be installed:
+
+```{r, eval=FALSE}
+install.packages("rix", repos = c(
+  "https://b-rodrigues.r-universe.dev",
+  "https://cloud.r-project.org"
+))
+```
+
+```{r}
+library(rix)
+```
+
+## Using rix to build project specific environments
+
+See [dedicated vignette](https://b-rodrigues.github.io/rix/articles/c-using-rix-to-build-project-specific-environments.html)
+
+```{r}
+path_default_nix <- "/tmp/rix-test"
+
+rix(
+  r_ver = "latest",
+  r_pkgs = c("dplyr", "ggplot2"),
+  system_pkgs = NULL,
+  git_pkgs = NULL,
+  ide = "rstudio",
+  project_path = path_default_nix,
+  overwrite = TRUE,
+  print = TRUE
+)
+```
+
+To start using this environment, open a terminal **in the folder containing default.nix** (i.e.) `r path_default_nix` and use the following Nix command:
+
+```{bash, eval=FALSE}
+cd /tmp/rix-test
+nix-build
+```
+
+::: {.callout-note collapse="true"}
+## Note: this should not be done via the Rstudio command line but from an external terminal
+
+Indeed within Rstudio this may fail with:
+
+```{bash, eval=FALSE}
+nix-build: /usr/lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.38' not found (required by nix-build)
+nix-build: /usr/lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.38' not found (required by /nix/store/4z754a0vzl98asv0pa95i5d9szw5jqbs-lowdown-1.0.2-lib/lib/liblowdown.so.3)
+nix-build: /usr/lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.38' not found (required by /nix/store/hinq0w2cd8rzw32hwz3pm3x0bvv0l0qa-nix-2.23.3/lib/libnixexpr.so)
+```
+
+whereas it works well with GLIBC_2.35 from a standard terminal. Moreover, `glibc` is a system library that should not be updated manually. See also: https://github.com/NixOS/nixpkgs/issues/287764
+:::
+
+One can then do `nix-shell` and use R from this shell:
+
+```{bash, eval=FALSE}
+$ nix-shell
+unpacking 'github:NixOS/nixpkgs/36a9aeaaa17a2d4348498275f9fe530cd4f9e519' into the Git cache...
+[nix-shell:/tmp/rix-test]$ 
+```
+
+Note that the prompt specifies that we are in a Nix session.
+
+```{bash, eval=FALSE}
+[nix-shell:/tmp/rix-test]$ R
+
+R version 4.4.1 (2024-06-14) -- "Race for Your Life"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library("dplyr")
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+```
+
+
+## Case study: reproducing Armand's Computo paper
+
+We clone the repo of the paper (in a temporary directory in order to avoid nested R projects and nested git projects)
+
+
+```{bash, eval=FALSE}
+$ cd /tmp/
+$ git clone git@github.com:computorg/published-202312-favrot-hierarchical.git
+Cloning into 'published-202312-favrot-hierarchical'...
+remote: Enumerating objects: 356, done.
+remote: Counting objects: 100% (22/22), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 356 (delta 15), reused 14 (delta 14), pack-reused 334 (from 1)
+Receiving objects: 100% (356/356), 62.41 MiB | 2.32 MiB/s, done.
+Resolving deltas: 100% (182/182), done.
+```
+
+We install the quarto extension for computo:
+
+```{bash, eval=FALSE}
+$ cd /tmp/published-202312-favrot-hierarchical
+$ quarto add computorg/computo-quarto-extension
+Quarto extensions may execute code when documents are rendered. If you do not 
+trust the authors of the extension, we recommend that you do not install or 
+use the extension.
+? Do you trust the authors of this extension (Y/n) › Yes
+[✓] Downloading
+[✓] Unzipping
+    Found 1 extension.
+
+The following changes will be made:
+Computo Format Template   [Install]   0.2.5 (formats)
+? Would you like to continue (Y/n) › Yes
+
+[✓] Copying
+[✓] Extension installation complete
+
+? View documentation using default browser? (Y/n) › n
+```
+
+::: callout-caution
+Question: how to install quarto via rix?
+:::
+
+The R packages used in this publication are managed using the R package `renv`. So we retrieve the R version and the packages listed in the `renv.lock` file:
+
+(note that this cannot be done from another project, so this command is not evaluated here):
+
+```{r eval=FALSE}
+> status <- renv::status("/tmp/published-202312-favrot-hierarchical")
+> R_version <- status$lockfile$R$Version
+> R_version
+[1] "4.2.2"
+> pkgs <- names(status$lockfile$Packages)
+> str(pkgs)
+ chr [1:110] "DBI" "MASS" "Matrix" "R6" "RColorBrewer" "askpass" ...
+```
+
+We save this info on disk for later use:
+```{r eval=FALSE}
+saveRDS(list(version = R_version, pkgs = pkgs), file = "repro_favrot.rds")
+```
+
+
+```{r}
+info <- readRDS("repro_favrot.rds")
+R_version <- info[["version"]]
+pkgs <- info[["pkgs"]]
+library(rix)
+path_default_nix <- "/tmp/published-202312-favrot-hierarchical"
+rix(
+  r_ver = R_version,
+  r_pkgs = pkgs,
+  system_pkgs = NULL,
+  git_pkgs = NULL,
+  ide = "rstudio",
+  project_path = path_default_nix,
+  overwrite = TRUE,
+  print = TRUE
+)
+```
+
+Note that the above triggers the following warning because an `.Rprofile``` file already exists.  In this case this file is only used by `renv` and we will not need `renv` so we do not follow the advice to 'append' and instead choose to 'overwrite':
+
+```{r eval=FALSE}
+library("rix")
+path_default_nix <- "/tmp/published-202312-favrot-hierarchical"
+rix_init(rprofile_action = 'overwrite', project_path = path_default_nix)
+# ### Bootstrapping isolated, project-specific, and runtime-pure R setup via Nix ###
+# ==> Existing isolated nix-R project folder:
+#  /tmp/published-202312-favrot-hierarchical 
+# 
+# * current R session running outside Nix environment and not from RStudio
+# 
+# ==> Overwrote `.Rprofile` file and code lines for new R sessions launched from:
+# /tmp/published-202312-favrot-hierarchical
+# 
+# * Added the location of the Nix store to `PATH` environmental variable for new R sessions on host/docker RStudio:
+# /nix/var/nix/profiles/default/bin> 
+```
+
+We are now ready to build and launch the corresponding Nix environment:
+
+```{bash, eval=FALSE}
+nix-build 
+nix-shell
+```
+
+And to try to render the publication:
+
+```{bash, eval=FALSE}
+[nix-shell:/tmp/published-202312-favrot-hierarchical]$quarto render
+```
+
+Unfortunately `codetools` is needed (why??) and was not specified in the `renv.lock` file, so it is missing and compilation fails:
+
+```{bash, eval=FALSE}
+Quitting from lines 343-346 (published-202312-favrot-hierarchical.qmd) 
+Error in loadNamespace(x) : there is no package called 'codetools'
+Calls: .main ... loadNamespace -> withRestarts -> withOneRestart -> doWithOneRestart
+
+Execution halted
+```
+
+
+Note that it is not possible to install packages directly from within Nix
+
+```{bash, eval=FALSE}
+> install.packages("codetools")
+Error in install.packages("codetools") : 
+  You are currently in an R session running from Nix.
+Don't install packages using install.packages(),
+add them to the default.nix file instead.
+```
+
+So we go back to the configuration of our Nix environment:
+
+```{r}
+info <- readRDS("repro_favrot.rds")
+R_version <- info[["version"]]
+pkgs <- info[["pkgs"]]
+library(rix)
+path_default_nix <- "/tmp/published-202312-favrot-hierarchical"
+rix_init(rprofile_action = 'overwrite', project_path = path_default_nix)
+rix(
+  r_ver = R_version,
+  r_pkgs = c(pkgs, "codetools"),
+  system_pkgs = NULL,
+  git_pkgs = NULL,
+  ide = "rstudio",
+  project_path = path_default_nix,
+  overwrite = TRUE,
+  print = TRUE
+)
+```
+
+and rebuild and restart the environment (fortunately the build is very fast because it only takes the missing package to be installed):
+
+```{bash, eval=FALSE}
+nix-build
+nix-shell
+```
+
+```{bash, eval=FALSE}
+[nix-shell:/tmp/published-202312-favrot-hierarchical]$ quarto render
+```
+
+... and this is a victory!
+
+```{bash, eval=FALSE}
+Output created: _site/published-202312-favrot-hierarchical.html
+```
+
+# References
