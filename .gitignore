@@ -51,3 +51,5 @@ rsconnect/
 01_nimble_files/
 _site/
 local_*.R
+
+/.quarto/
