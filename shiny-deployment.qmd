@@ -1,0 +1,61 @@
+---
+title: "Solutions institutionnelles de déploiement d'applications shiny avec kubernetes"
+author: Cédric Midoux, Pierre Neuvial, Aymeric Stamm, Emily Walker 
+editor: source
+bibliography: refs_shiny-deployment.bib
+number-sections: true
+---
+
+# Motivation
+
+- besoin de déploiement d'appli [shiny](https://shiny.posit.co/) pour utilisation sans programmation
+- solution proposée par [shinyapps.io](https://www.shinyapps.io/): limitation à 25h/mois et 5 applications concurrentes pour la version gratuite, et 1Gb de RAM. Les étapes du déploiement sont illustrées dans la @sec-shinyapps.io
+- solution proposée par Posit (anciennement par Shiny Server Pro): [PositConnect](https://posit.co/products/enterprise/connect/): payant (cher)
+- intérêt d'avoir une solution institutionnelle
+
+## Outils institutionnels existants
+
+| Outil | Institution | Références |
+|-------|------|-----------|
+| [plmshift](https://plmshift.pages.math.cnrs.fr/) | CNRS | |
+| [SK8](https://sk8.inrae.fr/) | INRAE | @maigne:hal-04141247 |
+| [Shiny-K8s](https://gitlab.pasteur.fr/hub/shiny-k8s ) | Institut Pasteur | @brancotte:pasteur-04643557 |
+
+## Préparation de l'appli au déploiement
+
+Ces trois outils sont dédiés au déploiement d'applications shiny via [Kubernetes](https://kubernetes.io/) (aka K8s). Le développeur de l'application shiny doit fournir un dépôt git contenant le code source de l'application et spécifier les dépendances (via un fichier csv dédié pour shiny-K8s et plmshift, ou automatiquement via renv pour SK8).
+
+![Etapes pour le déploiement d'une application shiny via SK8 (INRAE)](images/shinyapps-interface-01-overview.png)
+
+## Configuration du serveur shiny
+
+C'est ici que les trois solutions se différencient:
+
+- Pour [plmshift](https://plmshift.pages.math.cnrs.fr/), on demande également au développeur de l'application de configurer et d'administrer lui-même son instance ShinyServer, via l'interface d'OpenShift. Ces étapes sont documentées [ici](https://plmshift.pages.math.cnrs.fr/exemples_de_deploiement/deployer_shinyr/)  
+- Idem pour [Shiny-K8s](https://gitlab.pasteur.fr/hub/shiny-k8s), avec (semble-t-il) moins de compétences techniques requises. Ces étapes sont documentées [ici](https://hub.pages.pasteur.fr/shiny-k8s/user_guide/index.html)
+- [SK8](https://sk8.inrae.fr/) propose une interface simplifiée pour la configuration du serveur shiny, qui permet au développeur de l'application shiny spécifier directement les paramètres (RAM, CPU) sans avoir besoin de compétences en déploiement. 
+
+## Accessibilité ?
+
+[plmshift](https://plmshift.pages.math.cnrs.fr/), [SK8](https://sk8.inrae.fr/) et [Shiny-K8s](https://gitlab.pasteur.fr/hub/shiny-k8s) sont respectivement accessibles seulement pour des projets développés par le CNRS, INRAE et l'Institut Pasteur. 
+
+Aujourd'hui, SK8 semble la solution la plus simple d'utilisation pour le développeur shiny. Les paramètres de configuration sont relativement proches de ceux demandés pour le dépoiements sur shinyapps.io (voir @sec-shinyapps.io).  Afin de rendre ce type d'outil accessible à d'autres institutions qu''INRAE, on peut envisager soit l'ouverture d'un des services existants à ces institutions, soit la mise à disposition de ce type de service directement par chaque institution. Les deux solutions nécessitent des ressources matérielles et humaines; la première solution peut permettre des économies d'échelle mais peut poser des questions sur le partage des données de recherche entre institutions.
+
+## Autres ressources
+
+- [code](https://gitlab.pasteur.fr/hub/shiny-k8s-example) d'une application démo pour déploiement avec shiny-K8s
+- [présentation](https://forgemia.inra.fr/elisemaigne/slides/presentation_sk8_rr2024) d'Elise Maigné aux rencontres R 2024
+
+## Etapes du déploiement d'une application shiny via shinyapps.io {#sec-shinyapps.io}
+
+![Vue d'ensemble](images/shinyapps-interface-01-overview.png)
+
+![Configuration: paramètres de base](images/shinyapps-interface-02-params-basic.png)
+
+![Configuration: paramètres avancés](images/shinyapps-interface-03-params-advanced.png)
+
+![Statistiques d'utilisation](images/shinyapps-interface-04-metrics.png)
+
+
+
+## Bibliographie
