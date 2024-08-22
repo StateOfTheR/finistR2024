@@ -17,7 +17,6 @@ toc: true
 library(ggplot2)
 library(simulator)
 library(simpr)
-library(DeclareDesign)
 library(simChef)
 library(SimEngine)
 ```
@@ -610,6 +609,14 @@ the depth allowed.
 
 ::::
 
+```{r simulator-dir-remove}
+#| include: false
+if (file.exists(simulator_dir))
+  unlink(simulator_dir, recursive = TRUE)
+if (file.exists("files"))
+  unlink("files", recursive = TRUE)
+```
+
 ## [{**simEngine**}](https://cran.r-project.org/web/packages/SimEngine/vignettes/SimEngine.html)
 
 [{**simEngine**}](https://cran.r-project.org/web/packages/SimEngine/vignettes/SimEngine.html)
@@ -987,3 +994,9 @@ cannot debug a strange simulation result.
 :::
 
 ::::
+
+```{r simchef-dir-remove}
+#| include: false
+if (file.exists("results"))
+  unlink("results", recursive = TRUE)
+```
