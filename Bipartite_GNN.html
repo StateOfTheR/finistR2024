@@ -139,11 +139,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-algorithme">    
         <li>
     <a class="dropdown-item" href="./01_nimble.html">
- <span class="dropdown-text">Initiation à <code>Nimble</code></span></a>
+ <span class="dropdown-text">Initiation à Nimble</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./python_practice.qmd">
- <span class="dropdown-text">Un bon départ avec <code>Python</code></span></a>
+ <span class="dropdown-text">Un bon départ avec Python</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./c_python.html">
@@ -152,13 +152,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-themes-to-be-developped" role="button" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Themes to be developped</span>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-réseaux-de-neurones" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Réseaux de Neurones</span>
     </a>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-themes-to-be-developped">    
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-réseaux-de-neurones">    
         <li>
-    <a class="dropdown-item" href="./theme.qmd">
- <span class="dropdown-text">List to discussed</span></a>
+    <a class="dropdown-item" href="./Bipartite_GNN.html">
+ <span class="dropdown-text">Graph Neural Networks for bipartite graphs with pytorch_geometric</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-déploiement" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Déploiement</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-déploiement">    
+        <li>
+    <a class="dropdown-item" href="./shiny-deployment.html">
+ <span class="dropdown-text">Deploiement Shiny</span></a>
   </li>  
     </ul>
   </li>
@@ -527,7 +538,7 @@ We use the dataset KarateClub() which is organized as the typical object used by
 <span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, M)</span>
 <span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>plt.imshow(m[np.argsort(W1),:][:,np.argsort(W2)],cmap<span class="op">=</span><span class="st">"gray_r"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;matplotlib.image.AxesImage object at 0x7fe0cf6be8f0&gt;</code></pre>
+<pre><code>&lt;matplotlib.image.AxesImage object at 0x7f1d415222f0&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>edge_index <span class="op">=</span> torch.LongTensor(([np.where(m)[<span class="dv">0</span>],np.where(m)[<span class="dv">1</span>]]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -658,7 +669,7 @@ We use the dataset KarateClub() which is organized as the typical object used by
 </div>
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"AUC 2 : "</span>,roc_auc_score(W2[test_mask2],y_pred2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>AUC 2 :  0.875</code></pre>
+<pre><code>AUC 2 :  1.0</code></pre>
 </div>
 </div>
 </section>
@@ -853,17 +864,17 @@ We use the dataset KarateClub() which is organized as the typical object used by
 <div class="cell-output cell-output-stdout">
 <pre><code>
   0%|          | 0/20 [00:00&lt;?, ?it/s]
- 15%|#5        | 3/20 [00:00&lt;00:00, 21.25it/s]
- 30%|###       | 6/20 [00:00&lt;00:00, 21.46it/s]
- 45%|####5     | 9/20 [00:00&lt;00:00, 21.50it/s]
- 60%|######    | 12/20 [00:00&lt;00:00, 21.19it/s]
- 75%|#######5  | 15/20 [00:00&lt;00:00, 21.27it/s]
- 90%|######### | 18/20 [00:00&lt;00:00, 21.40it/s]
-100%|##########| 20/20 [00:00&lt;00:00, 21.40it/s]</code></pre>
+ 15%|#5        | 3/20 [00:00&lt;00:00, 21.10it/s]
+ 30%|###       | 6/20 [00:00&lt;00:00, 21.33it/s]
+ 45%|####5     | 9/20 [00:00&lt;00:00, 21.22it/s]
+ 60%|######    | 12/20 [00:00&lt;00:00, 21.33it/s]
+ 75%|#######5  | 15/20 [00:00&lt;00:00, 21.29it/s]
+ 90%|######### | 18/20 [00:00&lt;00:00, 21.30it/s]
+100%|##########| 20/20 [00:00&lt;00:00, 21.31it/s]</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>plt.plot(loss_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[&lt;matplotlib.lines.Line2D object at 0x7fe0c0c53a90&gt;]</code></pre>
+<pre><code>[&lt;matplotlib.lines.Line2D object at 0x7f1d32a6ff40&gt;]</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>loader_train <span class="op">=</span> DataLoader(data_train, batch_size<span class="op">=</span><span class="bu">len</span>(data_train))</span>
 <span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> batch <span class="kw">in</span> loader_train:</span>
