@@ -293,51 +293,59 @@ faire du python. Notamment, il est possible
 
 -   d'utiliser la commande Ctr+entr pour éxécuter un code Python ligne à
     ligne comme on le fera pour un code R dans Rstudio.
-    
-    
-    
+
 ## Installation et création d'environnement avec Windows
 
-Nous présentons ici 3 étapes importantes pour l'utilisation de Python sous Windows
+Nous présentons ici 3 étapes importantes pour l'utilisation de Python
+sous Windows
 
-- l'installation d'une version de Python,
+-   l'installation d'une version de Python,
 
-- l'utilisation d'un éditeur de code
+-   l'utilisation d'un éditeur de code
 
-- la création et l'utilisation d'un environnement Python pour programmer.
+-   la création et l'utilisation d'un environnement Python pour
+    programmer.
 
-Différentes approches existent pour réaliser chacune de ces tâches, nous présentons ici une approche pour chaque. 
-
+Différentes approches existent pour réaliser chacune de ces tâches, nous
+présentons ici une approche pour chaque.
 
 ### Installation de Python
 
-**Stratégie** Python est nativement disponible sous Linux. Une possibilité pour utiliser Python sous Windows est donc d'installer un sous-environnement Linux via WSL2 (Windows subsystem for linux), et d'utiliser la version de Python qui vient avec. 
+**Stratégie** Python est nativement disponible sous Linux. Une
+possibilité pour utiliser Python sous Windows est donc d'installer un
+sous-environnement Linux via WSL2 (Windows subsystem for linux), et
+d'utiliser la version de Python qui vient avec.
 
 #### Installer WSL2
 
 L'installation de WSL2 se fait via la commande (terminal PowerShell) :
+
 ```{bash}
 #| echo: true
 #| eval: false
 wsl --install
 ```
 
-Après redémarrage, on peut vérifier quelle version de linux est installée :
+Après redémarrage, on peut vérifier quelle version de linux est
+installée :
+
 ```{bash}
 #| echo: true
 #| eval: false
 wsl -l -v
 ```
 
-A noter qu'il est possible de préciser l'installation Linux que l'on veut installer :
+A noter qu'il est possible de préciser l'installation Linux que l'on
+veut installer :
+
 ```{bash}
 #| echo: true
 #| eval: false
 wsl --instal -d <Distribution>
 ```
 
-Dans l'exemple qui suit nous avons utilisé Ubuntu. 
-Il est maintenant possible de lancer un terminal Linux avec la commande
+Dans l'exemple qui suit nous avons utilisé Ubuntu. Il est maintenant
+possible de lancer un terminal Linux avec la commande
 
 ```{bash}
 #| echo: true
@@ -347,11 +355,12 @@ start ubuntu.exe
 
 et d'aller vérifier la version de Python disponible.
 
-
 #### Python
 
-On se place maintenant dans le terminal Ubuntu.
-Comme précédemment mentionné Python est directement disponible sous Linux, ce qui se vérifie de la manière suivante :
+On se place maintenant dans le terminal Ubuntu. Comme précédemment
+mentionné Python est directement disponible sous Linux, ce qui se
+vérifie de la manière suivante :
+
 ```{bash}
 #| echo: true
 #| eval: false
@@ -359,7 +368,12 @@ which python
 python --version
 ```
 
-Nous allons par la suite utiliser deux fonctionnalités de python : l'installation de package via **pip** ("**p**ython **i**nstall **p**ackage") et la création d'environnements virtuels via virtualenv. Ces deux fonctionnalités sont noramelement directement disponibles, si ce n'est pas le cas l'installation se fait via 
+Nous allons par la suite utiliser deux fonctionnalités de python :
+l'installation de package via **pip** ("**p**ython **i**nstall
+**p**ackage") et la création d'environnements virtuels via virtualenv.
+Ces deux fonctionnalités sont noramelement directement disponibles, si
+ce n'est pas le cas l'installation se fait via
+
 ```{bash}
 #| echo: true
 #| eval: false
@@ -368,7 +382,8 @@ sudo apt install python3-pip
 pip install virtualenv  
 ```
 
-Il est parfois nécéssaire de créer un alias python pour python3 et pip pour pip3:
+Il est parfois nécéssaire de créer un alias python pour python3 et pip
+pour pip3:
 
 ```{bash}
 #| echo: true
@@ -387,7 +402,11 @@ sudo ln -s /usr/bin/python3 /usr/bin/python
 sudo ln -s /usr/bin/pip3 /usr/bin/pip
 ```
 
-Une fois la vérification de python et des fonctionnalités pip et virtualenv faite, on peut interagir avec python (créer des environnements, coder, tester, etc.) via le terminal de l'éditeur de code VSC, et nous n'aurons plus besoin ni de l'invite de commande Windows, ni du terminal WSL.
+Une fois la vérification de python et des fonctionnalités pip et
+virtualenv faite, on peut interagir avec python (créer des
+environnements, coder, tester, etc.) via le terminal de l'éditeur de
+code VSC, et nous n'aurons plus besoin ni de l'invite de commande
+Windows, ni du terminal WSL.
 
 ### Utilisation de VSC
 
@@ -395,30 +414,38 @@ Préalable : installer VSC (sous Windows) !
 
 #### Choisir un environnement distant
 
-A l'ouverture de VSC, la première étape consiste à préciser que l'on souhaite travailler dans le sous-environnement Linux via WSL (où se trouve python...).
+A l'ouverture de VSC, la première étape consiste à préciser que l'on
+souhaite travailler dans le sous-environnement Linux via WSL (où se
+trouve python...).
 
-Pour cela, il faut 
-- configurer VSC en installant le module d'extension "WSL" de VSC (via l'icone d'installation d'extension)
-- ouvrir un environnement distant via l'icone "Open a Remote Window" en bas de la fenêtre VSC, et choisir "Connect to WSL". 
-Le sous-environnement de travail est maintenant "WSL:Ubuntu"
+Pour cela, il faut - configurer VSC en installant le module d'extension
+"WSL" de VSC (via l'icone d'installation d'extension) - ouvrir un
+environnement distant via l'icone "Open a Remote Window" en bas de la
+fenêtre VSC, et choisir "Connect to WSL". Le sous-environnement de
+travail est maintenant "WSL:Ubuntu"
 
-Une fois dans cet environnement, il est conseillé d'installer le module d'extension "Python".
+Une fois dans cet environnement, il est conseillé d'installer le module
+d'extension "Python".
 
 #### Ouvrir un terminal
 
-Une fois l'environnement de travail défini, on peut ouvrir un terminal. Le terminal qui s'ouvre dans VSC est l'équivalent d'un terminal WSL. On peut donc executer 
+Une fois l'environnement de travail défini, on peut ouvrir un terminal.
+Le terminal qui s'ouvre dans VSC est l'équivalent d'un terminal WSL. On
+peut donc executer
+
 ```{bash}
 #| echo: true
 #| eval: false
 which python
 python --version
 ```
+
 et vérifier que l'on obtient la même version que précédemment.
 
+### Création d'un environnement python
 
-### Création d'un environnement python 
-
-Dans le terminal WSL ouvert dans VSC, on peut maintenant créer un environnement python via la commande
+Dans le terminal WSL ouvert dans VSC, on peut maintenant créer un
+environnement python via la commande
 
 ```{bash}
 #| echo: true
@@ -426,7 +453,8 @@ Dans le terminal WSL ouvert dans VSC, on peut maintenant créer un environnement
 python -m venv Chemin/NomEnv  
 ```
 
-ce qui crée un répertoire "NomEnv" au Chemin indiqué (si besoin, pour supprimer l'env : rm -rf NomEnv).
+ce qui crée un répertoire "NomEnv" au Chemin indiqué (si besoin, pour
+supprimer l'env : `rm -rf NomEnv`).
 
 Cet environnement peut être activé comme suit :
 
@@ -444,8 +472,30 @@ ou alternativement
 . Chemin/NomEnv/bin/activate
 ```
 
-**Note** L'activation de l'environnement se traduit par un changement dans le prompteur, qui mentionne maintenant "(NomEnv)" devant le nom d'utilisateur de la session.
+**Note** L'activation de l'environnement se traduit par un changement
+dans le prompteur, qui mentionne maintenant "(NomEnv)" devant le nom
+d'utilisateur de la session.
 
-L'environnement va définir la version de Python ainsi que les packages/modules
-que l'on souhaite utiliser pour le projet. Par défaut la version de python de l'environnement nouvellement créé est la version de python utilisée pour créer l'environnement (ce que l'on peut vérifier avec `python --version`). 
+L'environnement va définir la version de Python ainsi que les
+packages/modules que l'on souhaite utiliser pour le projet. Par défaut
+la version de python de l'environnement nouvellement créé est la version
+de python utilisée pour créer l'environnement (ce que l'on peut vérifier
+avec `python --version`). Il reste donc à installer les packages nécessaires 
+au projet, ce qui se fait avec pip. Un exemple avec le package numpy:
+```{bash}
+#| echo: true
+#| eval: false
+pip install numpy
+```
+Il est possible de lister à tout moment les packages déjà inclus dans un projet avec l'instruction `pip list`
+Une fois l'environnement configuré, on "sort" de l'environnement avec l'instruction `deactivate`.
+
+### Programmer, exécuter... dans un environnement python
+
+L'environnement NomEnv étant maintenant disponible, on peut se placer dedans pour travailler et écrire nos premières lignes de code. Il suffit pour cela d'ouvrir/créer un fichier python (toujours dans VSC). 
+
+
+#### Execution en ligne de commande
+
+Tout est prêt mais l'execution du code ligne à ligne n'est pas directement accessible sur python. Pour y avoir accès il suffit d'installer le package ipython dans l'environnement python (cf paragraphe précédent) d'une part, et d'installer l'extention "iPython for VS Code" dans VSC. Une fois ces deux étapes réalisées, l'execution de la commande `iphyton` dans le terminal à l'execution en ligne.
 
