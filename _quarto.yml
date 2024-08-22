@@ -13,9 +13,9 @@ website:
     right:
       - text: Algorithme
         menu:
-        - text: Initiation à `Nimble`
+        - text: Initiation à Nimble
           href: 01_nimble.qmd
-        - text: Un bon départ avec `Python`
+        - text: Un bon départ avec Python
           href: python_practice.qmd
         - text: C++ depuis Python
           href: c_python.qmd
@@ -23,10 +23,15 @@ website:
         menu:
           - text: Pre-commit avec R
             href: precommit.qmd
-      - text: Themes to be developped
+      - text: Réseaux de Neurones
         menu:
-        - text: List to discussed
-          href: theme.qmd
+        - text: Graph Neural Networks for bipartite graphs with pytorch_geometric
+          href: Bipartite_GNN.qmd
+      - text: Déploiement
+        menu:
+        - text: Déploiement Shiny
+          href: shiny-deployment.qmd
+
         aria-label: GitHub
 format:
   html:
