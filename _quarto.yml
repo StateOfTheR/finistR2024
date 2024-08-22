@@ -19,6 +19,10 @@ website:
           href: python_practice.qmd
         - text: C++ depuis Python
           href: c_python.qmd
+      - text: Développement
+        menu:
+          - text: Pre-commit avec R
+            href: precommit.qmd
       - text: Themes to be developped
         menu:
         - text: List to discussed
