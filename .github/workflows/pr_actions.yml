@@ -17,7 +17,6 @@ jobs:
       - uses: qoomon/actions--access-token@v3
         id: access-token
         with:
-          repository: <TARGET_REPO>
           permissions: |
             contents: read
       - name: Checkout repository
