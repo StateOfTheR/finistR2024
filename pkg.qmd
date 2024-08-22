@@ -8,7 +8,9 @@ toc: true
 
 Un package est un projet (`.Rproj`) versionné `usethis::use_git()`. On peut contrôler l'environnement avec `{renv}`.
 
-:warning: sur windows il faut installer [RTools](https://cran.r-project.org/bin/windows/Rtools/) (la bonne version)
+::: {.callout-warning}
+Sur windows il faut installer [RTools](https://cran.r-project.org/bin/windows/Rtools/) (la même version que celle de R).
+:::
 
 ### Créer un package
 
@@ -16,7 +18,7 @@ Un package est un projet (`.Rproj`) versionné `usethis::use_git()`. On peut con
 usethis::create_package("~/path/to/mypkg")
 ```
 
--   `.Rbuildignore` liste des fichiers ignoré pour le build
+-   `.Rbuildignore` liste des fichiers ignorés pour le build
 -   `.gitignore`
 -   `DESCRIPTION` package metadata
 -   `NAMESPACE`import et export des fonctions
@@ -43,13 +45,13 @@ devtools::load_all()
 
 ### Dépendances
 
-On doit spécifier les packages qui sont utilisés
+On doit spécifier les packages qui sont utilisés.
 
 ``` r
 usethis::use_package('ggplot2')
 ```
 
-Ils sont ajoutés dans DESCRIPTION dans la section Import (ou Suggests par exemple).
+Ils sont ajoutés dans le fichier DESCRIPTION dans la section Import (ou Suggests par exemple).
 
 Pour prévoir la documentation, il est essentiel d'utiliser `roxygen2` (*Code \> Insert Roxygen Skeleton*).
 
@@ -70,9 +72,9 @@ add <- function(x, y) {
 
 -   `@export` permet l'export dans le NAMESPACE
 -   `@inherisParams` permet de récupérer la description des paramètres depuis une autre fonction
--   voir la doc pour la suite (https://roxygen2.r-lib.org/)
+-   voir [la doc](https://roxygen2.r-lib.org/) pour la suite
 
-Pour contrôler les @imports dans le Roxygen Skeleton, on peut utiliser [`{autoimport}`](https://github.com/DanChaltiel/autoimport)
+Pour contrôler les `@imports` dans le Roxygen Skeleton, on peut utiliser [`{autoimport}`](https://github.com/DanChaltiel/autoimport).
 
 On compile la doc et met a jour les namespaces avec
 
@@ -93,13 +95,13 @@ Duration: 8.4s
 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
 ```
 
-Si le *check* est bon, on peut installer le package :
+Si le *check* est bon, on peut installer le package.
 
 ``` r
 devtools::install()
 ```
 
-On peut maintenant charger son package
+On peut maintenant charger son package.
 
 ``` r
 library(mypkg)
@@ -117,14 +119,14 @@ usethis::use_test()
 devtools::test()
 ```
 
-Il faut tester (bonnes pratiques)
+Il faut tester (bonnes pratiques) :
 
 -   les arguments de la fonction (type)
 -   le résultat attendu
 -   les erreurs
 -   ...
 
-Si on détecte une erreur, on défini un test avant de chercher a corriger le bug. Puis on est content dans le test passe (et on est sur de détecter si ce bug est toujours présent)
+**Important : définir un test pour chaque bug observé.** Définir le test avant de corriger le bug. Ensuite on est content quand le test passe (et on est sur de détecter si ce bug est toujours présent).
 
 Pour aller plus loin, on peut faire du *test first*. On défini le test avant d'écrire la fonction.
 
@@ -132,7 +134,7 @@ Pour aller plus loin, on peut faire du *test first*. On défini le test avant d'
 
 ### GitHub Actions
 
-Pour optimiser les CI/CD on utilise les github actions (ou gitlab mais c'est pas le meme format)
+Pour optimiser les CI/CD on utilise les github actions (ou gitlab, mais c'est pas le même format).
 
 ``` r
 usethis::use_github() 
