@@ -57,7 +57,7 @@ You will need an ID and a login to extract the data. Here we took test codes.
 
 The products will be available in the `folder/` specified in the function. They provide a `.RData` file with all the extracted rasters (usually one per time step) or, alternatively, one raster per time step in `.tiff` (or a similar) format.
 
-# Dowload MODIS data from command line
+# Dowload MODIS data from the command line
 
 The package is quite limited in terms of available products (for example, there is no land cover data) and is no longer maintained, so there are several bugs (*e.g.*, during installation).
 
