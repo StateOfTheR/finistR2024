@@ -6,6 +6,8 @@ format: html
 
 Ci dessous, vous trouverez un modèle de document paramétré en quarto.
 
+# Inclusion de paramètres personnalisés dans un document quarto
+
 Il est probable que l'exécution de l'exemple ainsi que son adaptation soit suffisant pour tout comprendre.
 Cependant, après m'être un peu cassé les dents, quelques points importants.
 
@@ -39,15 +41,15 @@ Dans l'exemple ci dessous, on évalue un chunk conditionnellement à la correcti
 title: "Exemple de document paramétré"
 format: pdf
 params:
-  correction: true
+correction: true
 engine: knitr # Obligatoire pour interagir avec le code, même si on ne fait que du python
 ---
-
+  
 # Exemple dans du texte
-
+  
 :::{#exr-densite-loi-normale}
 ## 1 point
-
+    
 Soit $X \in \mathbb{R}$ une variable aléatoire de loi $\mathcal{N}(\mu, \sigma^2)$. 
 Donner l'expression de $p(x)$, la densité de $X$.
 :::
@@ -57,7 +59,7 @@ Donner l'expression de $p(x)$, la densité de $X$.
 :::{#sol-densite-loi-normale}
 La densité de $X$ est donnée par:
 $$
-p(x)=\frac{1}{\sqrt{2\pi \sigma^2}}\text{e}^{-\frac{1}{2\sigma^2}(x - \mu)^2}
+p(x)=\frac{1}{\sqrt{2\pi \sigma^2}}\text{e}^{-\frac{1}{2\sigma^2}(x - \mu)^2}\,.
 $$
 :::
 
@@ -84,6 +86,26 @@ ifelse(params$correction,
 if r.params["correction"]:
   print("Ce texte s'affiche en mode correction")
 ```
-
+  
 ````
+  
+# Compilation du document
+  
+Pour compiler le document (dans `R`) avec la liste des paramètres voulus, on utilisera la fonction `quarto_render` du package `quarto`.
+  
+```{r}
+#| label: code-rendering-quarto
+#| eval: false
 
+
+# Pour compiler le document avec toutes les valeurs possibles du paramètres
+purrr::map(c(FALSE, TRUE), function(cor_){
+  # On rajoute les traitements dépendant de l'argument
+  output_name <- ifelse(cor_, "sujet.pdf", "correction.pdf") 
+  quarto::quarto_render(input = "mon_document.qmd",  
+                        execute_params = list(correction  = cor_), 
+                        output_format = "pdf",
+                        output_file = output_name)
+})
+```
+  
