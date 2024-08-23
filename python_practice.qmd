@@ -46,7 +46,7 @@ packages.
 
 `sudo ln -sf /usr/bin/pip3 /usr/bin/pip`
 
-## Cérer un environnement avec conda sous Linux
+## Créer un environnement avec conda sous Linux
 
 Cette partie suppose que la commande `conda` est disponible (installée
 avec anaconda ou miniconda)
@@ -128,172 +128,6 @@ conda remove --name finistrbis --all
 La liste des commandes conda est disponible dans la [cheatsheet
 conda](https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html)
 
-## Créer un environnement avec virtual env sous Windows
-
-Sur un terminal PowerShell ("invite de commande") de Windows, installer
-WSL (Windows subsystem for linux) :
-
-```{r}
-#| echo: true
-#| eval: false
-wsl --install
-```
-
-On dispose maintenant d'un sous-environnement linux, qui vient
-automatiquement avec une version de python. Après redémarrage, on peut
-vérifier quelle version de linux est installée :
-
-```{r}
-#| echo: true
-#| eval: false
-wsl -l -v
-```
-
-Il faut ensuite créer un alias python pour python3 :
-
-```{r}
-#| echo: true
-#| eval: false
-source ~/.bashrc
-alias python=python3
-```
-
-installer pip s'il n'est pas directement disponible
-
-```{r}
-#| echo: true
-#| eval: false
-sudo apt-get update
-sudo apt install python3-pip
-```
-
-et enfin créer un alias pip pour pip3 :
-
-```{r}
-#| echo: true
-#| eval: false
-source ~/.bashrc
-alias pip=pip3
-```
-
-ou créer un lien symbolique entre pip3 et pip :
-
-```{r}
-#| echo: true
-#| eval: false
-sudo ln -s /usr/bin/pip3 /usr/bin/pip
-```
-
-Pour vérifier la version de pip qui est installée :
-
-```{r}
-#| echo: true
-#| eval: false
-pip --version
-```
-
-De même si ce n'est pas directement disponible il faut installer
-virtualenv :
-
-```{r}
-#| echo: true
-#| eval: false
-pip install virtualenv
-```
-
-Et si c'est demandé :
-
-```{r}
-#| echo: true
-#| eval: false
-sudo apt install python3.10-venv 
-```
-
-On peut ensuite créer un environnement python dans le dossier que l'on
-souhaite, par exemple ici l'environnement finistrEnv :
-
-```{r}
-#| echo: true
-#| eval: false
-python -m venv chemin/finistrEnv  
-```
-
-(si besoin, pour supprimer l'env : rm -rf finistrEnv)
-
-Enfin, pour activer l'environnement python 'finistrEnv' :
-
-```{r}
-#| echo: true
-#| eval: false
-source chemin/finistrEnv/bin/activate
-```
-
-ou alternativement
-
-```{r}
-#| echo: true
-#| eval: false
-. chemin/finistrEnv/bin/activate
-```
-
-Pour trouver les packages python : pypi
-
-```{r}
-#| echo: true
-#| eval: false
-pypi nom-du-package
-```
-
-On peut ensuite créer un script.py dans ubuntu :
-
-```{r}
-#| echo: true
-#| eval: false
-touch toto.py
-pwd
-```
-
-Puis l'ouvrir dans vscode, préalablement installé dans Windows.
-
-Il faut ensuite dans vscode, préciser le chemin de l'environnement
-python (situé dans linux).
-
-En supplément :
-
-Pour ouvrir l'émulateur linux, à partir d'un terminal windows :
-
-```{r}
-#| echo: true
-#| eval: false
-start ubuntu.exe
-```
-
-Pour désactiver l'environnement Python activé précédemment :
-
-```{r}
-#| echo: true
-#| eval: false
-deactivate
-```
-
-## Utiliser un environnement de développement agréable pour un utilisateur de R
-
-## Avec Visual Studio Code
-
-ipython
-
-### Avec Positron
-
-Le nouvel IDE Positron (disponible en version beta) semble avoir des
-avantages intéressants pour les gens qui aiment Rstudio mais veulent
-faire du python. Notamment, il est possible
-
--   de choisir facilement son environnement (menu déroulant en haut à
-    droite) et
-
--   d'utiliser la commande Ctr+entr pour éxécuter un code Python ligne à
-    ligne comme on le fera pour un code R dans Rstudio.
-
 ## Installation et création d'environnement avec Windows
 
 Nous présentons ici 3 étapes importantes pour l'utilisation de Python
@@ -371,8 +205,8 @@ python --version
 Nous allons par la suite utiliser deux fonctionnalités de python :
 l'installation de package via **pip** ("**p**ython **i**nstall
 **p**ackage") et la création d'environnements virtuels via virtualenv.
-Ces deux fonctionnalités sont normalement directement disponibles, si
-ce n'est pas le cas l'installation se fait via
+Ces deux fonctionnalités sont normalement directement disponibles, si ce
+n'est pas le cas l'installation se fait via
 
 ```{bash}
 #| echo: true
@@ -523,3 +357,21 @@ VSC (en mode WSL). Pour cela, taper `ctrl + shift + P` et rechercher
     "--no-autoindent"
 ],
 ```
+
+## Utiliser un environnement de développement agréable pour un utilisateur de R
+
+## Avec Visual Studio Code
+
+ipython
+
+### Avec Positron
+
+Le nouvel IDE Positron (disponible en version beta) semble avoir des
+avantages intéressants pour les gens qui aiment Rstudio mais veulent
+faire du python. Notamment, il est possible
+
+-   de choisir facilement son environnement (menu déroulant en haut à
+    droite) et
+
+-   d'utiliser la commande Ctr+entr pour éxécuter un code Python ligne à
+    ligne comme on le fera pour un code R dans Rstudio.
