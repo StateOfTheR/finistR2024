@@ -82,6 +82,10 @@ We manually select the R version from the `renv.lock` file (this should be optim
 
 # rix
 
+Quoting the documentation: 
+
+> [rix](https://b-rodrigues.github.io/rix/) is an R package that leverages [Nix](https://nixos.org/), a powerful package manager focusing on reproducible builds. With Nix, it is possible to create project-specific environments that contain a project-specific version of R and R packages (as well as other tools or languages, if needed). This project-specific environment will also include all the required system-level dependencies that can be difficult to install, such as GDAL for packages for geospatial analysis for example. Nix installs software as a complete “bundle” that include all of the software's dependencies, and all of the dependencies' dependencies and so on. Nix is an incredibly useful piece of software for ensuring reproducibility of projects, in research or otherwise.
+
 ## Installation
 
 First `Nix` should be installed, see [dedicated vignette](https://b-rodrigues.github.io/rix/articles/b1-setting-up-and-using-rix-on-linux-and-windows.html).
@@ -223,13 +227,28 @@ Computo Format Template   [Install]   0.2.5 (formats)
 ? View documentation using default browser? (Y/n) › n
 ```
 
-::: callout-caution
-Question: how to install quarto via rix?
+::: callout-note
+## Installing system dependencies via `rix`
+
+According to  <https://b-rodrigues.github.io/rix/articles/building-an-environment-for-literate-programming.html> it can be done via the option `system_pkgs`. Note that it is also possible to specify LaTeX packages to be installed, via the option `tex_pkgs`:
+
+```{bash eval=FALSE}
+path_default_nix <- tempdir()
+
+rix(r_ver = "4.3.1",
+    r_pkgs = c("quarto"),
+    system_pkgs = "quarto",
+    tex_pkgs = c("amsmath"),
+    ide = "other",
+    shell_hook = "",
+    project_path = path_default_nix,
+    overwrite = TRUE,
+    print = TRUE)
+```
+
 :::
 
-The R packages used in this publication are managed using the R package `renv`. So we retrieve the R version and the packages listed in the `renv.lock` file:
-
-(note that this cannot be done from another project, so this command is not evaluated here):
+The R packages used in this publication are managed using the R package `renv`. So we retrieve the R version and the packages listed in the `renv.lock` file (note that this cannot be done from another project, so this command is not evaluated here):
 
 ```{r eval=FALSE}
 > status <- renv::status("/tmp/published-202312-favrot-hierarchical")
@@ -239,13 +258,10 @@ The R packages used in this publication are managed using the R package `renv`. 
 > pkgs <- names(status$lockfile$Packages)
 > str(pkgs)
  chr [1:110] "DBI" "MASS" "Matrix" "R6" "RColorBrewer" "askpass" ...
+> saveRDS(list(version = R_version, pkgs = pkgs), file = "repro_favrot.rds")
 ```
 
-We save this info on disk for later use:
-
-```{r eval=FALSE}
-saveRDS(list(version = R_version, pkgs = pkgs), file = "repro_favrot.rds")
-```
+We then use these info to setup a configuration file for `Nix` via `rix`:
 
 ```{r}
 info <- readRDS("repro_favrot.rds")
@@ -256,7 +272,7 @@ path_default_nix <- "/tmp/published-202312-favrot-hierarchical"
 rix(
   r_ver = R_version,
   r_pkgs = pkgs,
-  system_pkgs = NULL,
+  system_pkgs = "quarto",
   git_pkgs = NULL,
   ide = "rstudio",
   project_path = path_default_nix,
