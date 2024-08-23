@@ -1,0 +1,117 @@
+---
+title: "Extract environmental data from MODIS"
+editor: visual
+---
+Extracting environmental data (such as temperature, land cover, and NDVI) from the web can be very challenging. Many platforms are available, such as [Copernicus](https://www.copernicus.eu/en/access-data) and [MODIS](https://modis.gsfc.nasa.gov/data/).
+
+These platforms offer a wide range of products that can be highly heterogeneous for a single variable, meaning they may differ in spatial/temporal resolution and extents. They also come with their own routines, which can be technically complex and resource-intensive.
+
+This brief document describes a simple and efficient, though likely not yet perfect, method for extracting certain environmental variables from [MODIS](https://modis.gsfc.nasa.gov/data/).
+
+Two approaches are possible:
+
+1. Use the package [`MODIStsp`](https://docs.ropensci.org/MODIStsp/) in R.
+
+*Be aware that the package may have installation issues on Linux, and it is no longer maintained. Additionally, not all products are available. When it does work, it is still very useful for extracting MODIS data within a specific spatio-temporal window.*
+
+2. Use the command line to download the data based on the URL link where the data is stored.# Extracting data with `MODIStsp`
+
+To install the package use:
+
+``` r
+
+remotes::install_github("ropensci/MODIStsp")
+```
+
+The base function of the package is `MODIStsp()`.
+
+``` r
+
+MODIStsp(
+  gui = FALSE, # Do not open GUI before processing
+  spatmeth = "tiles", # Type of spatial extent
+  out_folder = "folder/", # Folder to store the data
+  start_x = 17,end_x = 18, # Geographic rectangles/tiles to download the data
+  start_y = 3,end_y = 4,
+  start_date = "2000.01.01", # Beginning of the time series
+  end_date = "2020.12.01", # End of the time series,
+  selprod = "Vegetation_Indexes_Monthly_005dg (M*D13C2)", # Product to download 
+  bandsel = c("NDVI"), # MODIS layers to be processed
+  quality_bandsel = NULL,
+  indexes_bandsel = NULL,
+  user = "mstp_test", # put your ID
+  password = "MSTP_test_01", # and login
+  verbose = TRUE,
+  parallel = FALSE
+)
+```
+
+The argument `spatmeth` allows you to select the spatial extent of the data to download. It can be defined by a set of tiles that reference rectangles covering the world (specified through the arguments `start_x`, `end_x`, `start_y`, `end_y`) [link](https://modis-land.gsfc.nasa.gov/MODLAND_grid.html). It can also be a `bbox` or a shapefile contained in a file.
+
+`selprod` is the product to select (variable, spatial, and temporal resolution). All products available through `MODIStsp` can be obtained with the function `MODIStsp_get_prodnames()`.
+
+You will need an ID and a login to extract the data. Here we took test codes.
+
+The products will be available in the `folder/` specified in the function. They provide a `.RData` file with all the extracted rasters (usually one per time step) or, alternatively, one raster per time step in `.tiff` (or a similar) format.
+
+# Dowload MODIS data from command line
+
+The package is quite limited in terms of available products (for example, there is no land cover data) and is no longer maintained, so there are several bugs (*e.g.*, during installation).
+
+A more robust way to extract the data is to use the data access portal [link](https://lpdaac.usgs.gov/data/). The key point is to find the right product in the catalog [[catalog link](https://lpdaac.usgs.gov/product_search/)]. 
+
+After finding the product, such as [land cover](https://lpdaac.usgs.gov/products/mcd12c1v061/) > click on "Access the data" > click on the download icon in the "Data Pool" to directly download the data.
+
+![](images/MODIS_screen.png)
+
+This redirects you to a page with all the files related to the product (which can be extensive).
+
+For land cover data, here is the link <https://e4ftl01.cr.usgs.gov/MOTA/MCD12C1.061/>.
+
+The following steps are summarized for Ubuntu. Detailed instructions for different operating systems can be found [here](https://lpdaac.usgs.gov/resources/e-learning/how-access-lp-daac-data-command-line/).
+
+First, you will need to create a user profile at <https://urs.earthdata.nasa.gov/home>.
+
+Next, create a `.netrc` file in your home directory.
+
+Then, write the following lines with your earthdata.nasa ID and password in the terminal.
+
+```         
+echo "machine urs.earthdata.nasa.gov login YOUR_USERNAME password YOUR_PASSWORD" > ~/.netrc
+chmod 0600 ~/.netrc
+```
+
+Use `wget` to download the whole data:
+
+```         
+wget -r -np -nH --cut-dirs=3 --reject "index.html*" --no-check-certificate https://e4ftl01.cr.usgs.gov/MOTA/MCD12C1.061/
+```
+
+Here is an explanation of the argument:
+
+-   -r: Recursive download.
+
+-   -np: No parent, prevents wget from following links to the parent directory.
+
+-   -nH: Disables the creation of host-prefixed directories.
+
+-   --cut-dirs=3: Removes the first three directory levels from the downloaded file paths.
+
+-   --reject "index.html\*": Excludes the index.html files from the download.
+
+-   --no-check-certificate: Prevents wget from checking the SSL certificate (useful if there are issues with certificate validation).
+
+It will download the data in `.hdf` format files. To download data for only a single year (*e.g.*, 2001), navigate through the file tree by entering:
+
+```         
+wget -r -np -nH --cut-dirs=3 --reject "index.html*" --no-check-certificate 
+https://e4ftl01.cr.usgs.gov/MOTA/MCD12C1.061/2001.01.01/
+```
+
+Files will be downloaded to the home directory. To download them to a specific folder, navigate to the desired directory using the `cd` command, choose the directory of interest, and run the previous command. Alternatively, you can use the `-P` argument.
+
+```         
+wget -r -np -nH --cut-dirs=3 -P "file_name" --reject "index.html*" --no-check-certificate https://e4ftl01.cr.usgs.gov/MOTA/MCD12C1.061/2001.01.01/
+```
+
+**This option should be preferred over the R package `MODIStsp` because it provides access to more products and does not depend on package maintenance.**
