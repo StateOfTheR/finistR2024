@@ -14,7 +14,40 @@ We consider three options to reproduce Armand's Computo paper: @favrot2024
 - using `docker` + `renv`
 - using `rix`
 
+The GitHub repository for the paper is available on the [Computo page](https://computo.sfds.asso.fr/publications/).
+
 # renv
+
+`renv` is an R package that allows you to manage the versions of packages used in an R project. It is a tool that promotes code reproducibility. It can be installed from the CRAN. For more information, see the [GitHub page](https://rstudio.github.io/renv/articles/renv.html).
+
+::: {.callout-warning}
+`renv` does not manage the R version or system libraries. Code reproducibility may be compromised, for example, by a new version of R or a new version of Ubuntu.
+:::
+
+**Theoritical** steps to reproduce a paper from Computo:
+
+1) Clone the [GitHub repository](https://github.com/computorg/published-202312-favrot-hierarchical) of the paper.
+
+```{bash, eval=FALSE}
+$ git clone git@github.com:computorg/published-202312-favrot-hierarchical.git
+```
+
+2) If the repository is an R project (contains a `.Rproj` file), open it in RStudio. Otherwise, make it an R project by going to RStudio: `File > New Project > Existing Directory > path_to_the_folder`.
+
+3) Use the `renv::restore()` function to install the required packages for the project (ensuring the correct versions).
+
+4) Install the Computo extension (see section 1.4 of the [template for contribution to computo](https://computo.sfds.asso.fr/template-computo-R/)). In a terminal at the root of the project:
+
+```{bash, eval = FALSE}
+$ quarto add computorg/computo-quarto-extension
+```
+5) Open the `.qmd` file that contains the source code of the paper, and render it with the 'Render' button. The html and pdf files will be generated in `./site/`.
+
+
+In **practice**, it can be a little bit more tricky. 
+
+Here is what happened with ubuntu 22.04, with a the 4.4.1 version of R.
+
 
 # docker + renv
 
@@ -205,7 +238,7 @@ rix(
 )
 ```
 
-Note that the above triggers the following warning because an `.Rprofile``` file already exists.  In this case this file is only used by `renv` and we will not need `renv` so we do not follow the advice to 'append' and instead choose to 'overwrite':
+Note that the above triggers the following warning because an `.Rprofile` file already exists.  In this case this file is only used by `renv` and we will not need `renv` so we do not follow the advice to 'append' and instead choose to 'overwrite':
 
 ```{r eval=FALSE}
 library("rix")
