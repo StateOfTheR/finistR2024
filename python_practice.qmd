@@ -371,7 +371,7 @@ python --version
 Nous allons par la suite utiliser deux fonctionnalités de python :
 l'installation de package via **pip** ("**p**ython **i**nstall
 **p**ackage") et la création d'environnements virtuels via virtualenv.
-Ces deux fonctionnalités sont noramelement directement disponibles, si
+Ces deux fonctionnalités sont normalement directement disponibles, si
 ce n'est pas le cas l'installation se fait via
 
 ```{bash}
@@ -382,7 +382,7 @@ sudo apt install python3-pip
 pip install virtualenv  
 ```
 
-Il est parfois nécéssaire de créer un alias python pour python3 et pip
+Il est parfois nécessaire de créer un alias python pour python3 et pip
 pour pip3:
 
 ```{bash}
@@ -410,7 +410,7 @@ Windows, ni du terminal WSL.
 
 ### Utilisation de VSC
 
-Préalable : installer VSC (sous Windows) !
+Préalable : installer VSCode (sous Windows) !
 
 #### Choisir un environnement distant
 
@@ -502,12 +502,12 @@ pour cela d'ouvrir/créer un fichier python (toujours dans VSC).
 
 #### Execution en ligne de commande
 
-Tout est prêt mais l'execution du code ligne à ligne n'est pas
+Tout est prêt mais l'exécution du code ligne à ligne n'est pas
 directement accessible sur python. Pour y avoir accès il suffit
 d'installer le package ipython dans l'environnement python (cf
-paragraphe précédent) d'une part, et d'installer l'extention "iPython
-for VS Code" dans VSC. Une fois ces deux étapes réalisées, l'execution
-de la commande `iPython` dans le terminal à l'execution en ligne.
+paragraphe précédent) d'une part, et d'installer l'extension "iPython
+for VS Code" dans VSC. Une fois ces deux étapes réalisées, l'exécution
+de la commande `iPython` dans le terminal à l'exécution en ligne.
 
 **REMARQUE** *(fonctionne sur toutes les distributions en théorie, mais
 uniquement testé sur MacOS)***:** Afin de retrouver la fonctionnalité
