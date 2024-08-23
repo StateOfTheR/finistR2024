@@ -1,0 +1,244 @@
+---
+title: "Pre-commit pour R"
+format: html
+toc: true
+author: 
+  - Julie Aubert
+  - Annaïg De Walsche
+  - Louis Lacoste
+  - François Victor
+date: last-modified
+execute: 
+  eval: false
+---
+
+## Pourquoi pre-commit ?
+
+Pre-commit permet de faciliter les tâches annexes au développement de notre code en les externalisant en dehors de notre dépôt. Pre-commit s'assure que notre code est propre avant chaque commit, i.e :
+
+-   Les fichiers de code ont un style cohérent, et ne contiennent pas d'erreurs de syntaxe simples (par exemple, oubli de crochets).
+
+-   Dans le cas d'un package, la documentation (fichiers .rd dans le dossier man/) est à jour et sans erreur d'orthographe.
+
+## Installation
+
+L'installation est en deux étapes :
+
+1.  Installation de l'outil [pre-commit](https://pre-commit.com/) écrit en python en utilisant :
+
+```{bash}
+#| eval: false
+#| echo: true
+pip install pre-commit
+```
+
+2.  Installation du [package R `{precommit}`](https://cran.r-project.org/web/packages/precommit/index.html) en utilisant :
+
+```{r}
+#| eval: false
+#| echo: true
+install.packages("precommit")
+```
+
+## Dans notre projet R
+
+Une fois pre-commit installé, on peut se rendre dans le répertoire de notre Rprojet versionné avec Git, et exécuter la commande R:
+
+```{r}
+#| eval: false
+#| echo: true
+precommit::use_precommit()
+```
+
+Cette commande créer le fichier de configuration `.pre-commit-config.yaml`, et prépare le répertoire à utiliser pre-commit. Une page web d'authentification GitHub s'ouvre, elle n'est utile que pour mettre à jour automatiquement les versions de *hooks* que l'on utilise. On peut l'ignorer sans problèmes.
+
+Mais il faut alors penser à les mettre à jour manuellement de temps à autre:
+
+```{r}
+#| eval: false
+#| echo: true
+precommit::autoupdate()
+```
+
+## Configuration de pre-commit pour notre projet R
+
+Le fichier de configuration par défaut est :
+
+```{yaml}
+# All available hooks: https://pre-commit.com/hooks.html
+# R specific hooks: https://github.com/lorenzwalthert/precommit
+repos:
+-   repo: https://github.com/lorenzwalthert/precommit
+    rev: v0.4.3
+    hooks: 
+    -   id: style-files
+        args: [--style_pkg=styler, --style_fun=tidyverse_style] 
+    -   id: roxygenize #uniquement lorsque le projet est un package
+    -   id: spell-check
+        exclude: >
+          (?x)^(
+          .*\.[rR]|
+          .*\.feather|
+          .*\.jpeg|
+          .*\.pdf|
+          .*\.png|
+          .*\.py|
+          .*\.RData|
+          .*\.rds|
+          .*\.Rds|
+          .*\.Rproj|
+          .*\.sh|
+          (.*/|)\.gitignore|
+          (.*/|)\.gitlab-ci\.yml|
+          (.*/|)\.lintr|
+          (.*/|)\.pre-commit-.*|
+          (.*/|)\.Rbuildignore|
+          (.*/|)\.Renviron|
+          (.*/|)\.Rprofile|
+          (.*/|)\.travis\.yml|
+          (.*/|)appveyor\.yml|
+          (.*/|)NAMESPACE|
+          (.*/|)renv/settings\.dcf|
+          (.*/|)renv\.lock|
+          (.*/|)WORDLIST|
+          \.github/workflows/.*|
+          data/.*|
+          )$
+    -   id: lintr
+    -   id: readme-rmd-rendered
+    -   id: parsable-R
+    -   id: no-browser-statement
+    -   id: no-debug-statement
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks: 
+    -   id: check-added-large-files
+        args: ['--maxkb=200']
+    -   id: end-of-file-fixer
+        exclude: '\.Rd'
+-   repo: https://github.com/pre-commit-ci/pre-commit-ci-config
+    rev: v1.6.1
+    hooks:
+    # Only required when https://pre-commit.ci is used for config validation
+    -   id: check-pre-commit-ci-config
+-   repo: local
+    hooks:
+    -   id: forbid-to-commit
+        name: Don't commit common R artifacts
+        entry: Cannot commit .Rhistory, .RData, .Rds or .rds.
+        language: fail
+        files: '\.(Rhistory|RData|Rds|rds)$'
+        # `exclude: <regex>` to allow committing specific files
+
+ci:
+    autoupdate_schedule: monthly
+```
+
+Ce fichier indique les *hooks* que l'on veut utiliser en précisant les répertoires Git où l'on peut les trouver.
+
+Un *hook* est un programme réalisant un test sur les fichiers que l'on souhaite *commit*. Celui-ci peut ou non modifier un fichier, mais renvoie un état : skipped, passed, failed... La déclaration de chaque *hook* selon le répertoire Git où il se trouve se fait en renseignant son id et d'éventuels arguments, le tout en respectant la syntaxe yaml, par exemple :
+
+```{yaml}
+-   repo: https://github.com/lorenzwalthert/precommit #répertoire 1 des hooks
+    rev: v0.4.3 #version du répertoire 1s
+    hooks: 
+    -   id: style-files #nom du hook 1
+        args: [--style_pkg=styler, --style_fun=tidyverse_style]  #arguments du hook 1
+    -   id: lintr #nom du hook 2
+-   repo: https://github.com/pre-commit/pre-commit-hooks #répertoire 2 des hooks
+    rev: v4.6.0
+    hooks: 
+    -   id: check-added-large-files
+        args: ['--maxkb=200']
+```
+
+On peut retrouver les *hooks* disponibles pour du code R [ici](https://lorenzwalthert.github.io/precommit/articles/available-hooks.html).
+
+## *Hook* `roxygenize`
+
+Le but du *hook* est de mettre à jour la documentation lorsqu'elle est modifiée dans le code source. Cela passe par l'utilisation de `{roxygen2}`.
+
+Par défaut la configuration du *hook* est la suivante:
+
+```{yaml}
+-   id: roxygenize
+```
+
+Si le package utilise des dépendances, le *hook* va générer une erreur car il a besoin de connaitre les dépendances pour mettre à jour la documentation. Le package `{precommit}` propose une fonction renvoyant le texte à ajouter dans le fichier de configuration si il détecte que les dépendances ne sont pas fournies :
+
+```{r}
+#| eval: false
+#| echo: true
+precommit::snippet_generate('additional-deps-roxygenize')
+```
+
+Par exemple :
+
+```{r}
+#| eval: true
+#| echo: false
+cat("Generating snippet using CRAN versions. If you need another source, specify with syntax that `renv::install()` understands (see examples in help file). 
+
+    -   id: roxygenize
+        # roxygen requires loading pkg -> add dependencies from DESCRIPTION
+        additional_dependencies:
+        -    rlang
+        -    stringr
+
+• Replace the `id: roxygenize` key in `.pre-commit-config.yaml` with the above code.
+ℹ Note that CI services like <pre-commit.ci> have build-time restrictions and installing the above dependencies may exceed those, resulting in a timeout. In addition, system dependencies are not supported for <pre-commit.ci>. See `vignette('ci', package = 'precommit')` for details and solutions.")
+```
+
+Il faut alors ajouter les dépendances fournies dans le *hook* `roxygenize` du fichier de configuration :
+
+```{yaml}
+-   id: roxygenize
+        # roxygen requires loading pkg -> add dependencies from DESCRIPTION
+        additional_dependencies:
+        -    rlang
+        -    stringr
+```
+
+
+:::{.callout-tip title="Pour les packages hors du CRAN"}
+
+Par défaut si l'on met le nom d'un package le *hook* suppose qu'il est sur le CRAN. S'il ne l'est pas, il faut donner un format particulier, par exemple :
+
+-   pour GitHub : `NomDuDeveloppeur/NomDuPackage` (pour un répertoire dont l'url est le suivant : https://github.com/NomDuDeveloppeur/NomDuPackage)
+
+-   pour BioConductor : `bioc::NomDuPackage`
+
+-   pour un URL vers le package au format archive : `url::https://sitedupackage.example.com/nomdupackage.zip`
+
+Pour plus de détails voir [ici](https://remotes.r-lib.org/articles/dependencies.html) 
+:::
+
+## Désactiver pre-commit
+
+Pour désactiver pre-commit de son projet R, il suffit d'exécuter la commande suivante qui supprime le fichier .git/hooks/pre-commit :
+
+```{bash}
+#| eval: false
+#| echo: true
+rm .git/hooks/pre-commit
+```
+
+NB: Cette commande ne supprime pas le fichier de configuration `.pre-commit-config.yaml` permettant de sauvegarder nos configurations.
+
+Pour ré-activer pre-commit, il suffit d'utiliser la commande suivante dans le répertoire du projet :
+
+```{r}
+#| eval: false
+#| echo: true
+precommit::use_precommit()
+```
+
+## Conseils d'utilisation
+
+Pre-commit peut s'exécuter depuis la fenêtre Git de Rstudio. Cependant le rendu graphique des messages de pre-commit n'est pas très optimal, nous conseillons d'exécuter les commandes git sur le terminal bash de Rstudio.
+
+::: {.callout-warning title="Ne pas interrompre le processus de pre-commit"}
+S'il y a d'autres fichiers modifiés mais non ajoutés au commit en cours, pre-commit les met de côté (*stash*) pendant la durée d'execution des *hooks*, et les remet dans l'arbre de travail (*un-stash*) une fois le l'execution terminée. Interrompre avant la fin, empêche pre-commit de les remettre.
+
+Il est toujours possible d'utiliser `git apply` sur le fichier de patch se trouvant dans le dossier `.cache/pre-commit/` le plus récent.
+:::
