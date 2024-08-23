@@ -17,6 +17,8 @@ Two approaches are possible:
 
 2. Use the command line to download the data based on the URL link where the data is stored.# Extracting data with `MODIStsp`
 
+# Dowload MODIS data with the package `MODIStsp`
+
 To install the package use:
 
 ``` r
