@@ -22,9 +22,9 @@ Use the package RDatasets to use our favorite iris dataset.
 
 ```{julia}
 using Pkg
-Pkg.add("DataFrames")
-Pkg.add("DataFramesMeta")
-Pkg.add("PalmerPenguins")
+# Pkg.add("DataFrames")
+# Pkg.add("DataFramesMeta")
+# Pkg.add("PalmerPenguins")
 
 
 using DataFrames
@@ -37,7 +37,7 @@ penguins = dropmissing(DataFrame(PalmerPenguins.load()))
 ```
 
 ```{julia}
-Pkg.add("RDatasets")
+# Pkg.add("RDatasets")
 
 using RDatasets
 iris = dataset("datasets","iris")
@@ -174,7 +174,7 @@ Then install it using Julia's package manager Pkg:
 
 ```{julia}
 using Pkg
-Pkg.add("CairoMakie")
+# Pkg.add("CairoMakie")
 ```
 
 There's no need to install Makie.jl separately, it is re-exported by each backend package.
@@ -208,7 +208,7 @@ The GitHub page is there : https://github.com/GiovineItalia/Gadfly.jl/tree/maste
 - Last change to the GitHub repository : 5 months ago (so, early 2024)
 
 ```{julia}
-Pkg.add("Gadfly")
+# Pkg.add("Gadfly")
 
 using Gadfly
 ```
@@ -324,7 +324,7 @@ This does the work of +facet_grid().
 
 
 ```{julia}
-Pkg.add("Compose")
+# Pkg.add("Compose")
 
 using Compose
 p = Gadfly.plot(penguins, x=:bill_length_mm, y=:bill_depth_mm,xgroup=:species,ygroup=:sex,
@@ -374,7 +374,7 @@ This package relies on Makie.
 Warning : *draw* of AlgebraOfGraphics is not compatible with *draw* of Combine loaded earlier in the notebook.
 
 ```{julia}
-import Pkg; Pkg.add("AlgebraOfGraphics")
+# import Pkg; Pkg.add("AlgebraOfGraphics")
 import AlgebraOfGraphics as AOG
 using CairoMakie, PalmerPenguins
 

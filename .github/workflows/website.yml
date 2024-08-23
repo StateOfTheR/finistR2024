@@ -6,18 +6,28 @@ on:
 
 jobs:
   build:
-    name: Build website with rmarkdown
+    name: Build website with rmarkdown and Julia
     runs-on: ubuntu-latest
     container: stateofther/r-finistr2024:0.1
-
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Additional Packages
+
+      - name: Install Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.8' # Specify the Julia version you want to use
+
+      - name: Install Julia Packages
+        run: julia -e 'using Pkg; Pkg.add(["DataFrames", "DataFramesMeta", "RDatasets", "CairoMakie", "Gadfly", "Compose", "AlgebraOfGraphics"])' # Replace with the packages you need
+
+      - name: Additional R Packages
         run: Rscript -e "install.packages(c('tictoc'))"
+
       - name: Generate slides
         run: "quarto render"
+
       - name: GitHub Pages action
         uses: peaceiris/actions-gh-pages@v3
         with:
