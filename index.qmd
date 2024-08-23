@@ -25,6 +25,20 @@ Il s'agit de la huitième édition de l'atelier Finist'R. Cet atelier réunit an
 
 Le résultat de cette semaine est disponible  [sur cette page](https://stateofther.github.io/finistR2024/index.html)
 
+## Programme
+
+|   | Groupe 1 | Groupe 2 | Groupe 3 | Groupe 4 | Groupe 5 | Groupe 6  |  
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Lundi Après midi | Début en Python |  {{Simulator}} | Graphical Neural Network  | Nimble |  Calling C++ from Python |   | 
+| Mardi Matin 1|  *Cours future*  ||
+| Mardi Matin 2|  Packaging/Testing  |  Julia | Diffusion   | Nimble |   |   |   
+| Mardi Après midi |  Packaging/Testing  |  Julia | Diffusion | Nimble   |   |   |   
+| Mercredi Matin 1|   *Cours future*  ||
+| Mercredi Matin 2|  Restitution ||
+| Jeudi Matin    |  {{Rix}} | Shiny Dev | Energy and Optimisation | PINNS  | CTView Network   |  Enseignement |   
+| Jeudi Après Midi |  {{Rix}} | Shiny Dev | Energy and Optimisation | PINNS  | CTView Network   |  Enseignement |   
+| Vendredi Matin |   *Restitution*  ||
+
 ## Participants
 
 Baptiste Alglave, Emré Anakok, Julie Aubert,  Pierre Barbillon, Julien Chiquet, Lucia Clarotto, Caroline Cognot,  Annaïg De Walsche, Sophie Donnet, Marie-Pierre Etienne, Armand Favrot, Hugo Gangloff, Pierre Gloaguen,  Adeline Leclercq Samson, Tristan Mary-Huard, Cédric Midoux, Pierre Neuvial, Aymeric Stamm, Florian Teste, François Victor, Emily Walker. 
