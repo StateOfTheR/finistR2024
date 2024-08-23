@@ -19,6 +19,8 @@ website:
           href: python_practice.qmd
         - text: C++ depuis Python
           href: c_python.qmd
+        - text: Simulations
+          href: simulator.qmd
       - text: Développement
         menu:
           - text: Pre-commit avec R
@@ -31,7 +33,6 @@ website:
         menu:
         - text: Déploiement Shiny
           href: shiny-deployment.qmd
-
         aria-label: GitHub
 format:
   html:

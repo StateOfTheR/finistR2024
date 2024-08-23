@@ -56,3 +56,5 @@ _site/
 *_cache/
 01_nimble.html
 local_nimble*.R
+
+_site
