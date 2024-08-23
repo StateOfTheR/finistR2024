@@ -1,6 +1,7 @@
 ---
 title: "Extract environmental data from MODIS"
 editor: visual
+author: Baptiste Alglave
 ---
 Extracting environmental data (such as temperature, land cover, and NDVI) from the web can be very challenging. Many platforms are available, such as [Copernicus](https://www.copernicus.eu/en/access-data) and [MODIS](https://modis.gsfc.nasa.gov/data/).
 
