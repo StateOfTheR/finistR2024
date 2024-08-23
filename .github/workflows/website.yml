@@ -13,21 +13,23 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
       - name: Install Julia
         uses: julia-actions/setup-julia@v1
         with:
           version: '1.8' # Specify the Julia version you want to use
-
       - name: Install Julia Packages
-        run: julia -e 'using Pkg; Pkg.add(["DataFrames", "DataFramesMeta", "RDatasets", "CairoMakie", "Gadfly", "Compose", "AlgebraOfGraphics"])' # Replace with the packages you need
-
-      - name: Additional R Packages
-        run: Rscript -e "install.packages(c('tictoc'))"
-
+        run: |
+          julia -e 'using Pkg; Pkg.add(["DataFrames", "DataFramesMeta", "RDatasets", "CairoMakie", "Gadfly", "Compose", "AlgebraOfGraphics"])'
+      - name: Additional R packages
+        run: |
+          Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
+      - name: Additional Python packages
+        run: |
+          pip install torch torch_geometric 
+          pip install numpy==1.26.1
+          pip install scikit-learn scikit-network networkx matplotlib tqdm openpyxl pandas
       - name: Generate slides
         run: "quarto render"
-
       - name: GitHub Pages action
         uses: peaceiris/actions-gh-pages@v3
         with:
