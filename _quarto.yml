@@ -21,13 +21,17 @@ website:
           href: c_python.qmd
         - text: Simulations
           href: simulator.qmd
+      - text: Développement
+        menu:
+          - text: Pre-commit avec R
+            href: precommit.qmd
       - text: Réseaux de Neurones
         menu:
         - text: Graph Neural Networks for bipartite graphs with pytorch_geometric
           href: Bipartite_GNN.qmd
       - text: Déploiement
         menu:
-        - text: Deploiement Shiny
+        - text: Déploiement Shiny
           href: shiny-deployment.qmd
         aria-label: GitHub
 format:
