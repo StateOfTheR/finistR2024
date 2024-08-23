@@ -2,9 +2,9 @@
 title: Using Julia as a R user
 jupyter:
   kernelspec:
-    display_name: Julia 1.10.2
+    display_name: Julia 1.8
     language: julia
-    name: julia-1.10
+    name: julia-1.8
 ---
 
 **Authors:** 
