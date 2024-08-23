@@ -34,7 +34,7 @@ $ git clone git@github.com:computorg/published-202312-favrot-hierarchical.git
 
 2) If the repository is an R project (contains a `.Rproj` file), open it in RStudio. Otherwise, make it an R project by going to RStudio: `File > New Project > Existing Directory > path_to_the_folder`.
 
-3) Use the `renv::restore()` function to install the required packages for the project (ensuring the correct versions).
+3) Use the `renv::restore()` function to install the required packages for the project (ensuring the correct versions). These packages are listed in the `renv.lock` file.
 
 4) Install the Computo extension (see section 1.4 of the [template for contribution to computo](https://computo.sfds.asso.fr/template-computo-R/)). In a terminal at the root of the project:
 
@@ -46,8 +46,148 @@ $ quarto add computorg/computo-quarto-extension
 
 In **practice**, it can be a little bit more tricky. 
 
-Here is what happened with ubuntu 22.04, with a the 4.4.1 version of R.
+Here is how it went on a computer with ubuntu 22.04.3 LTS and R version 4.4.1.
 
+At step 2) there was no .Rproj file in the repository. We created one and we got this message in the console:
+
+```{bash, eval = FALSE}
+Bootstrapping renv 1.0.3 ---------------------------------------------------
+- Downloading renv ... OK
+- Installing renv  ... OK
+
+ℹ Using R 4.4.1 (lockfile was generated with R 4.2.2)
+- Project '~/test_reproductibilite_computo/published-202312-favrot-hierarchical' loaded. [renv 1.0.3]
+- One or more packages recorded in the lockfile are not installed.
+- Use `renv::status()` for more details.
+```
+
+Here we see that the version of R that was used when the paper was published (R 4.2.2) is not the same as the current version (R 4.4.1).
+
+When using `renv::status()`, we got a table with the packages that are listed in the `renv.lock` file. 
+
+```{bash, eval = FALSE}
+ package       installed recorded used
+ askpass       n         y        ?   
+ assertthat    n         y        ?   
+ backports     n         y        ? 
+ ...
+```
+
+At the end of the table, there was this message:
+
+```{bash, eval = FALSE}
+See ?renv::status() for advice on resolving these issues.
+Warning message:
+The 'yaml' package is required to parse dependencies within this project
+Consider installing it with `install.packages("yaml")`. 
+```
+
+After installing the `yaml` package and checking the help of `renv::status` function, we used `renv::restore()` to install the packages recorded in the `renv.lock` file. Note that in case the correct versions are already installed, renv will not install it again.
+
+`renv::restore()` lead to an error:
+
+```{bash, eval = FALSE}
+Error in .make_numeric_version(x, strict, .standard_regexps()$valid_numeric_version) : 
+  invalid non-character version specification 'x' (type: double)
+```
+
+That was due to the difference between the current R version and the one that was used when the paper was published (see [here](https://stat.ethz.ch/pipermail/r-devel/2023-July/082722.html)).
+
+At this point, we looked for a way to use different versions of R on a same computer. And we found `rig`, an `R` installation manager (see the dedicated report).
+
+After solving a signature problem of **Mattermost** that poped up when trying to install the 4.2.2 R version with `rig`:
+
+```{bash, eval = FALSE}
+The repository 'https://deb.packages.mattermost.com stable InRelease' is not signed.
+```
+
+And switching to the 4.2.2 R version, the `renv::restore()` worked.
+
+The next step was to insall the Computo extension in the project.
+
+```{bash, eval = FALSE}
+$ quarto add computorg/computo-quarto-extension
+```
+
+```{bash, eval = FALSE}
+ERROR: Unknown command "add". Did you mean command "rune" ?
+```
+
+We meant `add`. The problem was due to the version of quarto that was too old. We had to reinstall it with `sudo apt install quarto`. 
+
+At this point it was time to render. We clicked on the Render button of RStudio.
+
+```{bash, eval = FALSE}
+- The project is out-of-sync -- use `renv::status()` for details.
+
+processing file: published-202312-favrot-hierarchical.qmd
+Error in dyn.load(file, DLLpath = DLLpath, ...) : 
+  unable to load shared object '/home/mmip/.cache/R/renv/cache/v5/R-4.2/x86_64-pc-linux-gnu/stringi/1.7.6/bba431031d30789535745a9627ac9271/stringi/libs/stringi.so':
+  libicui18n.so.66: cannot open shared object file: No such file or directory
+Calls: .main ... namespaceImport -> loadNamespace -> library.dynam -> dyn.load
+Execution halted
+
+Unable to locate an installed version of R.
+Install R from https://cloud.r-project.org/
+```
+
+We executed `renv::status()` to see the details:
+
+```{bash, eval = FALSE}
+The following package(s) are out of sync [lockfile -> library]:
+
+RSPM -----------------------------------------------------------------------
+- xfun   [repo: CRAN -> RSPM; ver: 0.30 -> 0.47]
+
+
+See ?renv::status() for advice on resolving these issues.
+```
+
+We installed the correct version of the `xfun` package with `renv::install(packages = "xfun@0.30")`.
+
+And then, when executing `renv::status()` again:
+
+```{bash, eval = FALSE}
+No issues found -- the project is in a consistent state.
+```
+
+Nice.
+
+Let's try render again.
+
+```{bash, eval = FALSE}
+processing file: published-202312-favrot-hierarchical.qmd
+Error in dyn.load(file, DLLpath = DLLpath, ...) : 
+  unable to load shared object '/home/mmip/.cache/R/renv/cache/v5/R-4.2/x86_64-pc-linux-gnu/stringi/1.7.6/bba431031d30789535745a9627ac9271/stringi/libs/stringi.so':
+  libicui18n.so.66: cannot open shared object file: No such file or directory
+Calls: .main ... namespaceImport -> loadNamespace -> library.dynam -> dyn.load
+Execution halted
+```
+
+After looking for a solution on google that didn't came, we finally asked chatGPT and we were able to solve the problem. The problem was that the version 66 of the ICU library was missing on the system. 
+
+When we checked the version of libicui18n.so version available on the system, with:
+
+```{bash, eval = FALSE}
+$ ls /usr/lib/x86_64-linux-gnu/libicui18n.so.*
+```
+
+We got only:
+
+```{bash, eval = FALSE}
+/usr/lib/x86_64-linux-gnu/libicui18n.so.60  
+/usr/lib/x86_64-linux-gnu/libicui18n.so.70
+```
+
+We installed the 66 version:
+
+```{bash, eval = FALSE}
+$ wget http://archive.ubuntu.com/ubuntu/pool/main/i/icu/libicu66_66.1-2ubuntu2_amd64.deb
+$ sudo dpkg -i libicu66_66.1-2ubuntu2_amd64.deb
+$ sudo ldconfig
+```
+
+And then the Render worked.
 
 # docker + renv
 
