@@ -47,3 +47,13 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Ignore _site files
+_site/
+*_files/
+
+# Ignore divers files
+local_*.R
+local_nimble*.R
+local_extract_env_data*.R
+local_extract_env_data*.qmd
