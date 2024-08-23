@@ -10,6 +10,8 @@ author:
   - Florian Teste
 date: 2024-08-19
 toc: true
+execute: 
+  cache: true
 ---
 
 ```{r setup}
@@ -94,7 +96,7 @@ experimental design of interest, in order to understand the properties of this
 design. As its goal is not to evaluate computational methods via simulations, it
 does not address the question of interest and we did not evaluate it further.
 The underlying experimental design principles are described in the companion
-book: https://book.declaredesign.org/.
+book: <https://book.declaredesign.org/>.
 
 In the following, we will therefore focus on the packages
 [{**simEngine**}](https://cran.r-project.org/web/packages/SimEngine/vignettes/SimEngine.html),
@@ -1000,3 +1002,15 @@ cannot debug a strange simulation result.
 if (file.exists("results"))
   unlink("results", recursive = TRUE)
 ```
+
+# Tentative conclusion
+
+The four tools reviewed all seem to do the job. It makes sense to choose one or the other based on coding habits, i.e.:
+
+- [{**simpr**}](https://statisfactions.github.io/simpr/) is tidyverse-friendly, and seems to be easy to learn.
+
+- [{**simulator**}](https://jacobbien.github.io/simulator/) uses base R, and is flexible and modular: the components of the simulation study (simulation model, methods, evluation metrics) are stored on disk as R functions, and intermediate results are also stored on disk. It also outputs a Rmarkdown report.
+
+- [{**simEngine**}](https://cran.r-project.org/web/packages/SimEngine/vignettes/SimEngine.html) is  very well documented. It also has a built in parallelization scheme based on `parallel` tailored to simulation studies on a cluster.
+
+- [{**simChef**}](https://yu-group.github.io/simChef/index.html) is more recent (and not on CRAN yet). It is object-oriented and modular. It also outputs a Rmarkdown report. 
