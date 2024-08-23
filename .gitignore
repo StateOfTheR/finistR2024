@@ -47,10 +47,9 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
-
-/.quarto/
-
-# For niimble branch
+.quarto/
+_site/
+local_*.R
 _site/
 *_files/
 *_cache/
