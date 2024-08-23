@@ -1,0 +1,58 @@
+---
+title: "rig: an easy way to switch from an R version to another"
+author: Armand Favrot, Cédric Midoux, Pierre Neuvial
+format: html
+editor: source
+---
+
+`rig` is an R Installation manager that allows you to easily switch between different R versions. 
+
+To install it, follow the instructions on the [GitHub page](https://github.com/r-lib/rig).
+
+On ubuntu, rig will "work" with R versions installed/stored at `/opt/R/`. It will not detect the R versions installed via `apt`. If you never tried to solve this question of switching between R versions, you will need to reinstall the R versions you're interested in using rig.
+
+To do this, use the `add` command. For example, to install R version 4.2.2:
+
+```bash
+$ rig add 4.2.2
+```
+
+After installing additional versions, you can check all the versions available on your computer using the `list` command:
+
+```bash
+$ rig list
+* name   version  aliases
+------------------------------------------
+  4.2.2           
+  4.3.3           
+* 4.4.1           release
+```
+
+The '*' indicates the default version.
+
+Then to access the desired R version in RStudio, use the rstudio command:
+
+```bash
+$ rig rstudio 4.2.2
+```
+
+Here is a command list you can use:
+
+```bash
+rig add        -- install a new R version [alias: install]
+rig available  -- List R versions available to install.
+rig default    -- print or set default R version [alias: switch]
+rig library    -- manage package libraries [alias: lib] (experimental)
+rig list       -- list installed R versions [alias: ls]
+rig resolve    -- resolve a symbolic R version
+rig rm         -- remove R versions [aliases: del, delete, remove]
+rig rstudio    -- start RStudio with the specified R version
+rig run        -- Run R, an R script or an R project
+rig sysreqs    -- manage R-related system libraries and tools (experimental) (macOS)
+rig system     -- manage current installations
+```
+
+For more information, check the GitHub page.
+
+
+
