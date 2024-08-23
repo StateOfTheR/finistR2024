@@ -40,3 +40,5 @@ format:
     highlight: tango
     toc: true
     
+execute:
+  freeze: auto  # re-render only when source changes
