@@ -9,8 +9,10 @@ website:
         href: https://github.com/StateOfTheR/finistR2024
         aria-label: GitHub
       - text: "Instructions"
-        href: instructions.qmd
-    right:
+        href: instructions.qmd 
+    right: 
+      - text: "Graphiques avec Julia"
+        href: plotting_with_julia-1.qmd
       - text: Algorithme
         menu:
         - text: Initiation à Nimble
