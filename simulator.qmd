@@ -1017,7 +1017,7 @@ and seems to be easy to learn. Parallelization is built-in, powered by the
 
 - [{**simulator**}](https://jacobbien.github.io/simulator/) uses base R, and is
 flexible and modular: the components of the simulation study (simulation model,
-methods, evluation metrics) are stored on disk as R functions, and intermediate
+methods, evaluation metrics) are stored on disk as R functions, and intermediate
 results are also stored on disk. It also outputs an Rmarkdown report.
 
 - [{**simEngine**}](https://cran.r-project.org/web/packages/SimEngine/vignettes/SimEngine.html)
