@@ -513,26 +513,29 @@ name_of_simulation <- "normal-mean-test"
 
 ## @knitr main
 
-suppressMessages(
-  
-  sim <- new_simulation(
-    name = name_of_simulation, 
-    label = "Test of mean"
-  ) |> 
-    generate_model(
-      make_model = make_my_model_normal, 
-      seed = 13, 
-      n = 20, 
-      mu2 = as.list(seq(0, 10, by = 0.5)), 
-      mu1 = 0, 
-      sig = 5, 
-      vary_along = "mu2"
-    ) |> 
-    simulate_from_model(nsim = 1000) |> 
-    run_method(list(t_test)) |> 
-    evaluate(list(pval_loss))
+f <- file()
+sink(file = f)
 
-)
+sim <- new_simulation(
+  name = name_of_simulation, 
+  label = "Test of mean"
+) |> 
+  generate_model(
+    make_model = make_my_model_normal, 
+    seed = 13, 
+    n = 20, 
+    mu2 = as.list(seq(0, 10, by = 0.5)), 
+    mu1 = 0, 
+    sig = 5, 
+    vary_along = "mu2"
+  ) |> 
+  simulate_from_model(nsim = 1000) |> 
+  run_method(list(t_test)) |> 
+  evaluate(list(pval_loss))
+
+sink()
+close(f)
+unlink(f)
 
 ## @knitr tables
 
