@@ -4,6 +4,7 @@ author: Cédric Midoux, Pierre Neuvial, Aymeric Stamm, Emily Walker
 editor: source
 bibliography: refs_shiny-deployment.bib
 number-sections: true
+toc: true
 ---
 
 # Motivation
@@ -56,6 +57,26 @@ Aujourd'hui, SK8 semble la solution la plus simple d'utilisation pour le dévelo
 
 ![Statistiques d'utilisation](images/shinyapps-interface-04-metrics.png)
 
+## Idées d'amelioration de la solution PLMShift
 
+La procédure de déploiement consiste à:
+
+1.    Préparer le code de l'application shiny dans un repository git selon un template fourni par PLMShift;
+2.    Créer une instance ShinyR à partir de l'interface OpenShift en:
+
+      - Renseignant l'adresse du repository git;
+      - Configurant des secrets pour l'authentification (communication GitHub - OpenShift);
+      - Configurant des variables d'environnement pour l'application (nom de l'application, ressources nécessaires etc.);
+      - Configurant des paramètres de déploiement (nombre de réplicas, stratégie de déploiement etc.);
+      - Configurant des paramètres de monitoring (alertes, logs etc.).
+
+3.    Tester l'application déployée.
+
+Les étapes 2 et 3 sont réalisées par le développeur de l'application.
+L'interface OpenShift est complexe et nécessite des compétences techniques. Il
+serait intéressant de simplifier cette interface pour la rendre plus accessible
+aux utilisateurs non-experts. Par exemple, en proposant une interface graphique
+pour la configuration des secrets, des variables d'environnement, des paramètres
+de déploiement et de monitoring.
 
 ## Bibliographie
