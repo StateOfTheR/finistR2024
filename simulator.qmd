@@ -1008,12 +1008,29 @@ if (file.exists("results"))
 
 # Tentative conclusion
 
-The four tools reviewed all seem to do the job. It makes sense to choose one or the other based on coding habits, i.e.:
+The four tools reviewed all seem to do the job. It makes sense to choose one or
+the other based on coding habits, *i.e.*:
 
-- [{**simpr**}](https://statisfactions.github.io/simpr/) is tidyverse-friendly, and seems to be easy to learn.
+- [{**simpr**}](https://statisfactions.github.io/simpr/) is tidyverse-friendly, 
+and seems to be easy to learn. Parallelization is built-in, powered by the 
+[**futureverse**](https://www.futureverse.org).
 
-- [{**simulator**}](https://jacobbien.github.io/simulator/) uses base R, and is flexible and modular: the components of the simulation study (simulation model, methods, evluation metrics) are stored on disk as R functions, and intermediate results are also stored on disk. It also outputs a Rmarkdown report.
+- [{**simulator**}](https://jacobbien.github.io/simulator/) uses base R, and is
+flexible and modular: the components of the simulation study (simulation model,
+methods, evluation metrics) are stored on disk as R functions, and intermediate
+results are also stored on disk. It also outputs an Rmarkdown report.
 
-- [{**simEngine**}](https://cran.r-project.org/web/packages/SimEngine/vignettes/SimEngine.html) is  very well documented. It also has a built in parallelization scheme based on `parallel` tailored to simulation studies on a cluster.
+- [{**simEngine**}](https://cran.r-project.org/web/packages/SimEngine/vignettes/SimEngine.html)
+is very well documented. It also has a built-in parallelization scheme based on
+the {**parallel**} package which is tailored towards simulation studies on a
+cluster. The package implements the idea of *updating* a simulation study for,
+say, add more bootstrap samples or more Monte Carlo replicates without
+re-running the whole simulation study.
 
-- [{**simChef**}](https://yu-group.github.io/simChef/index.html) is more recent (and not on CRAN yet). It is object-oriented and modular. It also outputs a Rmarkdown report. 
+- [{**simChef**}](https://yu-group.github.io/simChef/index.html) is 
+pipe-friendly and implements a modular approach to simulations where the user
+must define a set of functions that implements the various parts of a simulation
+study: data-generating process, methods to be applied to the data, evaluation
+metrics to summarize the results of the applied method and visualization. It is
+not yet on CRAN. It is object-oriented and modular. It also outputs a Rmarkdown
+report.
