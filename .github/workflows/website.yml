@@ -16,13 +16,13 @@ jobs:
       - name: Install Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.8' # Specify the Julia version you want to use
+          version: "1.8" # Specify the Julia version you want to use
       - name: Install Julia Packages
         run: |
           julia -e 'using Pkg; Pkg.add(["DataFrames", "DataFramesMeta", "RDatasets", "CairoMakie", "Gadfly", "Compose", "AlgebraOfGraphics"])'
       - name: Additional R packages
         run: |
-          Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
+          Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm', 'simulator'))"
       - name: Additional Python packages
         run: |
           pip install torch torch_geometric 
