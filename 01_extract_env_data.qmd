@@ -1,6 +1,7 @@
 ---
 title: "Extract environmental data from MODIS"
 editor: visual
+author: Baptiste Alglave
 ---
 Extracting environmental data (such as temperature, land cover, and NDVI) from the web can be very challenging. Many platforms are available, such as [Copernicus](https://www.copernicus.eu/en/access-data) and [MODIS](https://modis.gsfc.nasa.gov/data/).
 
@@ -15,6 +16,8 @@ Two approaches are possible:
 *Be aware that the package may have installation issues on Linux, and it is no longer maintained. Additionally, not all products are available. When it does work, it is still very useful for extracting MODIS data within a specific spatio-temporal window.*
 
 2. Use the command line to download the data based on the URL link where the data is stored.# Extracting data with `MODIStsp`
+
+# Dowload MODIS data with the package `MODIStsp`
 
 To install the package use:
 
@@ -54,7 +57,7 @@ You will need an ID and a login to extract the data. Here we took test codes.
 
 The products will be available in the `folder/` specified in the function. They provide a `.RData` file with all the extracted rasters (usually one per time step) or, alternatively, one raster per time step in `.tiff` (or a similar) format.
 
-# Dowload MODIS data from command line
+# Dowload MODIS data from the command line
 
 The package is quite limited in terms of available products (for example, there is no land cover data) and is no longer maintained, so there are several bugs (*e.g.*, during installation).
 

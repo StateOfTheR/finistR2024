@@ -57,3 +57,7 @@ local_*.R
 local_nimble*.R
 local_extract_env_data*.R
 local_extract_env_data*.qmd
+
+
+_site
+/.quarto/
