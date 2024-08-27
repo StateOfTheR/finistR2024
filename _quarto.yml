@@ -35,6 +35,10 @@ website:
         menu:
         - text: Déploiement Shiny
           href: shiny-deployment.qmd
+      - text: "High performance computing"
+        menu:
+        - text: "futureverse"
+          href: futureverse.qmd
         aria-label: GitHub
 format:
   html:
