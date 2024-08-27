@@ -8,7 +8,7 @@ jobs:
   build:
     name: Build website with rmarkdown and Julia
     runs-on: ubuntu-latest
-    container: stateofther/r-finistr2024:0.1
+    container: stateofther/r-finistr2024:0.2
 
     steps:
       - name: Checkout repository
