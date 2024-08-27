@@ -21,8 +21,8 @@ jobs:
           julia -e 'using Pkg; Pkg.add(["DataFrames", "DataFramesMeta", "RDatasets", "CairoMakie", "Gadfly", "Compose", "AlgebraOfGraphics"])'
       - name: Additional R packages
         run: |
-          Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm', 'simulator', 'simpr', 'SimEngine'))"
-          Rscript -e "devtools::install_github('Yu-Group/simChef')"
+          Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
+          Rscript -e "install.packages(c('ggplot2', 'dplyr', 'simulator', 'simpr', 'SimEngine', 'DT', 'withr', 'bench'))"
       - name: Additional Python packages
         run: |
           pip install torch torch_geometric 
