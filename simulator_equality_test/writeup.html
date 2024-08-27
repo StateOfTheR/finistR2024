@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="My Name">
+<meta name="dcterms.date" content="2024-08-27">
 
-<title>Finist’R 2024</title>
+<title>Finist’R 2024 - My Simulation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,25 +22,59 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -77,7 +113,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">Finist’R 2024</span>
     </a>
   </div>
@@ -93,13 +129,13 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./instructions.html"> 
+    <a class="nav-link" href="../instructions.html"> 
 <span class="menu-text">Instructions</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./plotting_with_julia-1.html"> 
+    <a class="nav-link" href="../plotting_with_julia-1.html"> 
 <span class="menu-text">Graphiques avec Julia</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -108,19 +144,19 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-algorithme">    
         <li>
-    <a class="dropdown-item" href="./01_nimble.html">
+    <a class="dropdown-item" href="../01_nimble.html">
  <span class="dropdown-text">Initiation à Nimble</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./python_practice.qmd">
+    <a class="dropdown-item" href="../python_practice.qmd">
  <span class="dropdown-text">Un bon départ avec Python</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./c_python.html">
+    <a class="dropdown-item" href="../c_python.html">
  <span class="dropdown-text">C++ depuis Python</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./simulator.html">
+    <a class="dropdown-item" href="../simulator.html">
  <span class="dropdown-text">Simulations</span></a>
   </li>  
     </ul>
@@ -131,7 +167,7 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-développement">    
         <li>
-    <a class="dropdown-item" href="./precommit.html">
+    <a class="dropdown-item" href="../precommit.html">
  <span class="dropdown-text">Pre-commit avec R</span></a>
   </li>  
     </ul>
@@ -142,7 +178,7 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-réseaux-de-neurones">    
         <li>
-    <a class="dropdown-item" href="./Bipartite_GNN.html">
+    <a class="dropdown-item" href="../Bipartite_GNN.html">
  <span class="dropdown-text">Graph Neural Networks for bipartite graphs with pytorch_geometric</span></a>
   </li>  
     </ul>
@@ -153,7 +189,7 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-déploiement">    
         <li>
-    <a class="dropdown-item" href="./shiny-deployment.html">
+    <a class="dropdown-item" href="../shiny-deployment.html">
  <span class="dropdown-text">Déploiement Shiny</span></a>
   </li>  
     </ul>
@@ -164,7 +200,7 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-high-performance-computing">    
         <li>
-    <a class="dropdown-item" href="./futureverse.html">
+    <a class="dropdown-item" href="../futureverse.html">
  <span class="dropdown-text">futureverse</span></a>
   </li>  
     </ul>
@@ -185,27 +221,231 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#ateliers-finistr-2024" id="toc-ateliers-finistr-2024" class="nav-link active" data-scroll-target="#ateliers-finistr-2024">Ateliers Finist’R 2024</a></li>
+  <li><a href="#main-simulation" id="toc-main-simulation" class="nav-link active" data-scroll-target="#main-simulation">Main simulation</a></li>
+  <li><a href="#components" id="toc-components" class="nav-link" data-scroll-target="#components">Components</a>
+  <ul class="collapse">
+  <li><a href="#models" id="toc-models" class="nav-link" data-scroll-target="#models">Models</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a></li>
+  <li><a href="#metrics" id="toc-metrics" class="nav-link" data-scroll-target="#metrics">Metrics</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-
-
-
-<section id="ateliers-finistr-2024" class="level1">
-<h1>Ateliers Finist’R 2024</h1>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="https://stateofther.github.io/finistR2024/"><img src="https://github.com/StateOfTheR/finistR2024/workflows/website/badge.svg" class="img-fluid figure-img" alt="website"></a></p>
-<figcaption>website</figcaption>
-</figure>
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">My Simulation</h1>
 </div>
-<p>L’atelier Finist’R 2024 – ou <em>bootcamp R</em> s’est déroulé à la <a href="http://www.sb-roscoff.fr/">station biologique de Roscoff</a> du 19 au 23 août 2024.</p>
-<p>Il s’agit de la huitième édition de l’atelier Finist’R. Cet atelier réunit annuellement un groupe de chercheurs, ingénieurs, doctorants, tous utilisateurs avancés de <code>R</code> et dévelopeurs de paquets pour explorer les dernières fonctionalités du logiciel et les nouvelles pratiques de développement. A l’issu de l’atelier le collectif produit une synthèse de cette veille logiciel de manière à progresser collectivement dans l’utilisation du logiciel mais surtout dans la production d’outils statistiques à destination de la communauté.</p>
-<p>La restitution se fait sous forme de site web. Le site de l’édition 2024 <a href="https://stateofther.github.io/finistR2024/">sera disponible ici</a></p>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>My Name </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 27, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This is a <code>knitr</code> report generated by the <code>simulator</code> to describe your simulation. Knitting this file will rerun the simulation if any of the code files have been modified since the <code>simulation</code> object was last created.</p>
+<section id="main-simulation" class="level1">
+<h1>Main simulation</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(simulator)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>name_of_simulation <span class="ot">&lt;-</span> <span class="st">"normal-mean-test"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_simulation</span>(<span class="at">name =</span> name_of_simulation,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">label =</span> <span class="st">"Test of mean"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_model</span>(make_my_model_normal, <span class="at">seed =</span> <span class="dv">13</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">n =</span> <span class="dv">20</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">mu2 =</span> <span class="fu">as.list</span>(<span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="fl">0.5</span>)),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">mu1=</span><span class="dv">0</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sig=</span><span class="dv">5</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">vary_along=</span><span class="st">"mu2"</span>)                 <span class="sc">%&gt;%</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">simulate_from_model</span>(<span class="at">nsim =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_method</span>(<span class="fu">list</span>(t_test)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluate</span>(<span class="fu">list</span>(pval_loss))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can make plots.</p>
+<p>And tables too.</p>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tabulate_eval</span>(sim, <span class="st">"p_value"</span>, <span class="at">output_type =</span> <span class="st">"markdown"</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">format_args =</span> <span class="fu">list</span>(<span class="at">digits =</span> <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<!-- generated by simulator on Tue Aug 27 08:28:59 2024. -->
+<table class="caption-top table">
+<caption>A comparison of Mean pval&lt;0.05 (averaged over 1000 replicates).</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Mean equality test</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.055 (0.0072130)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.067 (0.0079103)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.100 (0.0094916)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.143 (0.0110758)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.226 (0.0132325)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.327 (0.0148422)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.441 (0.0157088)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.559 (0.0157088)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.671 (0.0148654)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.783 (0.0130415)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.860 (0.0109782)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.907 (0.0091889)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.955 (0.0065588)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.982 (0.0042064)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.992 (0.0028185)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.995 (0.0022316)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.999 (0.0010000)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.999 (0.0010000)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">0.999 (0.0010000)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">1.000 (0.0000000)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">1.000 (0.0000000)</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_eval_by</span>(sim, <span class="st">"p_value"</span>, <span class="at">varying =</span> <span class="st">"mu2"</span>, <span class="at">main =</span> <span class="st">"Power curve with mu1=0 and varying mu2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="writeup_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</section>
+<section id="components" class="level1">
+<h1>Components</h1>
+<section id="models" class="level2">
+<h2 class="anchored" data-anchor-id="models">Models</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>make_my_model_normal <span class="ot">&lt;-</span> <span class="cf">function</span>(n, mu1, mu2, sig) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">new_model</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"normal"</span>, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">"normal"</span>), </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">params =</span> <span class="fu">list</span>(<span class="at">n =</span> n, <span class="at">mu1 =</span> mu1, <span class="at">mu2 =</span> mu2, <span class="at">sig =</span> sig),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">simulate =</span> <span class="cf">function</span>(n, mu1,mu2, sig, nsim) {</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="co"># this function must return a list of length nsim</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      x1 <span class="ot">&lt;-</span> mu1 <span class="sc">+</span> sig <span class="sc">*</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(nsim <span class="sc">*</span> n), n, nsim)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      x2 <span class="ot">&lt;-</span> mu2 <span class="sc">+</span> sig <span class="sc">*</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(nsim <span class="sc">*</span> n), n, nsim)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      li1 <span class="ot">&lt;-</span> <span class="fu">split</span>(x1, <span class="fu">col</span>(x1))</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      li2 <span class="ot">&lt;-</span> <span class="fu">split</span>(x2, <span class="fu">col</span>(x2))</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>nsim, <span class="cf">function</span>(i) {</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cbind</span>(li1[[i]], li2[[i]])</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>      })</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>t_test <span class="ot">&lt;-</span> <span class="fu">new_method</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"t-test"</span>, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">label =</span> <span class="st">"Mean equality test"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="cf">function</span>(model, draw) {</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">pvalue =</span> <span class="fu">t.test</span>(draw[, <span class="dv">1</span>], draw[, <span class="dv">2</span>], <span class="at">paired =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>p.value)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="metrics" class="level2">
+<h2 class="anchored" data-anchor-id="metrics">Metrics</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pval_loss <span class="ot">&lt;-</span> <span class="fu">new_metric</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"p_value"</span>, </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">label =</span> <span class="st">"pval&lt;0.05"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metric =</span> <span class="cf">function</span>(model, out) {</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mean</span>(out<span class="sc">$</span>pvalue <span class="sc">&lt;</span> <span class="fl">0.05</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>To cite the <code>simulator</code>, please use</p>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">citation</span>(<span class="st">"simulator"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To cite package ‘simulator’ in publications use:</p>
+<p>Bien J (2016). “The simulator: An Engine to Streamline Simulations.” <em>arXiv:1607.00021</em>. <a href="https://arxiv.org/abs/1607.00021" class="uri">https://arxiv.org/abs/1607.00021</a>.</p>
+<p>A BibTeX entry for LaTeX users is</p>
+<p><span class="citation" data-cites="Article">@Article</span>{, title = {The {simulator}: An Engine to Streamline Simulations}, author = {Jacob Bien}, year = {2016}, url = {https://arxiv.org/abs/1607.00021}, journal = {arXiv:1607.00021}, }</p>
 
 
 </section>

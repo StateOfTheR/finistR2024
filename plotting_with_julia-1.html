@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Cédric Midoux, Pierre Neuvial, Aymeric Stamm, Emily Walker">
 
-<title>Finist’R 2024 - Solutions institutionnelles de déploiement d’applications shiny avec kubernetes</title>
+<title>Finist’R 2024 - Using Julia as a R user</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,27 +20,7 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -120,7 +99,7 @@ div.csl-indent {
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./plotting_with_julia-1.html"> 
+    <a class="nav-link active" href="./plotting_with_julia-1.html" aria-current="page"> 
 <span class="menu-text">Graphiques avec Julia</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -206,16 +185,45 @@ div.csl-indent {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#motivation" id="toc-motivation" class="nav-link active" data-scroll-target="#motivation"><span class="header-section-number">1</span> Motivation</a>
+  <li><a href="#data-to-use-for-the-tutorial" id="toc-data-to-use-for-the-tutorial" class="nav-link active" data-scroll-target="#data-to-use-for-the-tutorial">0: Data to use for the tutorial</a></li>
+  <li><a href="#plots" id="toc-plots" class="nav-link" data-scroll-target="#plots">Plots</a>
   <ul class="collapse">
-  <li><a href="#outils-institutionnels-existants" id="toc-outils-institutionnels-existants" class="nav-link" data-scroll-target="#outils-institutionnels-existants"><span class="header-section-number">1.1</span> Outils institutionnels existants</a></li>
-  <li><a href="#préparation-de-lappli-au-déploiement" id="toc-préparation-de-lappli-au-déploiement" class="nav-link" data-scroll-target="#préparation-de-lappli-au-déploiement"><span class="header-section-number">1.2</span> Préparation de l’appli au déploiement</a></li>
-  <li><a href="#configuration-du-serveur-shiny" id="toc-configuration-du-serveur-shiny" class="nav-link" data-scroll-target="#configuration-du-serveur-shiny"><span class="header-section-number">1.3</span> Configuration du serveur shiny</a></li>
-  <li><a href="#accessibilité" id="toc-accessibilité" class="nav-link" data-scroll-target="#accessibilité"><span class="header-section-number">1.4</span> Accessibilité ?</a></li>
-  <li><a href="#autres-ressources" id="toc-autres-ressources" class="nav-link" data-scroll-target="#autres-ressources"><span class="header-section-number">1.5</span> Autres ressources</a></li>
-  <li><a href="#sec-shinyapps.io" id="toc-sec-shinyapps.io" class="nav-link" data-scroll-target="#sec-shinyapps.io"><span class="header-section-number">1.6</span> Etapes du déploiement d’une application shiny via shinyapps.io</a></li>
-  <li><a href="#idées-damelioration-de-la-solution-plmshift" id="toc-idées-damelioration-de-la-solution-plmshift" class="nav-link" data-scroll-target="#idées-damelioration-de-la-solution-plmshift"><span class="header-section-number">1.7</span> Idées d’amelioration de la solution PLMShift</a></li>
-  <li><a href="#bibliographie" id="toc-bibliographie" class="nav-link" data-scroll-target="#bibliographie"><span class="header-section-number">1.8</span> Bibliographie</a></li>
+  <li><a href="#list-of-available-packages" id="toc-list-of-available-packages" class="nav-link" data-scroll-target="#list-of-available-packages">list of available packages</a></li>
+  </ul></li>
+  <li><a href="#tidierplots" id="toc-tidierplots" class="nav-link" data-scroll-target="#tidierplots">1. TidierPlots</a>
+  <ul class="collapse">
+  <li><a href="#combining-plots" id="toc-combining-plots" class="nav-link" data-scroll-target="#combining-plots">Combining plots</a></li>
+  <li><a href="#issues" id="toc-issues" class="nav-link" data-scroll-target="#issues">Issues</a></li>
+  </ul></li>
+  <li><a href="#makie" id="toc-makie" class="nav-link" data-scroll-target="#makie">2: Makie</a>
+  <ul class="collapse">
+  <li><a href="#installation-choose-a-backend-and-install-it." id="toc-installation-choose-a-backend-and-install-it." class="nav-link" data-scroll-target="#installation-choose-a-backend-and-install-it.">2.1 Installation : choose a backend and install it.</a></li>
+  <li><a href="#basic-plotting" id="toc-basic-plotting" class="nav-link" data-scroll-target="#basic-plotting">2.2 Basic plotting</a></li>
+  </ul></li>
+  <li><a href="#gadfly" id="toc-gadfly" class="nav-link" data-scroll-target="#gadfly">3: Gadfly</a>
+  <ul class="collapse">
+  <li><a href="#basic-plots" id="toc-basic-plots" class="nav-link" data-scroll-target="#basic-plots">3.1 Basic plots</a>
+  <ul class="collapse">
+  <li><a href="#geoms" id="toc-geoms" class="nav-link" data-scroll-target="#geoms">3.1.1 Geom(s) :</a></li>
+  <li><a href="#guides" id="toc-guides" class="nav-link" data-scroll-target="#guides">3.1.2 Guides:</a></li>
+  <li><a href="#layers" id="toc-layers" class="nav-link" data-scroll-target="#layers">3.1.3 Layers</a></li>
+  <li><a href="#scales" id="toc-scales" class="nav-link" data-scroll-target="#scales">3.1.4 Scales</a></li>
+  </ul></li>
+  <li><a href="#compositing" id="toc-compositing" class="nav-link" data-scroll-target="#compositing">3.2 Compositing</a>
+  <ul class="collapse">
+  <li><a href="#grids-using-geom.subplot_grid" id="toc-grids-using-geom.subplot_grid" class="nav-link" data-scroll-target="#grids-using-geom.subplot_grid">3.2.1 Grids using Geom.subplot_grid</a></li>
+  <li><a href="#stacks" id="toc-stacks" class="nav-link" data-scroll-target="#stacks">3.2.2 Stacks</a></li>
+  </ul></li>
+  <li><a href="#conclusion-on-this-package" id="toc-conclusion-on-this-package" class="nav-link" data-scroll-target="#conclusion-on-this-package">3.3 Conclusion on this package</a></li>
+  </ul></li>
+  <li><a href="#algebraofgraphics" id="toc-algebraofgraphics" class="nav-link" data-scroll-target="#algebraofgraphics">4 AlgebraOfGraphics</a>
+  <ul class="collapse">
+  <li><a href="#first-basic-plotting" id="toc-first-basic-plotting" class="nav-link" data-scroll-target="#first-basic-plotting">4.1 First basic plotting</a></li>
+  <li><a href="#combining-and" id="toc-combining-and" class="nav-link" data-scroll-target="#combining-and">4.2 Combining + and *</a></li>
+  <li><a href="#mapping" id="toc-mapping" class="nav-link" data-scroll-target="#mapping">4.3 mapping()</a></li>
+  <li><a href="#visual" id="toc-visual" class="nav-link" data-scroll-target="#visual">4.4 visual()</a></li>
+  <li><a href="#analyses" id="toc-analyses" class="nav-link" data-scroll-target="#analyses">4.5 analyses</a></li>
+  <li><a href="#one-last-example" id="toc-one-last-example" class="nav-link" data-scroll-target="#one-last-example">4.6 One last example</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -225,19 +233,13 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Solutions institutionnelles de déploiement d’applications shiny avec kubernetes</h1>
+<h1 class="title">Using Julia as a R user</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Cédric Midoux, Pierre Neuvial, Aymeric Stamm, Emily Walker </p>
-          </div>
-  </div>
     
   
     
@@ -248,135 +250,364 @@ div.csl-indent {
 </header>
 
 
-<section id="motivation" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Motivation</h1>
+<p><strong>Authors:</strong> - Caroline Cognot - Florian Teste</p>
+<section id="data-to-use-for-the-tutorial" class="level1">
+<h1>0: Data to use for the tutorial</h1>
+<p>We can use the PalmerPenguins dataset (designed for Julia) OR Use the package RDatasets to use our favorite iris dataset.</p>
+<pre class="{julia}"><code>using Pkg
+# Pkg.add("DataFrames")
+# Pkg.add("DataFramesMeta")
+# Pkg.add("PalmerPenguins")
+
+
+using DataFrames
+using DataFramesMeta
+
+using PalmerPenguins
+
+
+penguins = dropmissing(DataFrame(PalmerPenguins.load()))</code></pre>
+<pre class="{julia}"><code># Pkg.add("RDatasets")
+
+using RDatasets
+iris = dataset("datasets","iris")</code></pre>
+</section>
+<section id="plots" class="level1">
+<h1>Plots</h1>
+<section id="list-of-available-packages" class="level2">
+<h2 class="anchored" data-anchor-id="list-of-available-packages">list of available packages</h2>
+<p>List of packages for plots :</p>
 <ul>
-<li>besoin de déploiement d’appli <a href="https://shiny.posit.co/">shiny</a> pour utilisation sans programmation</li>
-<li>solution proposée par <a href="https://www.shinyapps.io/">shinyapps.io</a>: limitation à 25h/mois et 5 applications concurrentes pour la version gratuite, et 1Gb de RAM. Les étapes du déploiement sont illustrées dans la <a href="#sec-shinyapps.io" class="quarto-xref">Section&nbsp;1.6</a></li>
-<li>solution proposée par Posit (anciennement par Shiny Server Pro): <a href="https://posit.co/products/enterprise/connect/">PositConnect</a>: payant (cher)</li>
-<li>intérêt d’avoir une solution institutionnelle</li>
+<li>[<strong>Plots</strong>]</li>
+<li>[<strong>StatsPlots</strong>] - enriches the Plots package</li>
+<li>[<strong>Makie</strong>]</li>
+<li>[<strong>TidierPlots</strong>]</li>
+<li>[<strong>AlgebraOfGraphics</strong>] uses Makie</li>
+<li>[<strong>GadFly</strong>]</li>
 </ul>
-<section id="outils-institutionnels-existants" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="outils-institutionnels-existants"><span class="header-section-number">1.1</span> Outils institutionnels existants</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Outil</th>
-<th>Institution</th>
-<th>Références</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="https://plmshift.pages.math.cnrs.fr/">plmshift</a></td>
-<td>CNRS</td>
-<td></td>
-</tr>
-<tr class="even">
-<td><a href="https://sk8.inrae.fr/">SK8</a></td>
-<td>INRAE</td>
-<td><span class="citation" data-cites="maigne:hal-04141247">Maigné et al. (<a href="#ref-maigne:hal-04141247" role="doc-biblioref">2023</a>)</span></td>
-</tr>
-<tr class="odd">
-<td><a href="https://gitlab.pasteur.fr/hub/shiny-k8s">Shiny-K8s</a></td>
-<td>Institut Pasteur</td>
-<td><span class="citation" data-cites="brancotte:pasteur-04643557">Brancotte and Chapeaublanc (<a href="#ref-brancotte:pasteur-04643557" role="doc-biblioref">2024</a>)</span></td>
-</tr>
-</tbody>
-</table>
+<p>Other packages are available, see (https://discourse.julialang.org/t/comparison-of-plotting-packages/99860/2)</p>
+<p>We tried Makie,TidierPlots,AlgebraOfGraphics and GadFly.</p>
+<hr>
+<p>Important note : in the following document, every time we used a function, it was called using <em>PackageName.functionName</em>. This is necessary because we are using packages importing functions of the same name. For example <em>plot</em> is shared between most packages.</p>
+<p>Functions with names that are not shared can be called by their name only.</p>
 </section>
-<section id="préparation-de-lappli-au-déploiement" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="préparation-de-lappli-au-déploiement"><span class="header-section-number">1.2</span> Préparation de l’appli au déploiement</h2>
-<p>Ces trois outils sont dédiés au déploiement d’applications shiny via <a href="https://kubernetes.io/">Kubernetes</a> (aka K8s). Le développeur de l’application shiny doit fournir un dépôt git contenant le code source de l’application et spécifier les dépendances (via un fichier csv dédié pour shiny-K8s et plmshift, ou automatiquement via renv pour SK8).</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/shinyapps-interface-01-overview.png" class="img-fluid figure-img"></p>
-<figcaption>Etapes pour le déploiement d’une application shiny via SK8 (INRAE)</figcaption>
-</figure>
-</div>
 </section>
-<section id="configuration-du-serveur-shiny" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="configuration-du-serveur-shiny"><span class="header-section-number">1.3</span> Configuration du serveur shiny</h2>
-<p>C’est ici que les trois solutions se différencient:</p>
+<section id="tidierplots" class="level1">
+<h1>1. TidierPlots</h1>
+<p>https://tidierorg.github.io/TidierPlots.jl/latest/</p>
+<p>The goal here is to be able to do the same sort of graphics as when using R ggplot2, that we all love.</p>
+<p>Install the package using ], then add TidierPlots. It takes a long time.</p>
+<p>The package supports ggplot(), and :</p>
 <ul>
-<li>Pour <a href="https://plmshift.pages.math.cnrs.fr/">plmshift</a>, on demande également au développeur de l’application de configurer et d’administrer lui-même son instance ShinyServer, via l’interface d’OpenShift. Ces étapes sont documentées <a href="https://plmshift.pages.math.cnrs.fr/exemples_de_deploiement/deployer_shinyr/">ici</a><br>
-</li>
-<li>Idem pour <a href="https://gitlab.pasteur.fr/hub/shiny-k8s">Shiny-K8s</a>, avec (semble-t-il) moins de compétences techniques requises. Ces étapes sont documentées <a href="https://hub.pages.pasteur.fr/shiny-k8s/user_guide/index.html">ici</a></li>
-<li><a href="https://sk8.inrae.fr/">SK8</a> propose une interface simplifiée pour la configuration du serveur shiny, qui permet au développeur de l’application shiny spécifier directement les paramètres (RAM, CPU) sans avoir besoin de compétences en déploiement.</li>
+<li>some Geoms</li>
+<li>some themes, with the default being the ggplot2 theme</li>
+<li>scale_colour_manual and discrete</li>
+<li>facetting with wrap and grid</li>
+<li>scale, labs,lims</li>
+</ul>
+<p>TidierPlots uses AlgebraOfGraphics, which uses Makie.</p>
+<p>Example using a Julia dataframe : &nbsp;you need to run the PalmerPenguins.load() in the console when doing it for the first time and press y when it asks if you want the data downloaded.</p>
+<p>Issues during the work : it stopped working. First we looked if the version was good.</p>
+<ul>
+<li>] status TidierPlots.</li>
+<li>] update TidierPlots : its not better</li>
+<li>remove it : rm TidierPlots</li>
+<li>install from github :</li>
+</ul>
+<p>There are many dependances, we update all packages before. - using Pkg - Pkg.update()</p>
+<ul>
+<li>Pkg.add(“TidierPlots”)</li>
+</ul>
+<p>using TidierPlots</p>
+<p>g=TidierPlots.ggplot(data = penguins) + geom_bar(<span class="citation" data-cites="aes">@aes</span>(x = species)) + labs(x = “Species”); g</p>
+<section id="combining-plots" class="level3">
+<h3 class="anchored" data-anchor-id="combining-plots">Combining plots</h3>
+<p>Just like the <em>patchwork</em> package, we can combine plots, with + and | for horizontal and / for vertical.</p>
+<p>(g +g)</p>
+<p>g/(g+g)</p>
+<p>g/g +g</p>
+<p>((g + g + g) | g) / (g / g)</p>
+<p>Warning ; the <em>aes</em> syntax exactly as ggplot2 does not exist. It has many equivalents</p>
+<ul>
+<li><span class="citation" data-cites="aes">@aes</span>(x=x,y=y)</li>
+<li><span class="citation" data-cites="es">@es</span>(x=x,y=y)</li>
+<li>aes(x=:x,y=:y)</li>
+<li>aes(x=“x”,y=“y”)</li>
+</ul>
+<p>g1=ggplot(penguins, <span class="citation" data-cites="aes">@aes</span>(x = bill_length_mm, y = bill_depth_mm, color = species)) + geom_point() g2=ggplot(penguins, <span class="citation" data-cites="aes">@aes</span>(x=:bill_length_mm, y=:bill_depth_mm, color=:species)) + geom_point() g3=ggplot(penguins, aes(x = “bill_length_mm”, y = “bill_depth_mm”, color = “species”)) + geom_point() g4=ggplot(penguins, <span class="citation" data-cites="es">@es</span>(x = bill_length_mm, y = bill_depth_mm, color = species)) + geom_point()</p>
+<p>g1/g2+g3/g4</p>
+<p>The different syntaxes gave the same results ! The rest of the code is exactly the same as in ggplot2.</p>
+</section>
+<section id="issues" class="level3">
+<h3 class="anchored" data-anchor-id="issues">Issues</h3>
+<ul>
+<li>Package still not stable. It downgrades others when using add, and the GitHub version has unresolved issues.</li>
+<li>It worked at some point (20/08/2024 afternoon) and then in the same evening stopped.</li>
 </ul>
 </section>
-<section id="accessibilité" class="level2" data-number="1.4">
-<h2 data-number="1.4" class="anchored" data-anchor-id="accessibilité"><span class="header-section-number">1.4</span> Accessibilité ?</h2>
-<p><a href="https://plmshift.pages.math.cnrs.fr/">plmshift</a>, <a href="https://sk8.inrae.fr/">SK8</a> et <a href="https://gitlab.pasteur.fr/hub/shiny-k8s">Shiny-K8s</a> sont respectivement accessibles seulement pour des projets développés par le CNRS, INRAE et l’Institut Pasteur.</p>
-<p>Aujourd’hui, SK8 semble la solution la plus simple d’utilisation pour le développeur shiny. Les paramètres de configuration sont relativement proches de ceux demandés pour le dépoiements sur shinyapps.io (voir <a href="#sec-shinyapps.io" class="quarto-xref">Section&nbsp;1.6</a>). Afin de rendre ce type d’outil accessible à d’autres institutions qu’’INRAE, on peut envisager soit l’ouverture d’un des services existants à ces institutions, soit la mise à disposition de ce type de service directement par chaque institution. Les deux solutions nécessitent des ressources matérielles et humaines; la première solution peut permettre des économies d’échelle mais peut poser des questions sur le partage des données de recherche entre institutions.</p>
 </section>
-<section id="autres-ressources" class="level2" data-number="1.5">
-<h2 data-number="1.5" class="anchored" data-anchor-id="autres-ressources"><span class="header-section-number">1.5</span> Autres ressources</h2>
+<section id="makie" class="level1">
+<h1>2: Makie</h1>
+<p>https://docs.makie.org/v0.21/ https://github.com/MakieOrg/Makie.jl</p>
 <ul>
-<li><a href="https://gitlab.pasteur.fr/hub/shiny-k8s-example">code</a> d’une application démo pour déploiement avec shiny-K8s</li>
-<li><a href="https://forgemia.inra.fr/elisemaigne/slides/presentation_sk8_rr2024">présentation</a> d’Elise Maigné aux rencontres R 2024</li>
+<li>Date of today : 22/08/2024</li>
+<li>Last release : 19/08/2024</li>
+<li>Last change to the GitHub repository : 20/08/2024</li>
 </ul>
-</section>
-<section id="sec-shinyapps.io" class="level2" data-number="1.6">
-<h2 data-number="1.6" class="anchored" data-anchor-id="sec-shinyapps.io"><span class="header-section-number">1.6</span> Etapes du déploiement d’une application shiny via shinyapps.io</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/shinyapps-interface-01-overview.png" class="img-fluid figure-img"></p>
-<figcaption>Vue d’ensemble</figcaption>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/shinyapps-interface-02-params-basic.png" class="img-fluid figure-img"></p>
-<figcaption>Configuration: paramètres de base</figcaption>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/shinyapps-interface-03-params-advanced.png" class="img-fluid figure-img"></p>
-<figcaption>Configuration: paramètres avancés</figcaption>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/shinyapps-interface-04-metrics.png" class="img-fluid figure-img"></p>
-<figcaption>Statistiques d’utilisation</figcaption>
-</figure>
-</div>
-</section>
-<section id="idées-damelioration-de-la-solution-plmshift" class="level2" data-number="1.7">
-<h2 data-number="1.7" class="anchored" data-anchor-id="idées-damelioration-de-la-solution-plmshift"><span class="header-section-number">1.7</span> Idées d’amelioration de la solution PLMShift</h2>
-<p>La procédure de déploiement consiste à:</p>
-<ol type="1">
-<li><p>Préparer le code de l’application shiny dans un repository git selon un template fourni par PLMShift;</p></li>
-<li><p>Créer une instance ShinyR à partir de l’interface OpenShift en:</p>
+<p>Backend packages : GLMakie, WGLMakie, CairoMakie, RPRMakie.</p>
+<section id="installation-choose-a-backend-and-install-it." class="level2">
+<h2 class="anchored" data-anchor-id="installation-choose-a-backend-and-install-it.">2.1 Installation : choose a backend and install it.</h2>
 <ul>
-<li>Renseignant l’adresse du repository git;</li>
-<li>Configurant des secrets pour l’authentification (communication GitHub - OpenShift);</li>
-<li>Configurant des variables d’environnement pour l’application (nom de l’application, ressources nécessaires etc.);</li>
-<li>Configurant des paramètres de déploiement (nombre de réplicas, stratégie de déploiement etc.);</li>
-<li>Configurant des paramètres de monitoring (alertes, logs etc.).</li>
+<li>GLMakie (OpenGL based, interactive)</li>
+<li>CairoMakie (Cairo based, static vector graphics)</li>
+<li>WGLMakie (WebGL based, displays plots in the browser)</li>
+<li>RPRMakie (Experimental ray-tracing using RadeonProRender)</li>
+</ul>
+<p>Then install it using Julia’s package manager Pkg:</p>
+<pre class="{julia}"><code>using Pkg
+# Pkg.add("CairoMakie")</code></pre>
+<p>There’s no need to install Makie.jl separately, it is re-exported by each backend package.</p>
+</section>
+<section id="basic-plotting" class="level2">
+<h2 class="anchored" data-anchor-id="basic-plotting">2.2 Basic plotting</h2>
+<p>lines(x,y) scatter(x,y)</p>
+<pre class="{julia}"><code>using CairoMakie
+</code></pre>
+<p>Makie looks more like base R plots. We did not have the time to finish this part.</p>
+</section>
+</section>
+<section id="gadfly" class="level1">
+<h1>3: Gadfly</h1>
+<p>https://gadflyjl.org/stable/</p>
+<p>Gadfly can be installed using in the REPL julia&gt; ]add Gadfly</p>
+<p>Gadfly is based on R ggplot2 and supports DataFrames. As opposed to ggplot2, it does not <em>only</em> support DataFrames, you can also use vectors as arguments.</p>
+<p>The GitHub page is there : https://github.com/GiovineItalia/Gadfly.jl/tree/master</p>
+<ul>
+<li>Last release : 2021</li>
+<li>Last change to the GitHub repository : 5 months ago (so, early 2024)</li>
+</ul>
+<pre class="{julia}"><code># Pkg.add("Gadfly")
+
+using Gadfly</code></pre>
+<section id="basic-plots" class="level2">
+<h2 class="anchored" data-anchor-id="basic-plots">3.1 Basic plots</h2>
+<p>The basic plotting function is also called plot. The syntax when using a DataFrame is as follows :</p>
+<p>plot(data::AbstractDataFrame, elements::Element…; mapping…)</p>
+<p>It is not exactly the same as the ggplot2 syntax, but close.</p>
+<p>Every information goes in the same plot() function call.</p>
+<p>hstack(plots) stacks the plots side by side, vstack stacks vertically.</p>
+<section id="geoms" class="level3">
+<h3 class="anchored" data-anchor-id="geoms">3.1.1 Geom(s) :</h3>
+<ul>
+<li>The default geometry is Geom.point.</li>
+<li>others : https://gadflyjl.org/stable/gallery/geometries/ (with examples), or https://gadflyjl.org/stable/lib/geometries/ for all possibilities</li>
+<li>You can add as much Geom as you want separated by “,”</li>
+</ul>
+<pre class="{julia}"><code>p1 = Gadfly.plot(penguins, x=:bill_length_mm, y=:bill_depth_mm,color=:species, Geom.point);
+p2 = Gadfly.plot(penguins, x=:bill_length_mm, y=:bill_depth_mm,color=:species, Geom.point,Geom.line);
+hstack(p1,p2)</code></pre>
+<p>Saving a plot is done using the <em>draw</em> function.</p>
+<p>Notes :</p>
+<ul>
+<li>default has no background.</li>
+</ul>
+<p>img = SVG(“penguin_plot.svg”, 14cm, 8cm) draw(img, p1)</p>
+<p>img = SVG(“penguin_plot.png”, 14cm, 8cm) draw(img, p2)</p>
+<p>When using arrays instead of DataFrames, instead, use the data directly. However, the automatic axes do not exist and we have to add them manually using Guide.</p>
+</section>
+<section id="guides" class="level3">
+<h3 class="anchored" data-anchor-id="guides">3.1.2 Guides:</h3>
+<ul>
+<li>For adding informations on the plot.</li>
+<li>https://gadflyjl.org/stable/gallery/guides/ for examples, https://gadflyjl.org/stable/lib/guides/ for an exhaustive list</li>
+</ul>
+<p>Example : same graph usign first arrays, then the DataFrame directly.</p>
+<pre class="{julia}"><code>bill_length=penguins.bill_length_mm
+bill_depth=penguins.bill_depth_mm
+species = penguins.species
+p1 = Gadfly.plot(x=bill_length,y=bill_depth,color=species, Geom.point,
+Guide.xlabel("bill length"),Guide.ylabel("bill depth"),
+Guide.colorkey(title="Species",labels=["my favorite specie","others","another one"]),
+Gadfly.Theme(key_position=:inside),Guide.title("I love penguins"));
+p2 = Gadfly.plot(penguins,x=:bill_length_mm,y=:bill_depth_mm,color=:species, Geom.point,
+Guide.colorkey(title="Species",labels=["my favorite specie","others","another one"]),
+Gadfly.Theme(key_position=:inside),Guide.title("I love penguins more"));
+hstack(p1,p2)</code></pre>
+</section>
+<section id="layers" class="level3">
+<h3 class="anchored" data-anchor-id="layers">3.1.3 Layers</h3>
+<p>Layers allow several instructions in the same plot() call.</p>
+<p>Example of layers using the penguins dataframe :</p>
+<pre class="{julia}"><code>penguinm = @subset(penguins, :sex .== "male")
+penguinf = @subset(penguins, :sex .== "female")
+
+p3 = Gadfly.plot(penguinm, x=:bill_length_mm, y=:bill_depth_mm,color=["male"],shape=:species, Geom.point,
+    layer(penguinf,x=:bill_length_mm,y=:bill_depth_mm,color=["female"],shape=:species,Geom.point));
+    p3</code></pre>
+<p>Color, and other aesthetics, can also be mapped by using arrays with group labels or functional types e.g.&nbsp;[“group label”] or [colorant”red”]. [“Group labels”] are added to the key. [colorant”red”] are not added to the key, and not present in the legend of the plot.</p>
+<pre class="{julia}"><code>#example from Gadfly tutorial :
+y1 = [0.1, 0.26, NaN, 0.5, 0.4, NaN, 0.48, 0.58, 0.83]
+Gadfly.plot(x=1:9, y=y1, Geom.line, Geom.point,
+        color=["Item 1"], linestyle=[:dash], size=[3pt],
+    layer(x=1:10, y=rand(10), Geom.line, Geom.point,
+        color=["Item 2"], size=[5pt], shape=[Shape.square]),
+    layer(x=1:10, y=rand(10), color=[colorant"hotpink"],
+        linestyle=[[8pt, 3pt, 2pt, 3pt]], Geom.line))</code></pre>
+</section>
+<section id="scales" class="level3">
+<h3 class="anchored" data-anchor-id="scales">3.1.4 Scales</h3>
+<p>https://gadflyjl.org/stable/tutorial/#Continuous-Scales https://gadflyjl.org/stable/tutorial/#Discrete-Scales</p>
+<p>Scale can be supplied with Scale.myscale for continuous and discrete scales.</p>
+</section>
+</section>
+<section id="compositing" class="level2">
+<h2 class="anchored" data-anchor-id="compositing">3.2 Compositing</h2>
+<p>https://gadflyjl.org/stable/man/compositing/#Compositing</p>
+<p>With ggplot2, we also like using faceting and grids to represent different data.</p>
+<section id="grids-using-geom.subplot_grid" class="level3">
+<h3 class="anchored" data-anchor-id="grids-using-geom.subplot_grid">3.2.1 Grids using Geom.subplot_grid</h3>
+<p>For grids, we have to use “xgroup” and/or “ygroup” and “Geom.subplot_grid(Geom.mygeomIwant)” instead of just Geom.mygeomIwant. This does the work of +facet_grid().</p>
+<pre class="{julia}"><code># Pkg.add("Compose")
+
+using Compose
+p = Gadfly.plot(penguins, x=:bill_length_mm, y=:bill_depth_mm,xgroup=:species,ygroup=:sex,
+ shape=:sex, color=:island, Geom.subplot_grid(Geom.point),alpha=[0.5]);
+p</code></pre>
+<p>Additional Guides can be placed inside the Geom.subplot_grid :</p>
+<pre class="{julia}"><code>p4 = Gadfly.plot(penguins, x=:bill_length_mm, y=:bill_depth_mm,xgroup=:species,color=:sex,
+ shape=:sex,
+  Geom.subplot_grid(Geom.point,Guide.ylabel(orientation=:vertical)),
+  alpha=[0.5],Guide.title("I love penguins even more"));
+p4</code></pre>
+</section>
+<section id="stacks" class="level3">
+<h3 class="anchored" data-anchor-id="stacks">3.2.2 Stacks</h3>
+<p>stackings used different plots and hstack,vstack or gridstack.</p>
+<p>vstack(…) puts all argument on top of each other. hstack(…) puts them side by side. gridstack(…) works with a matrix of plots such as [ p1 p2;p3 p4] combining vstack and pstack also works to define different arrangements. a blank panel can be used using only plot()</p>
+<pre class="{julia}"><code>vstack(hstack(p1,p2,p3,Gadfly.plot()),hstack(p4))</code></pre>
+</section>
+</section>
+<section id="conclusion-on-this-package" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion-on-this-package">3.3 Conclusion on this package</h2>
+<p>The documentation is rich with examples from the RDatasets. There are replacements for common ggplot2 functions. The library lists all available functions, Geom, Guides, Statistics, Coordinates, Scales and Shape available.</p>
+</section>
+</section>
+<section id="algebraofgraphics" class="level1">
+<h1>4 AlgebraOfGraphics</h1>
+<p>“Define an algebra of graphics based on a few simple building blocks that can be combined using + and *. Still somewhat experimental, may break often.”</p>
+<p>Last release : 21/08/2024 Last GitHub activity : 21/08/2024</p>
+<p>This package relies on Makie.</p>
+<p>Warning : <em>draw</em> of AlgebraOfGraphics is not compatible with <em>draw</em> of Combine loaded earlier in the notebook.</p>
+<pre class="{julia}"><code># import Pkg; Pkg.add("AlgebraOfGraphics")
+import AlgebraOfGraphics as AOG
+using CairoMakie, PalmerPenguins
+
+penguins = dropmissing(DataFrame(PalmerPenguins.load()))
+first(penguins, 6)</code></pre>
+<pre class="{julia}"><code>AOG.set_aog_theme!()
+
+
+axis = (width = 225, height = 225)
+penguin_frequency = AOG.data(penguins) * AOG.frequency() * AOG.mapping(:species)
+
+AOG.draw(penguin_frequency; axis = axis)</code></pre>
+<p>Saving a plot :</p>
+<p>fg = AOG.draw(penguin_frequency; axis = axis) save(“figure.png”, fg, px_per_unit = 3) # save high-resolution png</p>
+<section id="first-basic-plotting" class="level2">
+<h2 class="anchored" data-anchor-id="first-basic-plotting">4.1 First basic plotting</h2>
+<p>AlgebraOfGraphics relies on the * and + operations to combine plotting elements.</p>
+<p>The plot object is defined through different blocks :</p>
+<ul>
+<li>data() to declare the data used (DataFrame)</li>
+<li>mapping() to declare the aesthetics (aes in ggplot2 or TidierPlots)
+<ul>
+<li>if classic plot with x,y : you can use mapping(x=:truc1,truc2) OR mapping (truc1,truc2) but not mapping(x=:truc1,y=:truc2).</li>
 </ul></li>
-<li><p>Tester l’application déployée.</p></li>
-</ol>
-<p>Les étapes 2 et 3 sont réalisées par le développeur de l’application. L’interface OpenShift est complexe et nécessite des compétences techniques. Il serait intéressant de simplifier cette interface pour la rendre plus accessible aux utilisateurs non-experts. Par exemple, en proposant une interface graphique pour la configuration des secrets, des variables d’environnement, des paramètres de déploiement et de monitoring.</p>
+<li>visual()</li>
+<li>analyses The resulting plot is then shown using draw(plt).</li>
+</ul>
+<pre class="{julia}"><code>penguin_bill = AOG.data(penguins) * AOG.mapping(:bill_length_mm, :bill_depth_mm,color=:species)
+AOG.draw(penguin_bill; axis = axis)</code></pre>
+<p>To rename x and y axis, add <em>=&gt; “name of axis”</em></p>
+<pre class="{julia}"><code>penguin_bill = AOG.data(penguins) * AOG.mapping(
+    :bill_length_mm  =&gt; "bill length (mm)",
+    :bill_depth_mm  =&gt; "bill depth (mm)",
+)
+AOG.draw(penguin_bill; axis = axis)</code></pre>
+<p>To apply a transformation to the values (mm to cm in this example), add <em>=&gt; (t-&gt;transformation(t))</em></p>
+<pre class="{julia}"><code>penguin_bill = AOG.data(penguins) * AOG.mapping(
+    :bill_length_mm =&gt; (t -&gt; t / 10) =&gt; "bill length (cm)",
+    :bill_depth_mm =&gt; (t -&gt; t / 10) =&gt; "bill depth (cm)",
+)
+AOG.draw(penguin_bill; axis = axis)</code></pre>
+<p>To add information, take your first plot object and add new mappings :</p>
+<pre class="{julia}"><code>plt = penguin_bill * AOG.mapping(color = :species)
+AOG.draw(plt; axis = axis)</code></pre>
 </section>
-<section id="bibliographie" class="level2" data-number="1.8">
-
-
+<section id="combining-and" class="level2">
+<h2 class="anchored" data-anchor-id="combining-and">4.2 Combining + and *</h2>
+<ul>
+<li>the * operator adds information on a plot</li>
+<li>the + operator adds a new layer</li>
+</ul>
+<p>We can use factorisation to combine the two operations. In this “Algebra Of Graphics”, mapping() is the “neutral” element.</p>
+<p>The linear regression removes the point plots. We have to add it back on the plot, using +</p>
+<p>And factorise this :</p>
+<pre class="{julia}"><code>
+plt = penguin_bill * (AOG.linear() + AOG.mapping()) * AOG.mapping(color = :species)
+AOG.draw(plt; axis = axis)</code></pre>
+</section>
+<section id="mapping" class="level2">
+<h2 class="anchored" data-anchor-id="mapping">4.3 mapping()</h2>
+<p>Examples of mappings :</p>
+<ul>
+<li>color =: colorkey</li>
+<li>col= :variablename; to use when gridding plots horizontally across variablename</li>
+<li>row=: variablename; for gridding vertically</li>
+<li>layout=:variablename</li>
+</ul>
+<p>If no data was set, the entries of <em>mapping</em> have to be vectors.</p>
+<p>The structure of the mapping is tied to the plotting function used with it (analysis), and the visual attribute. See documentations for more information.</p>
+<ul>
+<li><em>Pair</em> operator <em>=&gt;</em> is used to rename columns, transform columns, map to a custom scale</li>
+</ul>
+</section>
+<section id="visual" class="level2">
+<h2 class="anchored" data-anchor-id="visual">4.4 visual()</h2>
+<p>default is the xy scatterplot. command : visual(plottype; attributes…)</p>
+<p>Examples : - BarPlot - Heatmap</p>
+<pre class="{julia}"><code>penguin_bill = AOG.data(penguins) * AOG.mapping(
+    :body_mass_g,:species,color=:sex,layout=:island
+    
+)*AOG.visual(BarPlot)
+AOG.draw(penguin_bill; axis = axis)</code></pre>
+</section>
+<section id="analyses" class="level2">
+<h2 class="anchored" data-anchor-id="analyses">4.5 analyses</h2>
+<p>They do more complicated operation. Examples :</p>
+<ul>
+<li>histogram()</li>
+<li>density()</li>
+<li>frequency()</li>
+<li>linear()</li>
+<li>expectation() : compute expected value of last arg, conditionned on previous.</li>
+<li>smooth</li>
+<li>contours, filled_contours</li>
+</ul>
+</section>
+<section id="one-last-example" class="level2">
+<h2 class="anchored" data-anchor-id="one-last-example">4.6 One last example</h2>
+<pre class="{julia}"><code>
+penguinsplot = AOG.data(penguins)*
+    AOG.mapping(:bill_length_mm,:bill_depth_mm,
+    col=:species,row=:sex,marker=:sex,color=:island)
+AOG.draw(penguinsplot)</code></pre>
 
 
 </section>
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">1.8 Bibliographie</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-brancotte:pasteur-04643557" class="csl-entry" role="listitem">
-Brancotte, Bryan, and Elodie Chapeaublanc. 2024. <span>“<span class="nocase">Shiny-K8s, a toolkit to easily and reproducibly deploy your (R)Shiny app thanks to docker and Kubernetes (without mastering them!)</span>.”</span> <span>JOBIM TOULOUSE</span>; <span>JOBIM 2024</span>. <a href="https://pasteur.hal.science/pasteur-04643557">https://pasteur.hal.science/pasteur-04643557</a>.
-</div>
-<div id="ref-maigne:hal-04141247" class="csl-entry" role="listitem">
-Maigné, Élise, Isabelle Sanchez, David Carayon, Joseph Tran, Jean-François Rey, Cédric Midoux, and Marine Marjou. 2023. <span>“<span class="nocase">SK8 : Un service institutionnel de gestion et d’h<span class="nocase">é</span>bergement d’applications Shiny</span>.”</span> <span>Rencontres R 2023 et 2024</span>. <a href="https://hal.inrae.fr/hal-04141247">https://hal.inrae.fr/hal-04141247</a>.
-</div>
-</div></section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

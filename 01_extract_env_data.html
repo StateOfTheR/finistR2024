@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Baptiste Alglave">
 
-<title>Finist’R 2024</title>
+<title>Finist’R 2024 - Extract environmental data from MODIS</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -185,27 +220,110 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#ateliers-finistr-2024" id="toc-ateliers-finistr-2024" class="nav-link active" data-scroll-target="#ateliers-finistr-2024">Ateliers Finist’R 2024</a></li>
+  <li><a href="#dowload-modis-data-with-the-package-modistsp" id="toc-dowload-modis-data-with-the-package-modistsp" class="nav-link active" data-scroll-target="#dowload-modis-data-with-the-package-modistsp">Dowload MODIS data with the package <code>MODIStsp</code></a></li>
+  <li><a href="#dowload-modis-data-from-the-command-line" id="toc-dowload-modis-data-from-the-command-line" class="nav-link" data-scroll-target="#dowload-modis-data-from-the-command-line">Dowload MODIS data from the command line</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-
-
-
-<section id="ateliers-finistr-2024" class="level1">
-<h1>Ateliers Finist’R 2024</h1>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="https://stateofther.github.io/finistR2024/"><img src="https://github.com/StateOfTheR/finistR2024/workflows/website/badge.svg" class="img-fluid figure-img" alt="website"></a></p>
-<figcaption>website</figcaption>
-</figure>
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Extract environmental data from MODIS</h1>
 </div>
-<p>L’atelier Finist’R 2024 – ou <em>bootcamp R</em> s’est déroulé à la <a href="http://www.sb-roscoff.fr/">station biologique de Roscoff</a> du 19 au 23 août 2024.</p>
-<p>Il s’agit de la huitième édition de l’atelier Finist’R. Cet atelier réunit annuellement un groupe de chercheurs, ingénieurs, doctorants, tous utilisateurs avancés de <code>R</code> et dévelopeurs de paquets pour explorer les dernières fonctionalités du logiciel et les nouvelles pratiques de développement. A l’issu de l’atelier le collectif produit une synthèse de cette veille logiciel de manière à progresser collectivement dans l’utilisation du logiciel mais surtout dans la production d’outils statistiques à destination de la communauté.</p>
-<p>La restitution se fait sous forme de site web. Le site de l’édition 2024 <a href="https://stateofther.github.io/finistR2024/">sera disponible ici</a></p>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Baptiste Alglave </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Extracting environmental data (such as temperature, land cover, and NDVI) from the web can be very challenging. Many platforms are available, such as <a href="https://www.copernicus.eu/en/access-data">Copernicus</a> and <a href="https://modis.gsfc.nasa.gov/data/">MODIS</a>.</p>
+<p>These platforms offer a wide range of products that can be highly heterogeneous for a single variable, meaning they may differ in spatial/temporal resolution and extents. They also come with their own routines, which can be technically complex and resource-intensive.</p>
+<p>This brief document describes a simple and efficient, though likely not yet perfect, method for extracting certain environmental variables from <a href="https://modis.gsfc.nasa.gov/data/">MODIS</a>.</p>
+<p>Two approaches are possible:</p>
+<ol type="1">
+<li>Use the package <a href="https://docs.ropensci.org/MODIStsp/"><code>MODIStsp</code></a> in R.</li>
+</ol>
+<p><em>Be aware that the package may have installation issues on Linux, and it is no longer maintained. Additionally, not all products are available. When it does work, it is still very useful for extracting MODIS data within a specific spatio-temporal window.</em></p>
+<ol start="2" type="1">
+<li>Use the command line to download the data based on the URL link where the data is stored.# Extracting data with <code>MODIStsp</code></li>
+</ol>
+<section id="dowload-modis-data-with-the-package-modistsp" class="level1">
+<h1>Dowload MODIS data with the package <code>MODIStsp</code></h1>
+<p>To install the package use:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"ropensci/MODIStsp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The base function of the package is <code>MODIStsp()</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">MODIStsp</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">gui =</span> <span class="cn">FALSE</span>, <span class="co"># Do not open GUI before processing</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">spatmeth =</span> <span class="st">"tiles"</span>, <span class="co"># Type of spatial extent</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">out_folder =</span> <span class="st">"folder/"</span>, <span class="co"># Folder to store the data</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">start_x =</span> <span class="dv">17</span>,<span class="at">end_x =</span> <span class="dv">18</span>, <span class="co"># Geographic rectangles/tiles to download the data</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">start_y =</span> <span class="dv">3</span>,<span class="at">end_y =</span> <span class="dv">4</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">start_date =</span> <span class="st">"2000.01.01"</span>, <span class="co"># Beginning of the time series</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">end_date =</span> <span class="st">"2020.12.01"</span>, <span class="co"># End of the time series,</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">selprod =</span> <span class="st">"Vegetation_Indexes_Monthly_005dg (M*D13C2)"</span>, <span class="co"># Product to download </span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">bandsel =</span> <span class="fu">c</span>(<span class="st">"NDVI"</span>), <span class="co"># MODIS layers to be processed</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">quality_bandsel =</span> <span class="cn">NULL</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">indexes_bandsel =</span> <span class="cn">NULL</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">user =</span> <span class="st">"mstp_test"</span>, <span class="co"># put your ID</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">password =</span> <span class="st">"MSTP_test_01"</span>, <span class="co"># and login</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">parallel =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The argument <code>spatmeth</code> allows you to select the spatial extent of the data to download. It can be defined by a set of tiles that reference rectangles covering the world (specified through the arguments <code>start_x</code>, <code>end_x</code>, <code>start_y</code>, <code>end_y</code>) <a href="https://modis-land.gsfc.nasa.gov/MODLAND_grid.html">link</a>. It can also be a <code>bbox</code> or a shapefile contained in a file.</p>
+<p><code>selprod</code> is the product to select (variable, spatial, and temporal resolution). All products available through <code>MODIStsp</code> can be obtained with the function <code>MODIStsp_get_prodnames()</code>.</p>
+<p>You will need an ID and a login to extract the data. Here we took test codes.</p>
+<p>The products will be available in the <code>folder/</code> specified in the function. They provide a <code>.RData</code> file with all the extracted rasters (usually one per time step) or, alternatively, one raster per time step in <code>.tiff</code> (or a similar) format.</p>
+</section>
+<section id="dowload-modis-data-from-the-command-line" class="level1">
+<h1>Dowload MODIS data from the command line</h1>
+<p>The package is quite limited in terms of available products (for example, there is no land cover data) and is no longer maintained, so there are several bugs (<em>e.g.</em>, during installation).</p>
+<p>A more robust way to extract the data is to use the data access portal <a href="https://lpdaac.usgs.gov/data/">link</a>. The key point is to find the right product in the catalog [<a href="https://lpdaac.usgs.gov/product_search/">catalog link</a>].</p>
+<p>After finding the product, such as <a href="https://lpdaac.usgs.gov/products/mcd12c1v061/">land cover</a> &gt; click on “Access the data” &gt; click on the download icon in the “Data Pool” to directly download the data.</p>
+<p><img src="images/MODIS_screen.png" class="img-fluid"></p>
+<p>This redirects you to a page with all the files related to the product (which can be extensive).</p>
+<p>For land cover data, here is the link <a href="https://e4ftl01.cr.usgs.gov/MOTA/MCD12C1.061/" class="uri">https://e4ftl01.cr.usgs.gov/MOTA/MCD12C1.061/</a>.</p>
+<p>The following steps are summarized for Ubuntu. Detailed instructions for different operating systems can be found <a href="https://lpdaac.usgs.gov/resources/e-learning/how-access-lp-daac-data-command-line/">here</a>.</p>
+<p>First, you will need to create a user profile at <a href="https://urs.earthdata.nasa.gov/home" class="uri">https://urs.earthdata.nasa.gov/home</a>.</p>
+<p>Next, create a <code>.netrc</code> file in your home directory.</p>
+<p>Then, write the following lines with your earthdata.nasa ID and password in the terminal.</p>
+<pre><code>echo "machine urs.earthdata.nasa.gov login YOUR_USERNAME password YOUR_PASSWORD" &gt; ~/.netrc
+chmod 0600 ~/.netrc</code></pre>
+<p>Use <code>wget</code> to download the whole data:</p>
+<pre><code>wget -r -np -nH --cut-dirs=3 --reject "index.html*" --no-check-certificate https://e4ftl01.cr.usgs.gov/MOTA/MCD12C1.061/</code></pre>
+<p>Here is an explanation of the argument:</p>
+<ul>
+<li><p>-r: Recursive download.</p></li>
+<li><p>-np: No parent, prevents wget from following links to the parent directory.</p></li>
+<li><p>-nH: Disables the creation of host-prefixed directories.</p></li>
+<li><p>–cut-dirs=3: Removes the first three directory levels from the downloaded file paths.</p></li>
+<li><p>–reject “index.html*”: Excludes the index.html files from the download.</p></li>
+<li><p>–no-check-certificate: Prevents wget from checking the SSL certificate (useful if there are issues with certificate validation).</p></li>
+</ul>
+<p>It will download the data in <code>.hdf</code> format files. To download data for only a single year (<em>e.g.</em>, 2001), navigate through the file tree by entering:</p>
+<pre><code>wget -r -np -nH --cut-dirs=3 --reject "index.html*" --no-check-certificate 
+https://e4ftl01.cr.usgs.gov/MOTA/MCD12C1.061/2001.01.01/</code></pre>
+<p>Files will be downloaded to the home directory. To download them to a specific folder, navigate to the desired directory using the <code>cd</code> command, choose the directory of interest, and run the previous command. Alternatively, you can use the <code>-P</code> argument.</p>
+<pre><code>wget -r -np -nH --cut-dirs=3 -P "file_name" --reject "index.html*" --no-check-certificate https://e4ftl01.cr.usgs.gov/MOTA/MCD12C1.061/2001.01.01/</code></pre>
+<p><strong>This option should be preferred over the R package <code>MODIStsp</code> because it provides access to more products and does not depend on package maintenance.</strong></p>
 
 
 </section>
