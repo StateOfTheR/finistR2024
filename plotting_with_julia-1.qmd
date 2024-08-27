@@ -1,0 +1,518 @@
+---
+title: Using Julia as a R user
+engine: julia
+---
+
+**Authors:** 
+- Caroline Cognot
+- Florian Teste
+
+
+# 0: Data to use for the tutorial
+
+
+We can use the PalmerPenguins dataset (designed for Julia)
+OR
+Use the package RDatasets to use our favorite iris dataset.
+
+
+```{julia}
+using Pkg
+# Pkg.add("DataFrames")
+# Pkg.add("DataFramesMeta")
+# Pkg.add("PalmerPenguins")
+
+
+using DataFrames
+using DataFramesMeta
+
+using PalmerPenguins
+
+
+penguins = dropmissing(DataFrame(PalmerPenguins.load()))
+```
+
+```{julia}
+# Pkg.add("RDatasets")
+
+using RDatasets
+iris = dataset("datasets","iris")
+```
+
+
+
+# Plots 
+
+## list of available packages
+
+List of packages for plots :
+
+-   [**Plots**]
+-   [**StatsPlots**] - enriches the Plots package
+-   [**Makie**]
+-   [**TidierPlots**]
+-   [**AlgebraOfGraphics**] uses Makie
+-   [**GadFly**]
+
+
+Other packages are available, see (https://discourse.julialang.org/t/comparison-of-plotting-packages/99860/2)
+
+We tried Makie,TidierPlots,AlgebraOfGraphics and GadFly.
+
+---
+Important note : in the following document, every time we used a function, it was called using *PackageName.functionName*. This is necessary because we are using packages importing functions of the same name. For example *plot* is shared between most packages.
+
+Functions with names that are not shared can be called by their name only.
+
+# 1. TidierPlots
+
+https://tidierorg.github.io/TidierPlots.jl/latest/
+
+
+The goal here is to be able to do the same sort of graphics as when using R ggplot2, that we all love.
+
+Install the package using ], then add TidierPlots. It takes a long time.
+
+The package supports ggplot(), and :
+
+- some Geoms 
+- some themes, with the default being the ggplot2 theme
+- scale\_colour\_manual and discrete
+- facetting with wrap and grid
+- scale, labs,lims
+
+TidierPlots uses AlgebraOfGraphics, which uses Makie. 
+
+Example using a Julia dataframe :
+ you need to run the  PalmerPenguins.load() in the console when doing it for the first time
+and press y when it asks if you want the data downloaded.
+
+Issues during the work : it stopped working. First we looked if the version was good.
+
+-  ] status TidierPlots. 
+- ] update TidierPlots : its not better
+- remove it : rm TidierPlots
+- install from github : 
+
+There are many dependances, we update all packages before.
+- using Pkg
+- Pkg.update()
+
+- Pkg.add("TidierPlots")
+
+
+using TidierPlots
+
+
+g=TidierPlots.ggplot(data = penguins) + 
+    geom_bar(@aes(x = species)) +
+    labs(x = "Species");
+g
+
+### Combining plots
+
+Just like the *patchwork* package, we can combine plots, with + and | for horizontal and / for vertical.
+
+(g +g)
+
+g/(g+g)
+
+g/g +g
+
+((g + g + g) | g) / (g / g)
+
+Warning ; the *aes* syntax exactly as ggplot2 does not exist. It has many equivalents
+
+- @aes(x=x,y=y)
+- @es(x=x,y=y)
+- aes(x=:x,y=:y)
+- aes(x="x",y="y")
+
+g1=ggplot(penguins, @aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+    geom_point()
+g2=ggplot(penguins, @aes(x=:bill_length_mm, y=:bill_depth_mm, color=:species)) +
+geom_point()
+g3=ggplot(penguins, aes(x = "bill_length_mm", y = "bill_depth_mm", color = "species")) +
+geom_point()
+g4=ggplot(penguins, @es(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+geom_point()
+
+g1/g2+g3/g4
+
+The different syntaxes gave the same results !
+The rest of the code is exactly the same as in ggplot2.
+
+### Issues
+
+- Package still not stable. It downgrades others when using add, and the GitHub version has unresolved issues.
+- It worked at some point (20/08/2024 afternoon) and then in the same evening stopped.
+
+# 2: Makie
+
+https://docs.makie.org/v0.21/
+https://github.com/MakieOrg/Makie.jl
+
+
+- Date of today : 22/08/2024
+- Last release : 19/08/2024
+- Last change to the GitHub repository : 20/08/2024
+
+Backend packages : GLMakie, WGLMakie, CairoMakie, RPRMakie.
+
+## 2.1 Installation : choose a backend and install it.
+
+- GLMakie (OpenGL based, interactive)
+- CairoMakie (Cairo based, static vector graphics)
+- WGLMakie (WebGL based, displays plots in the browser)
+- RPRMakie (Experimental ray-tracing using RadeonProRender)
+
+Then install it using Julia's package manager Pkg:
+
+```{julia}
+using Pkg
+# Pkg.add("CairoMakie")
+```
+
+There's no need to install Makie.jl separately, it is re-exported by each backend package.
+
+
+## 2.2 Basic plotting
+
+lines(x,y) 
+scatter(x,y) 
+
+```{julia}
+using CairoMakie
+
+```
+
+Makie looks more like base R plots.
+We did not have the time to finish this part.
+
+# 3: Gadfly
+
+https://gadflyjl.org/stable/
+
+Gadfly can be installed using in the REPL
+julia> ]add Gadfly
+
+Gadfly is based on R ggplot2 and supports DataFrames. As opposed to ggplot2, it does not *only* support DataFrames, you can also use vectors as arguments.
+
+The GitHub page is there : https://github.com/GiovineItalia/Gadfly.jl/tree/master
+
+- Last release : 2021
+- Last change to the GitHub repository : 5 months ago (so, early 2024)
+
+```{julia}
+# Pkg.add("Gadfly")
+
+using Gadfly
+```
+
+## 3.1 Basic plots 
+
+
+The basic plotting function is also called plot.
+The syntax when using a DataFrame is as follows :
+
+plot(data::AbstractDataFrame, elements::Element...; mapping...)
+
+It is not exactly the same as the ggplot2 syntax, but close.
+
+Every information goes in the same plot() function call.
+
+hstack(plots) stacks the plots side by side, vstack stacks vertically.
+
+### 3.1.1 Geom(s) :
+
+- The default geometry is Geom.point.
+- others : https://gadflyjl.org/stable/gallery/geometries/ (with examples), or https://gadflyjl.org/stable/lib/geometries/ for all possibilities
+- You can add as much Geom as you want separated by ","
+
+```{julia}
+p1 = Gadfly.plot(penguins, x=:bill_length_mm, y=:bill_depth_mm,color=:species, Geom.point);
+p2 = Gadfly.plot(penguins, x=:bill_length_mm, y=:bill_depth_mm,color=:species, Geom.point,Geom.line);
+hstack(p1,p2)
+```
+
+Saving a plot is done using the *draw* function.
+
+Notes :
+
+- default has no background.
+
+img = SVG("penguin_plot.svg", 14cm, 8cm)
+draw(img, p1)
+
+img = SVG("penguin_plot.png", 14cm, 8cm)
+draw(img, p2)
+
+When using arrays instead of DataFrames, instead, use the data directly. However, the automatic axes do not exist and we have to add them manually using Guide.
+
+### 3.1.2 Guides:
+
+- For adding informations on the plot.
+- https://gadflyjl.org/stable/gallery/guides/ for examples, https://gadflyjl.org/stable/lib/guides/ for an exhaustive list
+
+Example : same graph usign first arrays, then the DataFrame directly.
+
+```{julia}
+bill_length=penguins.bill_length_mm
+bill_depth=penguins.bill_depth_mm
+species = penguins.species
+p1 = Gadfly.plot(x=bill_length,y=bill_depth,color=species, Geom.point,
+Guide.xlabel("bill length"),Guide.ylabel("bill depth"),
+Guide.colorkey(title="Species",labels=["my favorite specie","others","another one"]),
+Gadfly.Theme(key_position=:inside),Guide.title("I love penguins"));
+p2 = Gadfly.plot(penguins,x=:bill_length_mm,y=:bill_depth_mm,color=:species, Geom.point,
+Guide.colorkey(title="Species",labels=["my favorite specie","others","another one"]),
+Gadfly.Theme(key_position=:inside),Guide.title("I love penguins more"));
+hstack(p1,p2)
+```
+
+### 3.1.3 Layers
+
+Layers allow several instructions in the same plot() call.
+
+Example of layers using the penguins dataframe :
+
+```{julia}
+penguinm = @subset(penguins, :sex .== "male")
+penguinf = @subset(penguins, :sex .== "female")
+
+p3 = Gadfly.plot(penguinm, x=:bill_length_mm, y=:bill_depth_mm,color=["male"],shape=:species, Geom.point,
+    layer(penguinf,x=:bill_length_mm,y=:bill_depth_mm,color=["female"],shape=:species,Geom.point));
+    p3
+```
+
+Color, and other aesthetics, can also be mapped by using arrays with group labels or functional types e.g. ["group label"] or [colorant"red"]. ["Group labels"] are added to the key.
+[colorant"red"] are not added to the key, and not present in the legend of the plot.
+
+
+```{julia}
+#example from Gadfly tutorial :
+y1 = [0.1, 0.26, NaN, 0.5, 0.4, NaN, 0.48, 0.58, 0.83]
+Gadfly.plot(x=1:9, y=y1, Geom.line, Geom.point,
+        color=["Item 1"], linestyle=[:dash], size=[3pt],
+    layer(x=1:10, y=rand(10), Geom.line, Geom.point,
+        color=["Item 2"], size=[5pt], shape=[Shape.square]),
+    layer(x=1:10, y=rand(10), color=[colorant"hotpink"],
+        linestyle=[[8pt, 3pt, 2pt, 3pt]], Geom.line))
+```
+
+### 3.1.4 Scales 
+
+https://gadflyjl.org/stable/tutorial/#Continuous-Scales
+https://gadflyjl.org/stable/tutorial/#Discrete-Scales
+
+Scale can be supplied with Scale.myscale for continuous and discrete scales.
+
+## 3.2 Compositing
+
+https://gadflyjl.org/stable/man/compositing/#Compositing
+
+With ggplot2, we also like using faceting and grids to represent different data. 
+
+### 3.2.1 Grids using Geom.subplot_grid
+
+For grids, we have to use "xgroup" and/or "ygroup" and "Geom.subplot_grid(Geom.mygeomIwant)" instead of just Geom.mygeomIwant.
+This does the work of +facet_grid().
+
+
+```{julia}
+# Pkg.add("Compose")
+
+using Compose
+p = Gadfly.plot(penguins, x=:bill_length_mm, y=:bill_depth_mm,xgroup=:species,ygroup=:sex,
+ shape=:sex, color=:island, Geom.subplot_grid(Geom.point),alpha=[0.5]);
+p
+```
+
+Additional Guides can be placed inside the Geom.subplot_grid :
+
+```{julia}
+p4 = Gadfly.plot(penguins, x=:bill_length_mm, y=:bill_depth_mm,xgroup=:species,color=:sex,
+ shape=:sex,
+  Geom.subplot_grid(Geom.point,Guide.ylabel(orientation=:vertical)),
+  alpha=[0.5],Guide.title("I love penguins even more"));
+p4
+```
+
+### 3.2.2 Stacks
+
+stackings used different plots and hstack,vstack or gridstack.
+
+vstack(...) puts all argument on top of each other.
+hstack(...) puts them side by side.
+gridstack(...) works with a matrix of plots such as [ p1 p2;p3 p4]
+combining vstack and pstack also works to define different arrangements.
+a blank panel can be used using only plot()
+
+```{julia}
+vstack(hstack(p1,p2,p3,Gadfly.plot()),hstack(p4))
+```
+
+## 3.3 Conclusion on this package
+
+The documentation is rich with examples from the RDatasets. 
+There are replacements for common ggplot2 functions. The library lists all available functions, Geom, Guides, Statistics, Coordinates, Scales and Shape available.
+
+
+# 4 AlgebraOfGraphics
+
+"Define an algebra of graphics based on a few simple building blocks that can be combined using + and *. Still somewhat experimental, may break often."
+
+Last release : 21/08/2024
+Last GitHub activity : 21/08/2024
+
+This package relies on Makie.
+
+Warning : *draw* of AlgebraOfGraphics is not compatible with *draw* of Combine loaded earlier in the notebook.
+
+```{julia}
+# import Pkg; Pkg.add("AlgebraOfGraphics")
+import AlgebraOfGraphics as AOG
+using CairoMakie, PalmerPenguins
+
+penguins = dropmissing(DataFrame(PalmerPenguins.load()))
+first(penguins, 6)
+```
+
+```{julia}
+AOG.set_aog_theme!()
+
+
+axis = (width = 225, height = 225)
+penguin_frequency = AOG.data(penguins) * AOG.frequency() * AOG.mapping(:species)
+
+AOG.draw(penguin_frequency; axis = axis)
+```
+
+Saving a plot :
+
+fg = AOG.draw(penguin_frequency; axis = axis)
+save("figure.png", fg, px_per_unit = 3) # save high-resolution png
+
+## 4.1 First basic plotting
+
+AlgebraOfGraphics relies on the * and + operations to combine plotting elements.
+
+The plot object is defined through different blocks :
+
+- data() to declare the data used (DataFrame)
+- mapping() to declare the aesthetics (aes in ggplot2 or TidierPlots)
+    - if classic plot with x,y : you can use mapping(x=:truc1,truc2) OR mapping (truc1,truc2) but not mapping(x=:truc1,y=:truc2).
+- visual()
+- analyses 
+The resulting plot is then shown using draw(plt).
+
+
+```{julia}
+penguin_bill = AOG.data(penguins) * AOG.mapping(:bill_length_mm, :bill_depth_mm,color=:species)
+AOG.draw(penguin_bill; axis = axis)
+```
+
+To rename x and y axis, add *=> "name of axis"*
+
+```{julia}
+penguin_bill = AOG.data(penguins) * AOG.mapping(
+    :bill_length_mm  => "bill length (mm)",
+    :bill_depth_mm  => "bill depth (mm)",
+)
+AOG.draw(penguin_bill; axis = axis)
+```
+
+To apply a transformation to the values (mm to cm in this example), add *=> (t->transformation(t))*
+
+```{julia}
+penguin_bill = AOG.data(penguins) * AOG.mapping(
+    :bill_length_mm => (t -> t / 10) => "bill length (cm)",
+    :bill_depth_mm => (t -> t / 10) => "bill depth (cm)",
+)
+AOG.draw(penguin_bill; axis = axis)
+```
+
+To add information, take your first plot object and add new mappings :
+
+```{julia}
+plt = penguin_bill * AOG.mapping(color = :species)
+AOG.draw(plt; axis = axis)
+```
+
+## 4.2 Combining + and * 
+
+- the * operator adds information on a plot
+- the + operator adds a new layer
+
+We can use factorisation to combine the two operations. In this "Algebra Of Graphics", mapping() is the "neutral" element.
+
+The linear regression removes the point plots.
+We have to add it back on the plot, using + 
+
+And factorise this :
+
+```{julia}
+
+plt = penguin_bill * (AOG.linear() + AOG.mapping()) * AOG.mapping(color = :species)
+AOG.draw(plt; axis = axis)
+```
+
+## 4.3 mapping()
+
+Examples of mappings :
+
+- color =: colorkey
+- col= :variablename; to use when gridding plots horizontally across variablename
+- row=: variablename; for gridding vertically
+- layout=:variablename 
+
+If no data was set, the entries of *mapping* have to be vectors.
+
+The structure of the mapping is tied to the plotting function used with it (analysis), and the visual attribute. See documentations for more information.
+
+- *Pair* operator *=>* is used to rename columns, transform columns, map to a custom scale
+
+## 4.4 visual()
+
+
+default is the xy scatterplot.
+command : visual(plottype; attributes...)
+
+Examples :
+- BarPlot
+- Heatmap
+
+```{julia}
+penguin_bill = AOG.data(penguins) * AOG.mapping(
+    :body_mass_g,:species,color=:sex,layout=:island
+    
+)*AOG.visual(BarPlot)
+AOG.draw(penguin_bill; axis = axis)
+```
+
+## 4.5 analyses
+They do more complicated operation.
+Examples :
+
+- histogram()
+- density()
+- frequency()
+- linear()
+- expectation() : compute expected value of last arg, conditionned on previous.
+- smooth
+- contours, filled_contours 
+
+## 4.6 One last example
+
+
+
+
+
+```{julia}
+
+penguinsplot = AOG.data(penguins)*
+    AOG.mapping(:bill_length_mm,:bill_depth_mm,
+    col=:species,row=:sex,marker=:sex,color=:island)
+AOG.draw(penguinsplot)
+```
+

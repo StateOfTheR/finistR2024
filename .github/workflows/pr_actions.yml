@@ -1,14 +1,37 @@
+name: pr_check
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  pull_request:
+    branches: [main, master]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 
 jobs:
   build:
-    name: Build website with rmarkdown
+    name: Build website with rmarkdown and Julia
     runs-on: ubuntu-latest
-    container: stateofther/r-finistr2024:0.1
+    container: stateofther/r-finistr2024:0.2
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Additional Packages
-        run: Rscript -e "install.packages(c('tictoc'))"
-      - name: Generate slides
+      - name: Install Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: "1.8" # Specify the Julia version you want to use
+      - name: Install Julia Packages
+        run: |
+          julia -e 'using Pkg; Pkg.add(["DataFrames", "DataFramesMeta", "RDatasets", "CairoMakie", "Gadfly", "Compose", "AlgebraOfGraphics"])'
+      - name: Additional R packages
+        run: |
+          Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
+          Rscript -e "install.packages(c('ggplot2', 'dplyr', 'simulator', 'simpr', 'SimEngine', 'DT', 'withr', 'bench'))"
+          Rscript -e "install.packages(c('future', 'furrr', 'purrr', 'cli', 'RhpcBLASctl'))"
+      - name: Additional Python packages
+        run: |
+          pip install torch torch_geometric 
+          pip install numpy==1.26.1
+          pip install scikit-learn scikit-network networkx matplotlib tqdm openpyxl pandas
+      - name: Render website
         run: "quarto render"

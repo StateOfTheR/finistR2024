@@ -1,0 +1,111 @@
+---
+title: "Documents paramétrés en quarto"
+author: "Pierre Gloaguen"
+format: html
+---
+
+Ci dessous, vous trouverez un modèle de document paramétré en quarto.
+
+# Inclusion de paramètres personnalisés dans un document quarto
+
+Il est probable que l'exécution de l'exemple ainsi que son adaptation soit suffisant pour tout comprendre.
+Cependant, après m'être un peu cassé les dents, quelques points importants.
+
+- La liste des paramètres doit être spécifiée dans l'en tête `yaml`.
+
+```{yaml}
+#| label: entete-yaml
+#| echo: true
+params:
+  correction: true # or false
+```
+
+- Afin d'interagir avec le code, il me semble qu'il est impératif d'utiliser `knitr` comme moteur de rendu, et non `jupyter`, **même quand l'on utilise pas de `R`** (notamment, quand tout est en `python`).
+
+```{yaml}
+#| label: entete-yaml-knitr
+#| echo: true
+engine: knitr
+```
+
+- **Accès aux paramètres dans un code `R`** Pour accéder aux éléments de `params` dans un code `R`, il suffit d'y accéder comme dans n'importe quelle liste. Autrement dit, une liste `params` est créée au rendu, et on peut accéder à l'élément `correction` avec `params$correction` (voir l'exemple ci dessous).
+- **Accès aux paramètres dans un code `python`** Pour accéder aux éléments de `params` dans un code `R`, il faut accéder à l'objet `R` params dans python. Ceci est fait grâce au package `reticulate`.
+Dans la pratique, au rendu, un **dictionnaire** python nommé `r.params` est créé. On peut accéder à l'élément `correction` avec `r.params["correction"]` (voir l'exemple ci dessous).
+- **Accès aux paramètres dans les options d'un chunk** Pour faire appel au paramètre dans les options des chunks, il faut utiliser le préfixe `!expr` et appeler l'argument comme on le ferait en `R`. Ceci est vrai pour les chunks `R` et `python`.
+Dans l'exemple ci dessous, on évalue un chunk conditionnellement à la correction en écrivant `#| eval:!expr "params$correction"`.
+- **Accès aux paramètres dans le texte pour des affichages conditionnels** Lorsque le paramètre est une condition qui doit gérer l'affichage (typiquement, affiche t'"on la correction ou non ci dessous) il faut  utiliser les environnements `quarto` `.content-visible` dans lequel on utilisera l'option `when-meta="params.correction"`.
+
+
+````{verbatim, lang = "markdown"}
+---
+title: "Exemple de document paramétré"
+format: pdf
+params:
+correction: true
+engine: knitr # Obligatoire pour interagir avec le code, même si on ne fait que du python
+---
+  
+# Exemple dans du texte
+  
+:::{#exr-densite-loi-normale}
+## 1 point
+    
+Soit $X \in \mathbb{R}$ une variable aléatoire de loi $\mathcal{N}(\mu, \sigma^2)$. 
+Donner l'expression de $p(x)$, la densité de $X$.
+:::
+
+::: {.content-visible when-meta="params.correction"}
+
+:::{#sol-densite-loi-normale}
+La densité de $X$ est donnée par:
+$$
+p(x)=\frac{1}{\sqrt{2\pi \sigma^2}}\text{e}^{-\frac{1}{2\sigma^2}(x - \mu)^2}\,.
+$$
+:::
+
+:::
+
+# Exemple avec code conditionnel
+
+## Avec du `R`
+
+```{r}
+#| label: chunk-R-parametre
+#| eval: !expr "params$correction"
+ifelse(params$correction,
+       "Ce chunk est executé en mode correction",
+       "Ce chunk n'est pas executé en mode correction")
+```
+
+## Avec du python
+
+```{python}
+#| label: exemple-python 
+#| echo: fenced
+#| eval: !expr "params$correction"
+if r.params["correction"]:
+  print("Ce texte s'affiche en mode correction")
+```
+  
+````
+  
+# Compilation du document
+  
+Pour compiler le document (dans `R`) avec la liste des paramètres voulus, on utilisera la fonction `quarto_render` du package `quarto`.
+  
+```{r}
+#| label: code-rendering-quarto
+#| eval: false
+
+
+# Pour compiler le document avec toutes les valeurs possibles du paramètres
+purrr::map(c(FALSE, TRUE), function(cor_){
+  # On rajoute les traitements dépendant de l'argument
+  output_name <- ifelse(cor_, "sujet.pdf", "correction.pdf") 
+  quarto::quarto_render(input = "mon_document.qmd",  
+                        execute_params = list(correction  = cor_), 
+                        output_format = "pdf",
+                        output_file = output_name)
+})
+```
+  
