@@ -19,10 +19,12 @@ website:
           href: python_practice.qmd
         - text: C++ depuis Python
           href: c_python.qmd
-      - text: Ingénierie
+      - text: Développement
         menu:
         - text: Reproductibilité
           href: reproductibility.qmd
+        - text: rig - The R Installation Manager
+          href: rig.qmd
       - text: Themes to be developped
         menu:
         - text: List to discussed
