@@ -47,6 +47,7 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
 .quarto/
 _site/
 local_*.R
@@ -57,6 +58,7 @@ _site/
 local_nimble*.R
 local_extract_env_data*.R
 local_extract_env_data*.qmd
+
 
 
 _site

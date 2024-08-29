@@ -1,0 +1,254 @@
+---
+title: "Bien démarrer avec Python"
+lang: fr
+author: 
+  - Sophie Donnet
+  - Marie-Pierre Etienne
+  - Tristan Mary-Huard
+  - Francois Victor
+  - Emily Walker
+format: html
+toc: true
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Lorsque l'on utilise Python, une bonne pratique consiste à créer un environnement spécifique par projet. 
+L'environnement contient la version de Python que l'on souhaite utiliser ainsi que les packages/modules utiles au projet. 
+Cette façon de faire permet de faire coexister différentes versions de python ou de packages au sein du même ordinateur.
+Cette pratique n'est pas spécifique à Python, on pourrait imaginer créer des environnements pour utiliser des versions différentes de R.
+Si le programme ou la librairie n'est pas installée dans l'environnement mais est disponible dans l'installation globale de la machine, c'est cette version globale qui sera utilisée. Il faut donc bien vérifier ce qui est dispo dans l'environnement et globalement.
+
+Nous avons exploré deux manières de gérer les environnements soit avec `conda` soit avec `virtual env`. Nous avons testé sous Linux et sous Windows.
+
+## Installation python et problèmes potentiels
+
+On crée un lien symbolique pour que `python 3` soit le `python` par défaut en utilisant les instructions suivantes:
+
+`sudo ln -sf /usr/bin/python3 /usr/bin/python`
+
+On fait de même pour `pip` qui est un des installateurs de modules/ packages. 
+
+`sudo ln -sf /usr/bin/pip3 /usr/bin/pip`
+
+
+## Cérer un environnement avec  conda sous Linux
+
+Cette partie suppose que la commande `conda` est disponible (installée avec anaconda ou miniconda)
+
+La liste des environnement disponible est donnée par 
+
+`conda env list`
+
+Vous devez avoir au moins l'environnement de `base` dans cette liste. Vous avez aussi ainsi accès à l'adresse où vous trouverez vos environnements. 
+
+
+On souhaite **créer un nouvel environnement nommé finistr contenant uniquement python et pip**. 
+
+Il suffit de lancer la commande 
+`conda create --name finistr python=3.11 pip`
+
+
+En listant les environnements disponibles, vous devez voir l'environnement finistr créé.
+
+`conda env list`
+
+Il est très important d'installer `pip` en meme temps, sinon c'est le pip global du systeme qui est utilisé et toutes les commades `pip install` lancées depuis l'environnement feront en fait des installations globales et non locales à  l'environnement (plus de détails [ici](https://datumorphism.leima.is/til/programming/python/python-anaconda-install-requirements/) )
+
+Pour utiliser cette installation, il faut activer l'environnement 
+
+`conda activate finistr`
+
+On peut maintenant installer les packages de son choix avec des commandes type 
+`conda install` ou `pip install`
+
+Par exemple 
+`pip install numpy`
+
+Pour avoir la liste des packages installés dans l'environnemnet courant
+`conda list`
+
+
+On quitte l'environnement avec la commande 
+`conda deactivate`. Quand vous reviendrez à votre environnement (`conda activate`) vous aurez ces packages installés. 
+
+
+Il est possible de fournir une liste de packages à installer dans l'environnement sous forme d'un fichier txt. 
+
+```{r}
+#| echo: true
+#| eval: false
+conda create --name finistrbis python=3.11 pip 
+conda activate finistrbis
+pip install -r requirements.txt
+```
+
+Le fichier `requirement.txt` a la forme suivante
+
+```{r}
+#| echo: false
+#| eval: true
+#| output: true
+#| 
+file_content <- readLines("requirement.txt")
+cat(file_content, sep = "\n")
+```
+
+
+
+### Autres commandes 
+Il est possible de supprimer un environnement avec la commande 
+
+```{r}
+#| echo: true
+#| eval: false
+conda remove --name finistrbis --all
+```
+
+
+La liste des commandes conda est disponible dans la [cheatsheet conda](https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html)
+
+
+
+## Créer un environnement avec virtual env  sous Windows
+Sur un terminal PowerShell de Windows, installer WSL (Windows subsystem for linux) : 
+```{r}
+#| echo: true
+#| eval: false
+wsl --install
+```
+
+Après redémarrage, pour savoir quelle version de linux est installée :
+```{r}
+#| echo: true
+#| eval: false
+wsl -l -v
+```
+
+Il faut ensuite créer un alias python pour python3 :
+```{r}
+#| echo: true
+#| eval: false
+source ~/.bashrc
+alias python=python3alias python=python3
+```
+
+Puis installer pip :
+```{r}
+#| echo: true
+#| eval: false
+sudo apt-get update
+sudo apt install python3-pip
+```
+
+Créer un alias pip pour pip3 :
+```{r}
+#| echo: true
+#| eval: false
+source ~/.bashrc
+alias pip=pip3
+```
+Ou créer un lien symbolique entre pip3 et pip :
+```{r}
+#| echo: true
+#| eval: false
+sudo ln -s /usr/bin/pip3 /usr/bin/pip
+```
+
+Pour vérifier la version de pip qui est installée :
+```{r}
+#| echo: true
+#| eval: false
+pip --version
+```
+
+Installer virtualenv :
+```{r}
+#| echo: true
+#| eval: false
+pip install virtualenv
+```
+
+Et si c'est demandé :
+```{r}
+#| echo: true
+#| eval: false
+sudo apt install python3.10-venv 
+```
+
+On peut ensuite créer un environnement python dans le dossier que l'on souhaite, par exemple ici l'environnement finistrEnv :
+```{r}
+#| echo: true
+#| eval: false
+python -m venv chemin/finistrEnv  
+```
+(si besoin, pour supprimer l'env : rm -rf finistrEnv)
+
+Enfin, pour activer l'environnement python 'finistrEnv' :
+```{r}
+#| echo: true
+#| eval: false
+source chemin/finistrEnv/bin/activate
+```
+
+ou alternativement
+```{r}
+#| echo: true
+#| eval: false
+. chemin/finistrEnv/bin/activate
+```
+
+Pour trouver les packages python : pypi
+```{r}
+#| echo: true
+#| eval: false
+pypi nom-du-package
+```
+
+On peut ensuite créer un script.py dans ubuntu :
+```{r}
+#| echo: true
+#| eval: false
+touch toto.py
+pwd
+```
+
+Puis l'ouvrir dans vscode, préalablement installé dans Windows.
+
+Il faut ensuite dans vscode, préciser le chemin de l'environnement python (situé dans linux).
+
+
+En supplément :
+
+Pour ouvrir l'émulateur linux, à partir d'un terminal windows :
+```{r}
+#| echo: true
+#| eval: false
+start ubuntu.exe
+```
+
+Pour désactiver l'environnement Python activé précédemment :
+```{r}
+#| echo: true
+#| eval: false
+deactivate
+```
+
+
+## Utiliser un environnement  de développement agréable pour un utilisateur de R
+
+## Avec Visual Studio Code
+ipython
+
+### Avec Positron
+
+Le nouvel IDE Positron (disponible en version beta) semble avoir des avantages intéressants pour les gens qui aiment Rstudio mais veulent faire du python. Notamment, il est possible 
+
+   - de choisir facilement son environnement (menu déroulant en haut à droite) et 
+  
+   - d'utiliser la commande Ctr+entr pour éxécuter un code Python ligne à ligne comme on le fera pour un code R dans Rstudio. 
+

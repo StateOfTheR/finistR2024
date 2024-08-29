@@ -27,6 +27,10 @@ website:
         menu:
           - text: Pre-commit avec R
             href: precommit.qmd
+          - text: Python packaging
+            href: packaging_and_testing.qmd
+          - text: R packaging
+            href: pkg.qmd
       - text: Réseaux de Neurones
         menu:
         - text: Graph Neural Networks for bipartite graphs with pytorch_geometric
