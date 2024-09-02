@@ -127,7 +127,7 @@ cc_library(
 Finalement, l'exécution du programme donne :
 
 ```bash
-Execution time: 4063 milliseconds
+Execution time: 3718 milliseconds
 ```
 
 Retenons cette valeur à laquelle nous allons nous comparer plus tard.
@@ -290,3 +290,28 @@ Il faut préciser les dimensions et le
 type du résultat retourné avec un object `jax.ShapeDtypeStruct`, il ne nous
 faut pas préciser d'argument en entrée car nous n'avons que des attributs qui
 sont passés en \textit{keyword argument}.
+
+3) Nous instruisons l'appel avec les mêmes paramètres qu'auparavant et le chronométrons :
+
+```python
+rows = 200
+cols = 200
+Q = 3
+beta = 1
+n_iter = 1000
+
+start = time.time()
+res = gibbs_sampler_cpp(rows, cols, Q, beta, n_iter)
+end = time.time()
+
+print(f"Time: {end - start} seconds")
+```
+
+L'exécution de ce script Python donne :
+
+```bash
+Time: 3.9689433574676514 seconds
+```
+
+Ce qui est un temps très légèrement supérieur à l'appel directement depuis C++
+à la même fonction avec les mêmes paramètres.
