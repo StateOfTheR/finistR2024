@@ -19,8 +19,6 @@ website:
           href: 01_nimble.qmd
         - text: Un bon départ avec Python
           href: python_practice.qmd
-        - text: C++ depuis Python
-          href: c_python.qmd
         - text: Simulations
           href: simulator.qmd
       - text: Développement
@@ -43,6 +41,10 @@ website:
         menu:
         - text: "futureverse"
           href: futureverse.qmd
+        - text: C++ depuis Python
+          href: c_python.qmd
+        - text: C++ depuis JAX
+          href: c_jax.qmd
         aria-label: GitHub
 format:
   html:
