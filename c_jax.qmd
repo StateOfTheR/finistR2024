@@ -20,9 +20,9 @@ d'échantillonneur de Gibbs écrit en C++ depuis JAX.
 
 ## Le projet
 
-Tous les fichiers du projet est disponible sur [ce dépôt
+Tous les fichiers du projet sont disponibles sur [ce dépôt
 Github](https://github.com/HGangloff/jax_ffi_experiments). Les outils et
-l'arborescence sont similaires au tutoriel \textit{C++ depuis Python}.
+l'arborescence sont similaires au tutoriel *C++ depuis Python*.
 
 ## Code C++
 
@@ -116,9 +116,8 @@ cc_library(
     name = "gibbs_sampler_lib",
     srcs = ["gibbs_sampler.cpp"],
     hdrs = [
-        "gibbs_sampler.h",
+        "gibbs_sampler.h", # These headers are intended to be included by other libraries or binaries that depend on this library.
     ],
-    includes = ["."],
     copts = ["-std=c++17"],
     visibility = ["//visibility:public"],
 )
@@ -130,7 +129,12 @@ Finalement, l'exécution du programme donne :
 Execution time: 3718 milliseconds
 ```
 
-Retenons cette valeur à laquelle nous allons nous comparer plus tard.
+Retenons cette valeur à laquelle nous allons nous comparer plus tard. Retenons
+également l'illustration (voir le dépôt git pour le code C++ incluant la
+sauvegarde de l'image) :
+
+
+![Résultat de `gibbs_sampler_cpp.cpp`](pure_cpp.png)
 
 ## C++ depuis JAX
 
@@ -138,8 +142,8 @@ Retenons cette valeur à laquelle nous allons nous comparer plus tard.
 
 Comme indiqué dans les deux seuls tuto sur le sujet actuellement disponibles
 (sur la [doc de JAX](https://jax.readthedocs.io/en/latest/ffi.html) et sur la
-[doc XLA](https://openxla.org/xla/custom_call), il va nous falloir wrapper
-les fonctions de notre bibliothèque dans l'API des \textit{custom call} de
+[doc XLA](https://openxla.org/xla/custom_call)), il va nous falloir wrapper
+les fonctions de notre bibliothèque dans l'API des *custom call* de
 XLA.
 
 Nous commençons par télécharger l'API en trois fichiers, `api.h`, `c_api.h`
@@ -150,11 +154,11 @@ particuliers : `Buffer` (représentant les `jax.numpy` arrays), `Datatype`,
 `Error`, `Bind` et `Attr`. Ces objets sont à l'intermédiaire des structures de
 données de `jax.numpy` et de C++.
 Leur utilisation est décrite dans les tuto cités plus hauts.
-On note de manière intéressante que `GibbsSamplerImpl` ne prend pas de tableaux
+On note de manière intéressante que `GibbsSamplerImpl` ne prend pas de tableau
 (`jnp.array`) en entrée, i.e., pas de `Bind.Arg<>()` ; les seuls arguments
-d'entrée sont des \textit{attributs nommés}, i.e., `Bind().Attr<>()`. Il y aura
-cependant un retour qui sera le tableau du résultat du tirage, i.e.,
-`Bind().Ret<>()`. Finalement, la vraie fonction qui pourra être utilisable via
+d'entrée sont des *attributs nommés*, i.e., `Bind().Attr<>()`. Il y aura
+cependant un retour qui sera le tableau du résultat de l'échantillonneur, i.e.,
+`Bind().Ret<>()`. Finalement, la vraie fonction d'intérêt qui pourra être utilisable via
 le module `jax.extend` est construite par la macro
 `XLA_FFI_DEFINE_HANDLER_SYMBOL` et s'appelera `GibbsSampler`.
 
@@ -212,14 +216,18 @@ définie dans `lib/BUILD.bazel` :
 ```bash
 cc_library(
     name = "gibbs_sampler_xla_lib",
-    srcs = ["gibbs_sampler_xla.cpp"],
-    hdrs = [
-        "gibbs_sampler_xla.h",
+    srcs = [
         "xla/ffi/api/c_api.h",
         "xla/ffi/api/ffi.h",
         "xla/ffi/api/api.h",
+        "gibbs_sampler_xla.cpp",
+            ], # When deciding whether to put a header into hdrs or srcs, you should ask whether you want consumers of this library to be able to directly include it
+    hdrs = [
+        "gibbs_sampler_xla.h",
     ],
-    includes = ["."],
+    includes = [ # need to use include -I option is not available due to sandbox stuff
+            ".", # adding to srcs or hdrs does not include
+    ],
     copts = ["-std=c++17 -rdynamic"], # -rdynamic to use extern
     deps = ["//lib:gibbs_sampler_lib"],
     visibility = ["//visibility:public"],
@@ -230,7 +238,7 @@ On note que cette règle nécessite l'exécution de la règle `gibbs_sampler_lib
 
 ### Création du module Python
 
-Comme dans le tuto \textit{C++ depuis Python} nous allons utiliser `pybind` et
+Comme dans le tuto *C++ depuis Python* nous allons utiliser `pybind` et
 les `PyCapsule` pour cette partie des opérations. Nous créons alors un module
 python appelé `gibbs_sampler` contiendra une fonction elle-même appelée
 `gibbs_sampler`. L'appel de cette dernière retournera une `PyCapsule` contenant
@@ -255,7 +263,7 @@ Le code se compile en un module python avec la règle `gibbs_sampler` définie d
 `lib/BUILD.bazel` :
 
 ```bash
-pybind_extension( # must be in two steps (first pybind_library then pybind_extension)
+pybind_extension( # must be in two steps (first cc_library then pybind_extension)
     name = "gibbs_sampler", # must match the pybind module name
     srcs = ["gibbs_sampler_xla_pybind.cc"],
     deps = ["//lib:gibbs_sampler_xla_lib"],
@@ -289,7 +297,7 @@ l'appel à `GibbsSampler`, la fonction cachée dans la PyCapsule, à l'aide de
 Il faut préciser les dimensions et le
 type du résultat retourné avec un object `jax.ShapeDtypeStruct`, il ne nous
 faut pas préciser d'argument en entrée car nous n'avons que des attributs qui
-sont passés en \textit{keyword argument}.
+sont passés en *keyword argument*.
 
 3) Nous instruisons l'appel avec les mêmes paramètres qu'auparavant et le chronométrons :
 
@@ -314,4 +322,74 @@ Time: 3.9689433574676514 seconds
 ```
 
 Ce qui est un temps très légèrement supérieur à l'appel directement depuis C++
-à la même fonction avec les mêmes paramètres.
+à la même fonction avec les mêmes paramètres. Nous obtenons donc le résultat
+espéré et terme de temps, ainsi qu'en illustration :
+
+![Résultat de `gibbs_sampler_c_from_JAX.py`](c_from_JAX.png)
+
+## Comparaison avec Python / JAX
+
+La bibliothèque JAX de Python offre la fonctionnalité clé de compilation à la
+volée (*Just In Time compilation*) qui permet une compilation du code
+Python à la première exécution pour des exécutions ultérieures bien plus
+rapides, **en général**.
+
+### Sur CPU
+
+La bibliothèque [mrfx](https://github.com/HGangloff/mrfx) offre une implémentation
+en pur JAX de l'échantillonneur de Gibbs et de l'échantillonneur de Gibbs
+chromatique. Nous pouvons obtenir un chronométrage de l'échantillonneur de
+Gibbs grâce au code du fichier `gibbs_sampler_JAX_cpu.py` :
+
+```python
+import os
+os.environ["JAX_PLATFORMS"] = "cpu"
+import time
+
+import jax
+
+key = jax.random.PRNGKey(0)
+
+from mrfx.models import Potts
+from mrfx.samplers import GibbsSampler
+from mrfx.experiments import time_complete_sampling
+
+rows = 200
+cols = 200
+Q = 3
+beta = 1
+n_iter = 1000
+
+key, subkey = jax.random.split(key, 2)
+times, n_iterations = time_complete_sampling(
+    GibbsSampler,
+    Potts,
+    subkey,
+    [Q],
+    [(rows, cols)],
+    5,
+    kwargs_sampler={"eps": 0.01, "max_iter":n_iter, "cv_type":"iter_only"},
+    kwargs_model={"beta":1.}
+)
+print("JAX on CPU", times)
+```
+
+On note un temps d'exécution affiché de $7.7714$ secondes pour un temps de
+compulation de $7.3613$. 
+
+
+### Sur GPU
+
+Le fichier `gibbs_sampler_JAX_gpu.py` permet d'excécuter le code précédent sur
+GPU. En revanche, il apparaît que l'algorithme est environ 10 fois plus lent à
+la compilation et à l'exécution. C'est probablement dû à l'aspect hautement
+itératif de l'algorithme étudié qui s'adapte mal à une architecture GPU...
+
+## Conclusion
+
+Nous avons avec succès appelé du code C++ depuis JAX.
+Nous pouvons conclure que pour cette algorithme d'échantillonnage de Gibbs
+hautement itératif, la compilation à la volée de JAX ne surpasse pas un appel à
+du code C++. Le gain à l'utilisation de `jax.extend.ffi` est ici très
+important.
+
