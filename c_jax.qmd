@@ -374,8 +374,8 @@ times, n_iterations = time_complete_sampling(
 print("JAX on CPU", times)
 ```
 
-On note un temps d'exécution affiché de $7.7714$ secondes pour un temps de
-compulation de $7.3613$. 
+On note un temps de compilation et d'exécution affiché de $7.7714$ secondes et un temps
+d'exécution seule de $7.3613$. 
 
 
 ### Sur GPU
