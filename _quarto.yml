@@ -46,6 +46,12 @@ website:
         - text: C++ depuis JAX
           href: c_jax.qmd
         aria-label: GitHub
+      - text: Web scrapping
+        href: 01_extract_env_data.qmd
+      - text: Reproductibilité
+        menu:
+        - text: "Document paramétré en quarto"
+          href: quarto_parametre.qmd
 format:
   html:
     theme: flatly
