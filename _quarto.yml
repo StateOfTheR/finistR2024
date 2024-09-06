@@ -19,8 +19,6 @@ website:
           href: 01_nimble.qmd
         - text: Un bon départ avec Python
           href: python_practice.qmd
-        - text: C++ depuis Python
-          href: c_python.qmd
         - text: Simulations
           href: simulator.qmd
       - text: Développement
@@ -31,6 +29,10 @@ website:
             href: reproductibility.qmd
           - text: rig - The R Installation Manager
             href: rig.qmd
+          - text: Python packaging
+            href: packaging_and_testing.qmd
+          - text: R packaging
+            href: pkg.qmd
       - text: Réseaux de Neurones
         menu:
         - text: Graph Neural Networks for bipartite graphs with pytorch_geometric
@@ -43,7 +45,17 @@ website:
         menu:
         - text: "futureverse"
           href: futureverse.qmd
+        - text: C++ depuis Python
+          href: c_python.qmd
+        - text: C++ depuis JAX
+          href: c_jax.qmd
         aria-label: GitHub
+      - text: Web scrapping
+        href: 01_extract_env_data.qmd
+      - text: Reproductibilité
+        menu:
+        - text: "Document paramétré en quarto"
+          href: quarto_parametre.qmd
 format:
   html:
     theme: flatly

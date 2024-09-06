@@ -1,0 +1,334 @@
+---
+title: "Packaging et test, R & Python"
+lang: fr
+author: 
+  - Louis Lacoste
+  - Armand Favrot
+  - Tristan Mary-Huard
+  - Francois Victor
+format: html
+toc: true
+---
+
+## Python packaging
+
+Voici un workflow de développement de package python en intégration continue (CI) à l'aide de git et GitLab.
+
+### 1ère étape: création d'un dépôt (repository) git
+
+-   initialisation du repo `git init`
+-   ajouter un fichier `.gitignore`
+-   associer avec un repo sur gitlab avec `git remote add origin`
+-   `git push`
+
+### 2ème étape: mise en place des pre-commit hooks
+
+pre-commmit est un package python permettant de maintenir un code de qualité sur le plan de la syntaxe, du formattage du code, et des conventions de nommage. A chaque `git commit`, pre-commit execute une liste de "hooks", qui permettent à chacun de vérifier et pointer des erreurs de code.
+
+- installer pre-commit avec `pip install pre-commit`
+- créer le fichier `.pre-commit-config.yaml` (à la racine du répertoire git) avec:
+```yaml
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+
+  - repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+      - id: black
+
+  - repo: local
+  hooks:
+    - id: pylint
+      name: pylint
+      entry: pylint
+      language: system
+      types: [python]
+      args:
+        [
+          "-rn",
+          "-sn",
+          "--load-plugins=pylint.extensions.docparams",
+        ]
+```
+
+### 3ème étape: configuration de la pipeline d'intégration continue (CI)
+
+- créer un fichier `.gitlab-ci.yml`
+- ajouter l'image python par défaut et un stage:
+```yaml
+image: "python:3.8"
+stages:
+  - linting
+```
+- ajouter des jobs au stage:
+```yaml
+black:
+  stage: linting
+  image: registry.gitlab.com/pipeline-components/black:latest
+  script:
+    - black --check --verbose -- .
+  tags:
+    - docker
+pylint:
+  stage: linting
+  before_script:
+    - pip install pylint
+  script:
+    - find . -type f -name "*.py" |
+      xargs pylint
+          --disable=import-error
+          --load-plugins=pylint.extensions.docparams
+```
+
+### 4ème étape: créer le package
+A présent le repo git devrait avoir cette structure:
+```
+git_repo/
+├── .gitignore
+├── .gitlab-ci.yml
+├── .pre-commit-config.yaml
+└── README.md
+```
+
+Créer un sous-dossier `NOM_DE_PACKAGE`, et ajouter un fichier `__init__.py` vide dedans:
+
+```
+git_repo/
+├── .gitignore
+├── .gitlab-ci.yml
+├── .pre-commit-config.yaml
+├── README.md
+└── NOM_DE_PACKAGE/
+    └── __init__.py
+```
+
+Placez tous vos sous-modules dans le répertoire `NOM_DE_PACKAGE` :
+
+ - tous les modules importés lorsque le module de niveau supérieur est importé
+   doivent être importés dans `__init__.py` (vous pouvez utiliser l'importation relative).
+ - tous les modules masqués à l'utilisateur doivent commencer par un `_` (prononcé "blanc").
+ - toutes les fonctions/classes accessibles dans le module de niveau supérieur doivent être importées dans
+   `__init__.py` (avec `from … import …`).
+ - si vous avez des scripts, placez-les dans des sous-modules cachés.
+
+Par exemple, vous obtenez :
+
+```
+git_repo/
+├── .gitignore
+├── .gitlab-ci.yml
+├── .pre-commit-config.yaml
+├── README.md
+└── NOM_DE_PACKAGE/
+├── init.py
+├── _cli.py
+├── _data.py
+├── _functions.py
+└── advanced.py
+```
+
+avec `__init__.py` contenant :
+
+```python
+from ._data import Vector, Species, Tree, Fungus
+from ._functions import split, cluster, drop, detect
+advanced est un sous-module non importé par défaut.
+_cli est un sous-module caché, non importé.
+```
+
+
+### 5ème étape: tester la structure
+
+Testez votre package en vous rendant dans le dossier principal (votre dépôt git).
+
+```
+toto@passoir ~/the_git_repo $ ipython
+Python 3.11.9 (main, Jul 16 2024, 11:56:10)
+Type 'copyright', 'credits' or 'license' for more information
+IPython 8.26.0 -- An enhanced Interactive Python. Type '?' for help.
+In [1]: import NOM_DE_PACKAGE
+
+In [2]: NOM_DE_PACKAGE.cluster
+Out[2]: <function NOM_DE_PACKAGE._functions.cluster(data, values=None)>
+```
+
+#### Choisir une licence
+
+ - Ajoutez un fichier `LICENSE`.
+Pour une licence non-virale (MIT, BSD-2...), il est recommandé d'ajouter un en-tête dans chaque fichier avec la licence.
+
+#### Description du package
+
+Créez un fichier `pyproject.toml` :
+
+```toml
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+```
+
+Avec cette configuration, la version est gérée à l'aide d'un tag git.
+
+Complétez la description du projet dans `pyproject.toml`, en conservant la ligne `dynamic` :
+
+```toml
+[project]
+name = "NOM_DE_PACKAGE"
+dynamic = ["version"]
+description = "La description de votre package"
+readme = "README.md"
+license = {text = "MIT License"}
+requires-python = ">=3.7"
+keywords = []
+authors = [
+  {name = "Jean Dupont", email = "jean.dupont@exemple.com"},
+]
+maintainers = [{name = "Jean Dupont", email = "jean.dupont@exemple.com"},]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python",
+]
+dependencies = ["numpy",]
+```
+
+---
+
+Si vous avez des scripts, déclarez-les dans le fichier `pyproject.toml` :
+
+```toml
+[project.scripts]
+your_program = "NOM_DE_PACKAGE._cli:main"
+```
+
+Ici :
+
+- `ton_program` est le nom du script créé
+- `NOM_DE_PACKAGE._cli` est le module chargé pour exécuter la fonction
+- `main` est la fonction exécutée par le script
+
+Déclarez les URL de votre projet dans `pyproject.toml` :
+
+```toml
+[project.urls]
+homepage = "https://example.com/"
+repository = "https://example.com/"
+```
+
+Vous pouvez utiliser l'URL de GitLab pour le dépôt et le site Web si vous en avez un.
+
+---
+
+#### Tester le packaging
+
+Installez le module `build` (avec pip).
+
+- Installation locale :
+
+   ```bash
+   pip install .
+   ```
+
+   Le package devrait être installé, rendez-vous dans un autre répertoire, lancez `ipython` et essayez
+   d'importer votre package. Si vous avez un script, vous pouvez tester le script.
+
+- Construction locale :
+
+   ```bash
+   python3 -m build
+   ```
+
+   Vous obtenez un répertoire `dist/` contenant les packages construits.
+
+À ce stade, vous avez un packaging fonctionnel. Selon la définition du commit,
+vous devriez maintenant commettre tout ce travail en une fois.
+
+**Rappel :** aucun fichier non suivi. **Les packages construits ne doivent pas être commis**. Veuillez mettre à jour `.gitignore`.
+
+
+### Construire et publier via la CI
+#### Configuration
+Dans `.gitlab-ci.yml` :
+
+ - Ajoutez les étapes `build` et `publish` :
+
+   ```yaml
+   stages:
+     - linting
+     - build
+     - publish
+   ```
+
+ - Ajoutez le job pour construire le package :
+
+   ```yaml
+   build_package:
+     stage: build
+     before_script:
+       - pip install build
+     script:
+       - rm -rf dist/
+       - python -m build
+     artifacts:
+       untracked: true
+       expire_in: 1 week
+     tags:
+       - docker
+   ```
+
+   Le package est disponible pendant une semaine dans les artefacts du job.
+
+ - Ajoutez le job pour publier le package (uniquement sur les tags) :
+
+   ```yaml
+   publish_package:
+     stage: publish
+     before_script:
+       - pip install twine
+     script:
+       - TWINE_PASSWORD=${CI_JOB_TOKEN}
+         TWINE_USERNAME=gitlab-ci-token
+         python -m twine upload
+           --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+     tags:
+       - docker
+     only:
+       - tags
+   ```
+
+   Le package est téléchargé uniquement sur les nouveaux tags.
+
+ - Commit, push, merge
+
+
+Testez la construction via la CI.
+
+- Le job `publish_package` est exécuté uniquement sur un tag, un tag représente une version du
+   package. Ensuite, ajoutez un tag avec la version ([Semantic Versioning][semver] avec `major.minor.patch` est recommandé) :
+   
+  ```bash
+   git switch main
+   git pull
+   git tag -m 'version 0.0.1' 0.0.1
+   git push --tags
+  ```
+
+ - Vérifiez le pipeline (sur GitLab dans *CI/CD*).
+
+ - Vérifiez que le package est téléchargé (sur GitLab dans *Packages and registries* →
+   *Package and registry*. Copiez l'URL de l'extra-index).
+
+ - Nettoyez l'extra-index-url, l'authentification n'est pas nécessaire pour un dépôt public (supprimez
+   `__token__:<your_personal_token>@`).
+
+ - Mettez à jour le `README.md`, ajoutez une section **Install/Upgrade** avec la ligne
+   ```bash
+   pip install --upgrade --extra-index-url https://…
+   ```
+   (Commit, push, merge)
