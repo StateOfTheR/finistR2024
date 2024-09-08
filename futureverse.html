@@ -8,6 +8,7 @@
 
 <meta name="author" content="Tristan Mary-Huard">
 <meta name="author" content="Aymeric Stamm">
+<meta name="author" content="Louis Lacoste">
 
 <title>Finist’R 2024 - Futureverse follow-up to the tutorial</title>
 <style>
@@ -295,6 +296,13 @@ window.Quarto = {
   </ul></li>
   <li><a href="#using-source-in-a-future" id="toc-using-source-in-a-future" class="nav-link" data-scroll-target="#using-source-in-a-future">Using <code>source()</code> in a future</a></li>
   <li><a href="#sharing-big-matrices-between-r-processes" id="toc-sharing-big-matrices-between-r-processes" class="nav-link" data-scroll-target="#sharing-big-matrices-between-r-processes">Sharing big matrices between R processes</a></li>
+  <li><a href="#nested-parallelization-with-future" id="toc-nested-parallelization-with-future" class="nav-link" data-scroll-target="#nested-parallelization-with-future">Nested parallelization with <code>{future}</code></a>
+  <ul class="collapse">
+  <li><a href="#nested-task-definition" id="toc-nested-task-definition" class="nav-link" data-scroll-target="#nested-task-definition">Nested task definition</a></li>
+  <li><a href="#r-and-base-plan-with-future" id="toc-r-and-base-plan-with-future" class="nav-link" data-scroll-target="#r-and-base-plan-with-future"><code>R</code> and base <code>plan</code> with <code>{future}</code></a></li>
+  <li><a href="#nested-parallelization" id="toc-nested-parallelization" class="nav-link" data-scroll-target="#nested-parallelization">Nested parallelization</a></li>
+  <li><a href="#execution-time-summary-table" id="toc-execution-time-summary-table" class="nav-link" data-scroll-target="#execution-time-summary-table">Execution time summary table</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -315,6 +323,7 @@ window.Quarto = {
     <div class="quarto-title-meta-contents">
              <p>Tristan Mary-Huard </p>
              <p>Aymeric Stamm </p>
+             <p>Louis Lacoste </p>
           </div>
   </div>
     
@@ -823,8 +832,351 @@ Active working group on marshalling and serialization
 <p>May 2024: The R Consortium ISC Working Group <a href="https://github.com/RConsortium/marshalling-wg">‘Marshaling and Serialization in R’</a> has been launched to work on this problem. So we can expect some progress in the near future.</p>
 </div>
 </div>
+</section>
+<section id="nested-parallelization-with-future" class="level2">
+<h2 class="anchored" data-anchor-id="nested-parallelization-with-future">Nested parallelization with <code>{future}</code></h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Benchmarking
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>All time benchmarks are done using the <a href="https://cran.r-project.org/package=tictoc">{<strong>tictoc</strong>}</a> package and on a Lenovo LOQ 15IRH8 with an Intel i5-12450H including 12 cores and 16 GB of RAM under Ubuntu 24.04.1 LTS.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future.apply)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future.callr)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(progressr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="nested-task-definition" class="level3">
+<h3 class="anchored" data-anchor-id="nested-task-definition">Nested task definition</h3>
+<p>We define the following task where we split a sum in sub-sums and perform this multiple times. To slow down computations, we use <code>progressr::slow_sum</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>delay <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>list_sums <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="dv">11</span><span class="sc">:</span><span class="dv">20</span>)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>list_list_sums <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">list</span>(list_sums), <span class="dv">2</span>L)</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>future_nested_loop <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unlist</span>(future.apply<span class="sc">::</span><span class="fu">future_lapply</span>(list_list_sums, <span class="cf">function</span>(l_sums) {</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>        v_sums <span class="ot">&lt;-</span> <span class="fu">unlist</span>(</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>            future.apply<span class="sc">::</span><span class="fu">future_lapply</span>(l_sums, slow_sum,</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">delay =</span> delay,</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">message =</span> <span class="cn">FALSE</span></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(v_sums)</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    }))</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Below we implement a checking function to ensure everything went fine and the returned result was correct.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>expected_result <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">sum</span>(<span class="fu">unlist</span>(list_sums)), <span class="fu">length</span>(list_list_sums))</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>check_result <span class="ot">&lt;-</span> <span class="cf">function</span>(task_time, task_result) {</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(task_result <span class="sc">==</span> expected_result)) {</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>        cli<span class="sc">::</span><span class="fu">cli_abort</span>(<span class="at">message =</span> <span class="fu">c</span>(<span class="st">"{task_time$msg} result do not match expected result"</span>,</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"x"</span> <span class="ot">=</span> <span class="st">"Expected : {expected_result} got {task_result}"</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>        ))</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>        cli<span class="sc">::</span><span class="fu">cli_alert_success</span>(<span class="st">"Task returned expected result"</span>)</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="r-and-base-plan-with-future" class="level3">
+<h3 class="anchored" data-anchor-id="r-and-base-plan-with-future"><code>R</code> and base <code>plan</code> with <code>{future}</code></h3>
+<section id="base-r-and-plansequential" class="level4">
+<h4 class="anchored" data-anchor-id="base-r-and-plansequential">Base <code>R</code> and <code>plan(sequential)</code></h4>
+<p>With <code>R</code> base functions :</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>(<span class="st">"Base R"</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>base_r_result <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">lapply</span>(list_list_sums, <span class="cf">function</span>(l_sums) {</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    v_sums <span class="ot">&lt;-</span> <span class="fu">unlist</span>(</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">lapply</span>(l_sums, slow_sum, <span class="at">delay =</span> delay, <span class="at">message =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(v_sums)</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>base_r_time <span class="ot">&lt;-</span> <span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Base R: 20.076 sec elapsed</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_result</span>(<span class="at">task_time =</span> base_r_time, base_r_result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ Task returned expected result</code></pre>
+</div>
+</div>
+<p>With our delay values we have the following :</p>
+<ul>
+<li><span class="math inline">\(10 \times 0.5s\)</span> for each sub-sum.</li>
+<li><span class="math inline">\(2 \times 10 \times 0.5s\)</span> for each sub-list of sub-sum</li>
+</ul>
+<p>So <span class="math inline">\(2 \times 2 \times 10 \times 0.5 s\)</span> for the list of sub-lists of sub-sums, so <span class="math inline">\(20 s\)</span>. Which is what we approximately observe with <code>{tictoc}</code>:<br>
+<span class="math inline">\(20.076 s\)</span>.</p>
+<p>Avec le plan <code>sequential</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(sequential)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>(<span class="st">"Future plan(sequential)"</span>)</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>sequential_result <span class="ot">&lt;-</span> <span class="fu">future_nested_loop</span>()</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>sequential_time <span class="ot">&lt;-</span> <span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Future plan(sequential): 20.145 sec elapsed</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_result</span>(</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_time =</span> sequential_time,</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_result =</span> sequential_result</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With <code>sequential</code> plan it takes <span class="math inline">\(20.145\)</span> s, which is comparable with<code>R</code> base functions.</p>
+</section>
+<section id="planmultisession" class="level4">
+<h4 class="anchored" data-anchor-id="planmultisession"><code>plan(multisession)</code></h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(<span class="fu">tweak</span>(<span class="st">"multisession"</span>, <span class="at">workers =</span> <span class="dv">2</span>L))</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>(<span class="st">"Future plan(tweak('multisession', workers = 2L))"</span>)</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>multisession2_result <span class="ot">&lt;-</span> <span class="fu">future_nested_loop</span>()</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>multisession2_time <span class="ot">&lt;-</span> <span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Future plan(tweak('multisession', workers = 2L)): 10.365 sec elapsed</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_result</span>(</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_time =</span> multisession2_time,</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_result =</span> multisession2_result</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ Task returned expected result</code></pre>
+</div>
+</div>
+<p>By allocating 2 workers with <code>multisession</code> we manage to obtain a duration below <code>sequential</code>: <span class="math inline">\(10.365\)</span> s.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(<span class="fu">multisession</span>(<span class="at">workers =</span> <span class="dv">4</span>L))</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>(<span class="st">"Future plan(multisession(workers = 4L))"</span>)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>multisession4_result <span class="ot">&lt;-</span> <span class="fu">future_nested_loop</span>()</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>multisession4_time <span class="ot">&lt;-</span> <span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Future plan(multisession(workers = 4L)): 10.404 sec elapsed</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_result</span>(</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_time =</span> multisession4_time,</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_result =</span> multisession4_result</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ Task returned expected result</code></pre>
+</div>
+</div>
+<p>By allocating 4 workers, we observe no improvement, it takes: <span class="math inline">\(10.404\)</span> s.</p>
+<p>This is because <code>{future}</code> doesn’t leverage nested parallelization by default, the first <code>future_lapply</code> being on a two elements list, the maximal reduction time is obtained with two workers. The other two allocated in this example are not used.</p>
+</section>
+</section>
+<section id="nested-parallelization" class="level3">
+<h3 class="anchored" data-anchor-id="nested-parallelization">Nested parallelization</h3>
+<p>According to the documentation we can specify not only a single <code>plan</code> but a list of plans, that can apply to nested futures.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(<span class="fu">list</span>(multisession, multisession))</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>(<span class="st">"Future plan(list(multisession, multisession))"</span>)</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>list_multisession_result <span class="ot">&lt;-</span> <span class="fu">future_nested_loop</span>()</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>list_multisession_time <span class="ot">&lt;-</span> <span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Future plan(list(multisession, multisession)): 10.651 sec elapsed</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_result</span>(</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_time =</span> list_multisession_time,</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_result =</span> list_multisession_result</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ Task returned expected result</code></pre>
+</div>
+</div>
+<p>But at the opposite of what we expected, we do not lower the time taken but it increases ! The task takes: <span class="math inline">\(10.651\)</span> s.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>As Henrik Bengtsson explains in the vignette <a href="https://future.futureverse.org/articles/future-3-topologies.html#built-in-protection-against-recursive-parallelism"><em>Future Topologies</em></a>, <code>{future}</code> has a protection against recursive parallelism. And thus the second loop is not parallelized but forced to be sequential.</p>
+<p>The plan must thus be specified in a specific manner to work as intended.</p>
+</div>
+</div>
+<section id="plan-lists-with-explicit-parameters" class="level4">
+<h4 class="anchored" data-anchor-id="plan-lists-with-explicit-parameters">Plan lists with explicit parameters</h4>
+<p>Given the structure of our task we want the first loop to run on the 2 elements of the list in parallel, thus we need 2 workers for the first <code>future_lapply</code>.</p>
+<p>Each sub-list containing 2 elements, we want to allocate <em>each</em> 2 workers.</p>
+<p>As we want to parallelize the whole task we need: <span class="math inline">\(2 \times 2 =
+4\)</span> workers to allocate.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(<span class="fu">list</span>(<span class="fu">tweak</span>(multisession, <span class="at">workers =</span> <span class="dv">2</span>L), <span class="fu">tweak</span>(multisession, <span class="at">workers =</span> <span class="dv">2</span>L)))</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>(<span class="st">"Future plan(list(tweak(multisession, workers = 2L), tweak(multisession, workers = 2L)))"</span>)</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>list_multisession2_2_result <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">try_fetch</span>(</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">future_nested_loop</span>(),</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">error =</span> <span class="cf">function</span>(cnd) <span class="fu">inform</span>(<span class="st">"Task failed."</span>, <span class="at">parent =</span> cnd)</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in checkNumberOfLocalWorkers(workers): Careful, you are setting up 2
+localhost parallel workers with only 1 CPU cores available for this R process
+(per ‘mc.cores’), which could result in a 200% load. The soft limit is set to
+100%. Overusing the CPUs has negative impact on the current R process, but also
+on all other processes of yours and others running on the same machine. See
+help("parallelly.options", package = "parallelly") for how to override the soft
+and hard limits
+Warning in checkNumberOfLocalWorkers(workers): Careful, you are setting up 2
+localhost parallel workers with only 1 CPU cores available for this R process
+(per ‘mc.cores’), which could result in a 200% load. The soft limit is set to
+100%. Overusing the CPUs has negative impact on the current R process, but also
+on all other processes of yours and others running on the same machine. See
+help("parallelly.options", package = "parallelly") for how to override the soft
+and hard limits</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>list_multisession2_2_time <span class="ot">&lt;-</span> <span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Future plan(list(tweak(multisession, workers = 2L), tweak(multisession, workers = 2L))): 6.349 sec elapsed</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_result</span>(</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_time =</span> list_multisession2_2_time,</span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_result =</span> list_multisession2_2_result</span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ Task returned expected result</code></pre>
+</div>
+</div>
+<p>With this plan we get some warnings, explaining the we are over-parallelizing. We get this message even if we have the correct number of cores (or workers) to properly run this task.</p>
+<p>This is <code>{future}</code> defense mecanism against recursive parallelism.</p>
+<div class="callout callout-style-default callout-caution callout-titled" title="Why shouldn't I ignore this warning">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why shouldn’t I ignore this warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>{future}</code> has a soft limit (that gives warnings) and a hard limit, when reaching the hard limit (of 300% load per core) the future won’t run, even if there is enough available cores.</p>
+<p>The next callout block and next code block explains how to tell <code>{future}</code> that this plan is ok.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled" title="Let `{future}` know that we want recursive parallelism">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Let <code>{future}</code> know that we want recursive parallelism
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To tell the package that we know what we are doing, we must use <code>I()</code> which gives <code>AsIs</code> class to the object it wraps.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(<span class="fu">list</span>(<span class="fu">tweak</span>(multisession, <span class="at">workers =</span> <span class="dv">2</span>L), <span class="fu">tweak</span>(multisession, <span class="at">workers =</span> <span class="fu">I</span>(<span class="dv">2</span>L))))</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>(<span class="st">"Future plan(list(tweak(multisession, workers = 2L), tweak(multisession, workers = I(2L))))"</span>)</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>list_multisession2_I2_result <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">try_fetch</span>(</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">future_nested_loop</span>(),</span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">error =</span> <span class="cf">function</span>(cnd) <span class="fu">inform</span>(<span class="st">"Task failed."</span>, <span class="at">parent =</span> cnd)</span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>list_multisession2_I2_time <span class="ot">&lt;-</span> <span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Future plan(list(tweak(multisession, workers = 2L), tweak(multisession, workers = I(2L)))): 6.396 sec elapsed</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_result</span>(</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_time =</span> list_multisession2_I2_time,</span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_result =</span> list_multisession2_I2_result</span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ Task returned expected result</code></pre>
+</div>
+</div>
+<p>And this way we can specify a working nested parallelization plan.</p>
+</section>
+<section id="with-future.callr" class="level4">
+<h4 class="anchored" data-anchor-id="with-future.callr">With <code>{future.callr}</code></h4>
+<p>The <code>{future.callr}</code> package solves some limitations of <code>future::multisession()</code> and do not need the use of <code>I()</code> as shown in the below example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(<span class="fu">list</span>(<span class="fu">tweak</span>(callr, <span class="at">workers =</span> <span class="dv">2</span>L), <span class="fu">tweak</span>(callr, <span class="at">workers =</span> <span class="dv">2</span>L)))</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>(<span class="st">"Future `plan(list(tweak(callr, workers = 2L), tweak(callr, workers = 2L)))`"</span>)</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>list_callr2_2_result <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">try_fetch</span>(</span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">future_nested_loop</span>(),</span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">error =</span> <span class="cf">function</span>(cnd) <span class="fu">inform</span>(<span class="st">"Task failed."</span>, <span class="at">parent =</span> cnd)</span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>list_callr2_2_time <span class="ot">&lt;-</span> <span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Future `plan(list(tweak(callr, workers = 2L), tweak(callr, workers = 2L)))`: 6.299 sec elapsed</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check_result</span>(</span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_time =</span> list_callr2_2_time,</span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">task_result =</span> list_callr2_2_result</span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ Task returned expected result</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="execution-time-summary-table" class="level3">
+<h3 class="anchored" data-anchor-id="execution-time-summary-table">Execution time summary table</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 87%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><code>future::plan(.)</code></th>
+<th style="text-align: right;">Elapsed time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Base R</td>
+<td style="text-align: right;">20.076</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>sequential</code></td>
+<td style="text-align: right;">20.145</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>multisession(workers = 2L)</code></td>
+<td style="text-align: right;">10.365</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>multisession(workers = 4L)</code></td>
+<td style="text-align: right;">10.404</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>list(multisession, multisession)</code></td>
+<td style="text-align: right;">10.651</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>list(tweak(multisession, workers = 2L), tweak(multisession, workers = 2L))</code></td>
+<td style="text-align: right;">6.349</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>list(tweak(multisession, workers = 2L), tweak(multisession, workers = I(2L)))</code></td>
+<td style="text-align: right;">6.396</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>list(tweak(callr, workers = 2L), tweak(callr, workers = 2L))</code></td>
+<td style="text-align: right;">6.299</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

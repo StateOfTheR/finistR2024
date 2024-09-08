@@ -595,7 +595,7 @@ We use the dataset KarateClub() which is organized as the typical object used by
 <span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, M)</span>
 <span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>plt.imshow(m[np.argsort(W1),:][:,np.argsort(W2)],cmap<span class="op">=</span><span class="st">"gray_r"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;matplotlib.image.AxesImage object at 0x7fb92fc29ed0&gt;</code></pre>
+<pre><code>&lt;matplotlib.image.AxesImage object at 0x7f7ee754ed70&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>edge_index <span class="op">=</span> torch.LongTensor(([np.where(m)[<span class="dv">0</span>],np.where(m)[<span class="dv">1</span>]]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -726,7 +726,7 @@ We use the dataset KarateClub() which is organized as the typical object used by
 </div>
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"AUC 2 : "</span>,roc_auc_score(W2[test_mask2],y_pred2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>AUC 2 :  0.8</code></pre>
+<pre><code>AUC 2 :  1.0</code></pre>
 </div>
 </div>
 </section>
@@ -921,21 +921,17 @@ We use the dataset KarateClub() which is organized as the typical object used by
 <div class="cell-output cell-output-stdout">
 <pre><code>
   0%|          | 0/20 [00:00&lt;?, ?it/s]
- 10%|#         | 2/20 [00:00&lt;00:00, 18.31it/s]
- 20%|##        | 4/20 [00:00&lt;00:00, 18.26it/s]
- 30%|###       | 6/20 [00:00&lt;00:00, 18.61it/s]
- 40%|####      | 8/20 [00:00&lt;00:00, 19.02it/s]
- 50%|#####     | 10/20 [00:00&lt;00:00, 19.35it/s]
- 60%|######    | 12/20 [00:00&lt;00:00, 19.36it/s]
- 70%|#######   | 14/20 [00:00&lt;00:00, 19.48it/s]
- 80%|########  | 16/20 [00:00&lt;00:00, 19.55it/s]
- 90%|######### | 18/20 [00:00&lt;00:00, 19.58it/s]
-100%|##########| 20/20 [00:01&lt;00:00, 19.56it/s]
-100%|##########| 20/20 [00:01&lt;00:00, 19.30it/s]</code></pre>
+ 15%|#5        | 3/20 [00:00&lt;00:00, 20.42it/s]
+ 30%|###       | 6/20 [00:00&lt;00:00, 20.39it/s]
+ 45%|####5     | 9/20 [00:00&lt;00:00, 20.41it/s]
+ 60%|######    | 12/20 [00:00&lt;00:00, 20.42it/s]
+ 75%|#######5  | 15/20 [00:00&lt;00:00, 20.40it/s]
+ 90%|######### | 18/20 [00:00&lt;00:00, 20.20it/s]
+100%|##########| 20/20 [00:00&lt;00:00, 20.28it/s]</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>plt.plot(loss_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[&lt;matplotlib.lines.Line2D object at 0x7fb91d361180&gt;]</code></pre>
+<pre><code>[&lt;matplotlib.lines.Line2D object at 0x7f7ed2ac11e0&gt;]</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>loader_train <span class="op">=</span> DataLoader(data_train, batch_size<span class="op">=</span><span class="bu">len</span>(data_train))</span>
 <span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> batch <span class="kw">in</span> loader_train:</span>
