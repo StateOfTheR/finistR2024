@@ -3,6 +3,7 @@ title: "Futureverse follow-up to the tutorial"
 author: 
   - Tristan Mary-Huard
   - Aymeric Stamm
+  - Louis Lacoste
 toc: true
 ---
 
@@ -633,4 +634,401 @@ marshal package will soon be able to marshal and unmarshal objects of class
 ## Active working group on marshalling and serialization
 
 May 2024: The R Consortium ISC Working Group [‘Marshaling and Serialization in R’](https://github.com/RConsortium/marshalling-wg) has been launched to work on this problem. So we can expect some progress in the near future.
+:::
+
+## Nested parallelization with `{future}`
+
+::: {.callout-note}
+### Benchmarking
+
+All time benchmarks are done using the
+[{**tictoc**}](https://cran.r-project.org/package=tictoc) package and on a
+Lenovo LOQ 15IRH8 with an Intel i5-12450H  including 12 cores and 16 GB of RAM
+under Ubuntu 24.04.1 LTS.
+:::
+
+::: cell
+``` {.r .cell-code}
+library(future)
+library(future.apply)
+library(future.callr)
+library(progressr)
+```
+:::
+
+### Nested task definition
+
+We define the following task where we split a sum in sub-sums and
+perform this multiple times. To slow down computations, we use
+`progressr::slow_sum`.
+
+::: cell
+``` {.r .cell-code}
+delay <- 0.5
+
+list_sums <- list(1:10, 11:20)
+list_list_sums <- rep(list(list_sums), 2L)
+future_nested_loop <- function() {
+    unlist(future.apply::future_lapply(list_list_sums, function(l_sums) {
+        v_sums <- unlist(
+            future.apply::future_lapply(l_sums, slow_sum,
+                delay = delay,
+                message = FALSE
+            )
+        )
+        sum(v_sums)
+    }))
+}
+```
+:::
+
+Below we implement a checking function to ensure everything went fine
+and the returned result was correct.
+
+::: cell
+``` {.r .cell-code}
+expected_result <- rep(sum(unlist(list_sums)), length(list_list_sums))
+
+check_result <- function(task_time, task_result) {
+    if (!all(task_result == expected_result)) {
+        cli::cli_abort(message = c("{task_time$msg} result do not match expected result",
+            "x" = "Expected : {expected_result} got {task_result}"
+        ))
+    } else {
+        cli::cli_alert_success("Task returned expected result")
+    }
+}
+```
+:::
+
+### `R` and base `plan` with `{future}`
+
+#### Base `R` and `plan(sequential)`
+
+With `R` base functions :
+
+::: cell
+``` {.r .cell-code}
+tic("Base R")
+base_r_result <- unlist(lapply(list_list_sums, function(l_sums) {
+    v_sums <- unlist(
+        lapply(l_sums, slow_sum, delay = delay, message = FALSE)
+    )
+    sum(v_sums)
+}))
+base_r_time <- toc()
+```
+
+::: {.cell-output .cell-output-stdout}
+    Base R: 20.076 sec elapsed
+:::
+
+``` {.r .cell-code}
+check_result(task_time = base_r_time, base_r_result)
+```
+
+::: {.cell-output .cell-output-stderr}
+    ✔ Task returned expected result
+:::
+:::
+
+With our delay values we have the following :
+
+-   $10 \times 0.5s$ for each sub-sum.
+-   $2 \times 10 \times 0.5s$ for each sub-list of sub-sum
+
+So $2 \times 2 \times 10 \times 0.5 s$ for the list of sub-lists of
+sub-sums, so $20 s$. Which is what we approximately observe with
+`{tictoc}`:\
+$20.076 s$.
+
+Avec le plan `sequential`
+
+::: cell
+``` {.r .cell-code}
+plan(sequential)
+tic("Future plan(sequential)")
+sequential_result <- future_nested_loop()
+sequential_time <- toc()
+```
+
+::: {.cell-output .cell-output-stdout}
+    Future plan(sequential): 20.145 sec elapsed
+:::
+
+``` {.r .cell-code}
+check_result(
+    task_time = sequential_time,
+    task_result = sequential_result
+)
+```
+:::
+
+With `sequential` plan it takes $20.145$ s, which is comparable with`R`
+base functions.
+
+#### `plan(multisession)`
+
+::: cell
+``` {.r .cell-code}
+plan(tweak("multisession", workers = 2L))
+tic("Future plan(tweak('multisession', workers = 2L))")
+multisession2_result <- future_nested_loop()
+multisession2_time <- toc()
+```
+
+::: {.cell-output .cell-output-stdout}
+    Future plan(tweak('multisession', workers = 2L)): 10.365 sec elapsed
+:::
+
+``` {.r .cell-code}
+check_result(
+    task_time = multisession2_time,
+    task_result = multisession2_result
+)
+```
+
+::: {.cell-output .cell-output-stderr}
+    ✔ Task returned expected result
+:::
+:::
+
+By allocating 2 workers with `multisession` we manage to obtain a
+duration below `sequential`: $10.365$ s.
+
+::: cell
+``` {.r .cell-code}
+plan(multisession(workers = 4L))
+tic("Future plan(multisession(workers = 4L))")
+multisession4_result <- future_nested_loop()
+multisession4_time <- toc()
+```
+
+::: {.cell-output .cell-output-stdout}
+    Future plan(multisession(workers = 4L)): 10.404 sec elapsed
+:::
+
+``` {.r .cell-code}
+check_result(
+    task_time = multisession4_time,
+    task_result = multisession4_result
+)
+```
+
+::: {.cell-output .cell-output-stderr}
+    ✔ Task returned expected result
+:::
+:::
+
+By allocating 4 workers, we observe no improvement, it takes: $10.404$
+s.
+
+This is because `{future}` doesn't leverage nested parallelization by
+default, the first `future_lapply` being on a two elements list, the
+maximal reduction time is obtained with two workers. The other two
+allocated in this example are not used.
+
+### Nested parallelization
+
+According to the documentation we can specify not only a single `plan`
+but a list of plans, that can apply to nested futures.
+
+::: cell
+``` {.r .cell-code}
+plan(list(multisession, multisession))
+tic("Future plan(list(multisession, multisession))")
+list_multisession_result <- future_nested_loop()
+list_multisession_time <- toc()
+```
+
+::: {.cell-output .cell-output-stdout}
+    Future plan(list(multisession, multisession)): 10.651 sec elapsed
+:::
+
+``` {.r .cell-code}
+check_result(
+    task_time = list_multisession_time,
+    task_result = list_multisession_result
+)
+```
+
+::: {.cell-output .cell-output-stderr}
+    ✔ Task returned expected result
+:::
+:::
+
+But at the opposite of what we expected, we do not lower the time taken
+but it increases ! The task takes: $10.651$ s.
+
+:::{.callout-note}
+As Henrik Bengtsson explains in the vignette [*Future Topologies*](https://future.futureverse.org/articles/future-3-topologies.html#built-in-protection-against-recursive-parallelism), `{future}` has a protection against recursive parallelism. 
+And thus the second loop is not parallelized but forced to be sequential.
+
+The plan must thus be specified in a specific manner to work as intended.
+:::
+
+
+#### Plan lists with explicit parameters
+
+Given the structure of our task we want the first loop to run on the 2
+elements of the list in parallel, thus we need 2 workers for the first
+`future_lapply`.
+
+Each sub-list containing 2 elements, we want to allocate *each* 2
+workers.
+
+As we want to parallelize the whole task we need: $2 \times 2 =
+4$ workers to allocate.
+
+::: cell
+``` {.r .cell-code}
+plan(list(tweak(multisession, workers = 2L), tweak(multisession, workers = 2L)))
+tic("Future plan(list(tweak(multisession, workers = 2L), tweak(multisession, workers = 2L)))")
+list_multisession2_2_result <- rlang::try_fetch(
+    future_nested_loop(),
+    error = function(cnd) inform("Task failed.", parent = cnd)
+)
+```
+
+::: {.cell-output .cell-output-stderr}
+    Warning in checkNumberOfLocalWorkers(workers): Careful, you are setting up 2
+    localhost parallel workers with only 1 CPU cores available for this R process
+    (per ‘mc.cores’), which could result in a 200% load. The soft limit is set to
+    100%. Overusing the CPUs has negative impact on the current R process, but also
+    on all other processes of yours and others running on the same machine. See
+    help("parallelly.options", package = "parallelly") for how to override the soft
+    and hard limits
+    Warning in checkNumberOfLocalWorkers(workers): Careful, you are setting up 2
+    localhost parallel workers with only 1 CPU cores available for this R process
+    (per ‘mc.cores’), which could result in a 200% load. The soft limit is set to
+    100%. Overusing the CPUs has negative impact on the current R process, but also
+    on all other processes of yours and others running on the same machine. See
+    help("parallelly.options", package = "parallelly") for how to override the soft
+    and hard limits
+:::
+
+``` {.r .cell-code}
+list_multisession2_2_time <- toc()
+```
+
+::: {.cell-output .cell-output-stdout}
+    Future plan(list(tweak(multisession, workers = 2L), tweak(multisession, workers = 2L))): 6.349 sec elapsed
+:::
+
+``` {.r .cell-code}
+check_result(
+    task_time = list_multisession2_2_time,
+    task_result = list_multisession2_2_result
+)
+```
+
+::: {.cell-output .cell-output-stderr}
+    ✔ Task returned expected result
+:::
+:::
+
+With this plan we get some warnings, explaining the we are
+over-parallelizing. We get this message even if we have the correct
+number of cores (or workers) to properly run this task.
+
+This is `{future}` defense mecanism against recursive parallelism.
+
+:::{.callout-caution title="Why shouldn't I ignore this warning"}
+`{future}` has a soft limit (that gives warnings) and a hard limit, when reaching the hard limit (of 300% load per core) the future won't run, even if there is enough available cores. 
+
+The next callout block and next code block explains how to tell `{future}` that this plan is ok.
+:::
+
+:::{.callout-important title="Let `{future}` know that we want recursive parallelism"}
+To tell the package that we know what we are doing, we must use `I()` which
+gives `AsIs` class to the object it wraps.
+:::
+
+::: cell
+``` {.r .cell-code}
+plan(list(tweak(multisession, workers = 2L), tweak(multisession, workers = I(2L))))
+tic("Future plan(list(tweak(multisession, workers = 2L), tweak(multisession, workers = I(2L))))")
+list_multisession2_I2_result <- rlang::try_fetch(
+    future_nested_loop(),
+    error = function(cnd) inform("Task failed.", parent = cnd)
+)
+list_multisession2_I2_time <- toc()
+```
+
+::: {.cell-output .cell-output-stdout}
+    Future plan(list(tweak(multisession, workers = 2L), tweak(multisession, workers = I(2L)))): 6.396 sec elapsed
+:::
+
+``` {.r .cell-code}
+check_result(
+    task_time = list_multisession2_I2_time,
+    task_result = list_multisession2_I2_result
+)
+```
+
+::: {.cell-output .cell-output-stderr}
+    ✔ Task returned expected result
+:::
+:::
+
+And this way we can specify a working nested parallelization plan.
+
+#### With `{future.callr}`
+
+The `{future.callr}` package solves some limitations of
+`future::multisession()` and do not need the use of `I()` as shown in
+the below example:
+
+::: cell
+``` {.r .cell-code}
+plan(list(tweak(callr, workers = 2L), tweak(callr, workers = 2L)))
+tic("Future `plan(list(tweak(callr, workers = 2L), tweak(callr, workers = 2L)))`")
+list_callr2_2_result <- rlang::try_fetch(
+    future_nested_loop(),
+    error = function(cnd) inform("Task failed.", parent = cnd)
+)
+list_callr2_2_time <- toc()
+```
+
+::: {.cell-output .cell-output-stdout}
+    Future `plan(list(tweak(callr, workers = 2L), tweak(callr, workers = 2L)))`: 6.299 sec elapsed
+:::
+
+``` {.r .cell-code}
+check_result(
+    task_time = list_callr2_2_time,
+    task_result = list_callr2_2_result
+)
+```
+
+::: {.cell-output .cell-output-stderr}
+    ✔ Task returned expected result
+:::
+:::
+
+### Execution time summary table
+
+::: cell
+::: cell-output-display
+  -------------------------------------------------------------------------------------------
+  `future::plan(.)`                                                                   Elapsed
+                                                                                         time
+  --------------------------------------------------------------------------------- ---------
+  Base R                                                                               20.076
+
+  `sequential`                                                                         20.145
+
+  `multisession(workers = 2L)`                                                         10.365
+
+  `multisession(workers = 4L)`                                                         10.404
+
+  `list(multisession, multisession)`                                                   10.651
+
+  `list(tweak(multisession, workers = 2L), tweak(multisession, workers = 2L))`          6.349
+
+  `list(tweak(multisession, workers = 2L), tweak(multisession, workers = I(2L)))`       6.396
+
+  `list(tweak(callr, workers = 2L), tweak(callr, workers = 2L))`                        6.299
+  -------------------------------------------------------------------------------------------
+:::
 :::
