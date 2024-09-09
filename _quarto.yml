@@ -25,6 +25,10 @@ website:
         menu:
           - text: Pre-commit avec R
             href: precommit.qmd
+          - text: Reproductibilité
+            href: reproductibility.qmd
+          - text: rig - The R Installation Manager
+            href: rig.qmd
           - text: Python packaging
             href: packaging_and_testing.qmd
           - text: R packaging

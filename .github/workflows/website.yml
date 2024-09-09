@@ -24,6 +24,8 @@ jobs:
           Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
           Rscript -e "install.packages(c('simulator', 'simpr', 'SimEngine', 'DT', 'withr', 'bench'))"
           Rscript -e "install.packages(c('future', 'furrr', 'purrr', 'cli', 'RhpcBLASctl'))"
+          Rscript -e "install.packages('rix', repos = c('https://b-rodrigues.r-universe.dev', 'https://cloud.r-project.org'))"
+- name: Additional Python packages
       - name: Additional Python packages
         run: |
           pip install torch torch_geometric 
