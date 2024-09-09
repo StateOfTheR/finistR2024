@@ -1,5 +1,10 @@
 ---
 title: "Graph Neural Networks for bipartite graphs with pytorch_geometric"
+author: 
+  - Emré Anakok
+  - Pierre Barbillon
+  - Lucia Clarotto
+  - Louis Lacoste
 format: 
   html: 
     number-sections: true
