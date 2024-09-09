@@ -56,7 +56,7 @@ website:
         menu:
         - text: "Document paramétré en quarto"
           href: quarto_parametre.qmd
-        - text: "Reproducibility with renv, docker, and rix"
+        - text: "Reproducibility with renv, docker+renv, and rix"
           href: reproducibility.qmd  
 format:
   html:
