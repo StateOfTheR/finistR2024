@@ -3,7 +3,7 @@ name: pr_check
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   pull_request:
-    types: [opened, reopened]
+    branches: [main, master]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 
@@ -16,7 +16,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Additional Packages
-        run: Rscript -e "install.packages(c('tictoc'))"
-      - name: Generate slides
+      - name: Additional R packages
+        run: |
+          Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
+      - name: Additional Python packages
+        run: |
+          pip install torch torch_geometric 
+          pip install numpy==1.26.1
+          pip install scikit-learn scikit-network networkx matplotlib tqdm openpyxl pandas
+      - name: Render website
         run: "quarto render"

@@ -47,3 +47,12 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+/.quarto/
+
+# For niimble branch
+_site/
+*_files/
+*_cache/
+01_nimble.html
+local_nimble*.R
