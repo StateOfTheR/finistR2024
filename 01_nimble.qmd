@@ -846,7 +846,8 @@ ggplot(formatted_results) +
   labs(x = "Sample ID", y = "Parameter value", color = "")
 ```
 
-Temps de calcul 2 chaînes en séquentiel avec les 2 graines :
+##Temps de calcul 2 chaînes en séquentiel avec les 2 graines :
+
 ```{r}
 #| echo: true
 #| eval: false
@@ -870,12 +871,13 @@ print(Sys.time()-time0)
 # Time difference of 35.44853 secs
 ```
 
-Test de parallelisation avec le tuto du site Nimble
-https://r-nimble.org/nimbleExamples/parallelizing_NIMBLE.html
+## Test de parallelisation avec le tuto du site Nimble
+
 
 ```{r}
 #| echo: true
 #| eval: false
+#https://r-nimble.org/nimbleExamples/parallelizing_NIMBLE.html
 #library(parallel)
 
 model_neg_bin <- nimbleModel(code = code_neg_bin, 
@@ -933,7 +935,7 @@ print(Sys.time()-time0)
 stopCluster(workers)
 ```
 
-Le meilleur pour la fin : test de parallelisation avec future à partir du tuto d'Aymeric Stamm
+## Le meilleur pour la fin : test de parallelisation avec future à partir du tuto d'Aymeric Stamm
 
 ```{r}
 #| echo: true
@@ -981,4 +983,4 @@ print(Sys.time()-time0)
 #Time difference of 23.59011 secs
 ```
 
-And the winner is... ?
+## And the winner is... ?
