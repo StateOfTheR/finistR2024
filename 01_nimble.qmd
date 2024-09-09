@@ -26,6 +26,9 @@ library(mvtnorm)
 library(nimble)
 library(nimbleHMC)
 library(tidyverse)
+library(parallel)
+library(future)
+library(furrr)
 
 ```
 
@@ -740,4 +743,242 @@ ggs(results) %>%
   geom_line()
 ```
 
+# Parallelisation with nimble
 
+Objectifs : 
+
+Paralléliser les calculs de plusieurs chaînes sur différents processeurs de la machine
+
+Prendre en compte des graines différentes pour les chaînes
+
+Comparer les temps de calcul entre :
+ -- séquentiel : 2 façons de faire (nimbleModel+compile+build+runMCMC ou nimbleMCMC où tout est intégré)
+ -- parallélisation de la fonction run_MCMC_allcode (nimbleModel+compile+build+runMCMC) avec parallel
+ -- parallélisation de la fonction run_MCMC_allcode (nimbleModel+compile+build+runMCMC) avec future
+
+```{r}
+#| echo: true
+#| eval: false
+set.seed(123) #For reproducibility
+data_ex1 <- rnbinom(n = 100, prob = 0.4, size = 12)
+
+code_neg_bin <- nimbleCode({
+  # Observation model
+  for(i in 1:n){# n is never defined before, it will be a constant
+    y[i] ~ dnbinom(prob, theta)
+  }
+  # PRIORS
+  prob ~ dunif(0, 1)
+  theta ~ dexp(0.1)
+})
+
+time0=Sys.time()
+seed=c(123,234)
+model_neg_bin <- nimbleModel(code = code_neg_bin, 
+                             name = "Negative binomial", 
+                             constants = list(n = length(data_ex1)),
+                             data = list(y = data_ex1),
+                             inits = list(prob = 0.5, theta = 1))
+
+CmyModel <- compileNimble(model_neg_bin)
+myMCMC <- buildMCMC(CmyModel) #, monitors = monitors)
+CmyMCMC <- compileNimble(myMCMC)
+
+results_1 <- runMCMC(CmyMCMC, setSeed = seed,
+                   niter = 10000, # Number of it. per chain
+                   thin = 10, # Thinning
+                   nburnin = 1000,
+                   nchains=2)
+print(Sys.time()-time0)
+#Time difference of 29.35223 secs
+```
+
+Ou directement les étapes de compile, build et run en même temps :
+```{r}
+#| echo: true
+#| eval: false
+time0=Sys.time()
+results_1bis <- nimbleMCMC(model_neg_bin,
+                                        inits = list(prob = 0.5, theta = 1),
+                                        nchains = 2, # Number of independent chains 
+                                        niter = 10000, # Number of it. per chain
+                                        thin = 10, # Thinning
+                                        nburnin = 1000) # Number of initial iterations discarded
+print(Sys.time()-time0)
+# Time difference of 18.00453 secs
+```
+
+Graphs des chaines (optionnel)
+```{r}
+#| echo: true
+#| eval: false
+formatted_results <- imap_dfr(results_1, 
+                              function(x, nm){
+                                as.data.frame(x) %>% 
+                                  rowid_to_column(var = "Iteration") %>% 
+                                  mutate(Chain = str_remove(nm, "chain"))
+                              }) %>% 
+  pivot_longer(cols = -c("Iteration", "Chain"),
+               names_to = "Parameter", 
+               values_to = "value")
+ggplot(formatted_results) +
+  aes(x = Iteration,
+      y = value, color = Chain) +
+  facet_wrap(~Parameter, scales = "free") +
+  geom_line() +
+  labs(x = "Sample ID", y = "Parameter value", color = "")
+
+
+formatted_results <- imap_dfr(results_1bis, 
+                              function(x, nm){
+                                as.data.frame(x) %>% 
+                                  rowid_to_column(var = "Iteration") %>% 
+                                  mutate(Chain = str_remove(nm, "chain"))
+                              }) %>% 
+  pivot_longer(cols = -c("Iteration", "Chain"),
+               names_to = "Parameter", 
+               values_to = "value")
+ggplot(formatted_results) +
+  aes(x = Iteration,
+      y = value, color = Chain) +
+  facet_wrap(~Parameter, scales = "free") +
+  geom_line() +
+  labs(x = "Sample ID", y = "Parameter value", color = "")
+```
+
+Temps de calcul 2 chaînes en séquentiel avec les 2 graines :
+```{r}
+#| echo: true
+#| eval: false
+
+time0=Sys.time()
+posterior_samples_neg_bin1 <- nimbleMCMC(model_neg_bin,
+                                         inits = list(prob = 0.5, theta = 1),
+                                         nchains = 1, # Number of independent chains 
+                                         niter = 10000, # Number of it. per chain
+                                         thin = 10, # Thinning
+                                         nburnin = 1000,
+                                         setSeed=123) # Number of initial iterations discarded
+posterior_samples_neg_bin2 <- nimbleMCMC(model_neg_bin,
+                                         inits = list(prob = 0.5, theta = 1),
+                                         nchains = 1, # Number of independent chains 
+                                         niter = 10000, # Number of it. per chain
+                                         thin = 10, # Thinning
+                                         nburnin = 1000,
+                                         setSeed=234) # Number of initial iterations discarded
+print(Sys.time()-time0)
+# Time difference of 35.44853 secs
+```
+
+Test de parallelisation avec le tuto du site Nimble
+https://r-nimble.org/nimbleExamples/parallelizing_NIMBLE.html
+
+```{r}
+#| echo: true
+#| eval: false
+#library(parallel)
+
+model_neg_bin <- nimbleModel(code = code_neg_bin, 
+                             name = "Negative binomial", 
+                             constants = list(n = length(data_ex1)),
+                             data = list(y = data_ex1))
+
+posterior_samples_neg_bin <- nimbleMCMC(model_neg_bin,
+                                        inits = list(prob = 0.5, theta = 1),
+                                        nchains = 2, # Number of independent chains 
+                                        niter = 10000, # Number of it. per chain
+                                        thin = 10, # Thinning
+                                        nburnin = 1000) # Number of initial iterations discarded
+
+workers <- makeCluster(3)
+plan(multisession)
+
+myData <-  data_ex1
+
+run_MCMC_allcode <- function(seed=seed, data=myData, code=code){ #, useWAIC = F) {
+  library(nimble)
+
+  model_neg_bin <- nimbleModel(code = code, 
+                               name = "Negative binomial", 
+                               constants = list(n = length(data)),
+                               data = list(y = data),
+                               inits = list(prob = 0.5, theta = 1))
+  
+  CmyModel <- compileNimble(model_neg_bin)
+  
+  #if(useWAIC) 
+  #  monitors <- myModel$getParents(model_neg_bin$getNodeNames(dataOnly = TRUE), stochOnly = TRUE)
+  ## One may also wish to add additional monitors
+  
+  myMCMC <- buildMCMC(CmyModel) #, monitors = monitors)
+  CmyMCMC <- compileNimble(myMCMC)
+  
+  results <- runMCMC(CmyMCMC, setSeed = seed,
+                     niter = 10000, # Number of it. per chain
+                     thin = 10, # Thinning
+                     nburnin = 1000)
+  
+  return(results)
+}
+
+time0=Sys.time()
+chain_output <- parLapply(cl = workers, X = 1:3, 
+                          fun = run_MCMC_allcode, 
+                          data = myData, code = code_neg_bin)#,
+                          #useWAIC = F)
+print(Sys.time()-time0)
+# Time difference of 27.86264 secs
+
+# It's good practice to close the cluster when you're done with it.
+stopCluster(workers)
+```
+
+Le meilleur pour la fin : test de parallelisation avec future à partir du tuto d'Aymeric Stamm
+
+```{r}
+#| echo: true
+#| eval: false
+#library(future)
+#library(furrr)
+plan(multisession,workers=2)
+
+data_ex1 <- rnbinom(n = 100, prob = 0.4, size = 12)
+myData <- data_ex1
+seed=c(123,234)
+
+myCode <- nimbleCode({
+  # Observation model
+  for(i in 1:n){
+    y[i] ~ dnbinom(prob, theta)
+  }
+  # PRIORS
+  prob ~ dunif(0, 1)
+  theta ~ dexp(0.1)
+})
+
+run_MCMC_allcode <- function(seed=seed, data=myData, code=myCode){ #, useWAIC = F) {
+  library(nimble)
+    model_neg_bin <- nimbleModel(code = code, 
+                               name = "Negative binomial", 
+                               constants = list(n = length(data)),
+                               data = list(y = data),
+                               inits = list(prob = 0.5, theta = 1))
+  CmyModel <- compileNimble(model_neg_bin)
+  myMCMC <- buildMCMC(CmyModel) 
+  CmyMCMC <- compileNimble(myMCMC)
+  results <- runMCMC(CmyMCMC, setSeed = seed,
+                     niter = 10000, # Number of it. per chain
+                     thin = 10, # Thinning
+                     nburnin = 1000)
+  return(results)
+}
+
+# temps de calcul avec parallélisation des 2 chaînes avec des graines différentes 
+
+time0=Sys.time()
+fMCMC <- future_map(.x=seed, .f= run_MCMC_allcode,.options=furrr_options(seed=TRUE))
+print(Sys.time()-time0)
+#Time difference of 23.59011 secs
+```
+
+And the winner is... ?
