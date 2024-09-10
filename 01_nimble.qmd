@@ -344,7 +344,7 @@ First, nimble is able to identify conjugate priors and make the exact computatio
 
 `nimble` provides support for Hamiltonian Monte Carlo (HMC) and compute the derivatives of the likelihood through automatic differentiation. The `nimbleHMC` package implement two versions of No-U-Turn (NUTS) HMC sampling: the standard one developed in Hoffman and Gelman ([link](https://jmlr.org/papers/volume15/hoffman14a/hoffman14a.pdf)) and an updated one with improved adaptation routines and convergence criteria, which matches the HMC sampler of `STAN`.
 
-In order to allow an algorithm to use AD for a specific model, that model must be created with `buildDerivs = TRUE`.
+In order to allow an algorithm to use AD for a specific model, that model must be created with `buildDerivs = TRUE` and  `calculate = FALSE`.
 
 ```{r}
 #| label: HMC_code
