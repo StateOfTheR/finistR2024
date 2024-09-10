@@ -743,7 +743,7 @@ ggs(results) %>%
   geom_line()
 ```
 
-# Parallelisation with nimble
+# Parallelisation with Nimble
 
 Objectifs : 
 
