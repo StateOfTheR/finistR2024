@@ -48,19 +48,18 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
+
+# Ignore _site files
+_site/
 .quarto/
-_site/
-local_*.R
-_site/
 *_files/
-*_cache/
-01_nimble.html
+
+# Ignore divers files
+local_*.R
 local_nimble*.R
 local_extract_env_data*.R
 local_extract_env_data*.qmd
 
 
 
-_site
 
-/.quarto/

@@ -9,75 +9,92 @@ author:
   - Emily Walker
 format: html
 toc: true
+editor: 
+  markdown: 
+    wrap: 72
 ---
-
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Lorsque l'on utilise Python, une bonne pratique consiste à créer un environnement spécifique par projet. 
-L'environnement contient la version de Python que l'on souhaite utiliser ainsi que les packages/modules utiles au projet. 
-Cette façon de faire permet de faire coexister différentes versions de python ou de packages au sein du même ordinateur.
-Cette pratique n'est pas spécifique à Python, on pourrait imaginer créer des environnements pour utiliser des versions différentes de R.
-Si le programme ou la librairie n'est pas installée dans l'environnement mais est disponible dans l'installation globale de la machine, c'est cette version globale qui sera utilisée. Il faut donc bien vérifier ce qui est dispo dans l'environnement et globalement.
+Lorsque l'on utilise Python, une bonne pratique consiste à créer un
+environnement spécifique par projet. L'environnement contient la version
+de Python que l'on souhaite utiliser ainsi que les packages/modules
+utiles au projet. Cette façon de faire permet de faire coexister
+différentes versions de python ou de packages au sein du même
+ordinateur. Cette pratique n'est pas spécifique à Python, on pourrait
+imaginer créer des environnements pour utiliser des versions différentes
+de R. Si le programme ou la librairie n'est pas installée dans
+l'environnement mais est disponible dans l'installation globale de la
+machine, c'est cette version globale qui sera utilisée. Il faut donc
+bien vérifier ce qui est dispo dans l'environnement et globalement.
 
-Nous avons exploré deux manières de gérer les environnements soit avec `conda` soit avec `virtual env`. Nous avons testé sous Linux et sous Windows.
+Nous avons exploré deux manières de gérer les environnements soit avec
+`conda` soit avec `virtual env`. Nous avons testé sous Linux et sous
+Windows.
 
 ## Installation python et problèmes potentiels
 
-On crée un lien symbolique pour que `python 3` soit le `python` par défaut en utilisant les instructions suivantes:
+On crée un lien symbolique pour que `python 3` soit le `python` par
+défaut en utilisant les instructions suivantes:
 
 `sudo ln -sf /usr/bin/python3 /usr/bin/python`
 
-On fait de même pour `pip` qui est un des installateurs de modules/ packages. 
+On fait de même pour `pip` qui est un des installateurs de modules/
+packages.
 
 `sudo ln -sf /usr/bin/pip3 /usr/bin/pip`
 
+## Créer un environnement avec conda sous Linux
 
-## Cérer un environnement avec  conda sous Linux
+Cette partie suppose que la commande `conda` est disponible (installée
+avec anaconda ou miniconda)
 
-Cette partie suppose que la commande `conda` est disponible (installée avec anaconda ou miniconda)
-
-La liste des environnement disponible est donnée par 
+La liste des environnement disponible est donnée par
 
 `conda env list`
 
-Vous devez avoir au moins l'environnement de `base` dans cette liste. Vous avez aussi ainsi accès à l'adresse où vous trouverez vos environnements. 
+Vous devez avoir au moins l'environnement de `base` dans cette liste.
+Vous avez aussi ainsi accès à l'adresse où vous trouverez vos
+environnements.
 
+On souhaite **créer un nouvel environnement nommé finistr contenant
+uniquement python et pip**.
 
-On souhaite **créer un nouvel environnement nommé finistr contenant uniquement python et pip**. 
-
-Il suffit de lancer la commande 
+Il suffit de lancer la commande
 `conda create --name finistr python=3.11 pip`
 
-
-En listant les environnements disponibles, vous devez voir l'environnement finistr créé.
+En listant les environnements disponibles, vous devez voir
+l'environnement finistr créé.
 
 `conda env list`
 
-Il est très important d'installer `pip` en meme temps, sinon c'est le pip global du systeme qui est utilisé et toutes les commades `pip install` lancées depuis l'environnement feront en fait des installations globales et non locales à  l'environnement (plus de détails [ici](https://datumorphism.leima.is/til/programming/python/python-anaconda-install-requirements/) )
+Il est très important d'installer `pip` en meme temps, sinon c'est le
+pip global du systeme qui est utilisé et toutes les commades
+`pip install` lancées depuis l'environnement feront en fait des
+installations globales et non locales à l'environnement (plus de détails
+[ici](https://datumorphism.leima.is/til/programming/python/python-anaconda-install-requirements/)
+)
 
-Pour utiliser cette installation, il faut activer l'environnement 
+Pour utiliser cette installation, il faut activer l'environnement
 
 `conda activate finistr`
 
-On peut maintenant installer les packages de son choix avec des commandes type 
-`conda install` ou `pip install`
+On peut maintenant installer les packages de son choix avec des
+commandes type `conda install` ou `pip install`
 
-Par exemple 
-`pip install numpy`
+Par exemple `pip install numpy`
 
 Pour avoir la liste des packages installés dans l'environnemnet courant
 `conda list`
 
+On quitte l'environnement avec la commande `conda deactivate`. Quand
+vous reviendrez à votre environnement (`conda activate`) vous aurez ces
+packages installés.
 
-On quitte l'environnement avec la commande 
-`conda deactivate`. Quand vous reviendrez à votre environnement (`conda activate`) vous aurez ces packages installés. 
-
-
-Il est possible de fournir une liste de packages à installer dans l'environnement sous forme d'un fichier txt. 
+Il est possible de fournir une liste de packages à installer dans
+l'environnement sous forme d'un fichier txt.
 
 ```{r}
 #| echo: true
@@ -98,10 +115,9 @@ file_content <- readLines("requirement.txt")
 cat(file_content, sep = "\n")
 ```
 
+### Autres commandes
 
-
-### Autres commandes 
-Il est possible de supprimer un environnement avec la commande 
+Il est possible de supprimer un environnement avec la commande
 
 ```{r}
 #| echo: true
@@ -109,146 +125,253 @@ Il est possible de supprimer un environnement avec la commande
 conda remove --name finistrbis --all
 ```
 
+La liste des commandes conda est disponible dans la [cheatsheet
+conda](https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html)
 
-La liste des commandes conda est disponible dans la [cheatsheet conda](https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html)
+## Installation et création d'environnement avec Windows
 
+Nous présentons ici 3 étapes importantes pour l'utilisation de Python
+sous Windows
 
+-   l'installation d'une version de Python,
 
-## Créer un environnement avec virtual env  sous Windows
-Sur un terminal PowerShell de Windows, installer WSL (Windows subsystem for linux) : 
-```{r}
+-   l'utilisation d'un éditeur de code
+
+-   la création et l'utilisation d'un environnement Python pour
+    programmer.
+
+Différentes approches existent pour réaliser chacune de ces tâches, nous
+présentons ici une approche pour chaque.
+
+### Installation de Python
+
+**Stratégie** Python est nativement disponible sous Linux. Une
+possibilité pour utiliser Python sous Windows est donc d'installer un
+sous-environnement Linux via WSL2 (Windows subsystem for linux), et
+d'utiliser la version de Python qui vient avec.
+
+#### Installer WSL2
+
+L'installation de WSL2 se fait via la commande (terminal PowerShell) :
+
+```{bash}
 #| echo: true
 #| eval: false
 wsl --install
 ```
 
-Après redémarrage, pour savoir quelle version de linux est installée :
-```{r}
+Après redémarrage, on peut vérifier quelle version de linux est
+installée :
+
+```{bash}
 #| echo: true
 #| eval: false
 wsl -l -v
 ```
 
-Il faut ensuite créer un alias python pour python3 :
-```{r}
+A noter qu'il est possible de préciser l'installation Linux que l'on
+veut installer :
+
+```{bash}
 #| echo: true
 #| eval: false
-source ~/.bashrc
-alias python=python3alias python=python3
+wsl --instal -d <Distribution>
 ```
 
-Puis installer pip :
-```{r}
-#| echo: true
-#| eval: false
-sudo apt-get update
-sudo apt install python3-pip
-```
+Dans l'exemple qui suit nous avons utilisé Ubuntu. Il est maintenant
+possible de lancer un terminal Linux avec la commande
 
-Créer un alias pip pour pip3 :
-```{r}
-#| echo: true
-#| eval: false
-source ~/.bashrc
-alias pip=pip3
-```
-Ou créer un lien symbolique entre pip3 et pip :
-```{r}
-#| echo: true
-#| eval: false
-sudo ln -s /usr/bin/pip3 /usr/bin/pip
-```
-
-Pour vérifier la version de pip qui est installée :
-```{r}
-#| echo: true
-#| eval: false
-pip --version
-```
-
-Installer virtualenv :
-```{r}
-#| echo: true
-#| eval: false
-pip install virtualenv
-```
-
-Et si c'est demandé :
-```{r}
-#| echo: true
-#| eval: false
-sudo apt install python3.10-venv 
-```
-
-On peut ensuite créer un environnement python dans le dossier que l'on souhaite, par exemple ici l'environnement finistrEnv :
-```{r}
-#| echo: true
-#| eval: false
-python -m venv chemin/finistrEnv  
-```
-(si besoin, pour supprimer l'env : rm -rf finistrEnv)
-
-Enfin, pour activer l'environnement python 'finistrEnv' :
-```{r}
-#| echo: true
-#| eval: false
-source chemin/finistrEnv/bin/activate
-```
-
-ou alternativement
-```{r}
-#| echo: true
-#| eval: false
-. chemin/finistrEnv/bin/activate
-```
-
-Pour trouver les packages python : pypi
-```{r}
-#| echo: true
-#| eval: false
-pypi nom-du-package
-```
-
-On peut ensuite créer un script.py dans ubuntu :
-```{r}
-#| echo: true
-#| eval: false
-touch toto.py
-pwd
-```
-
-Puis l'ouvrir dans vscode, préalablement installé dans Windows.
-
-Il faut ensuite dans vscode, préciser le chemin de l'environnement python (situé dans linux).
-
-
-En supplément :
-
-Pour ouvrir l'émulateur linux, à partir d'un terminal windows :
-```{r}
+```{bash}
 #| echo: true
 #| eval: false
 start ubuntu.exe
 ```
 
-Pour désactiver l'environnement Python activé précédemment :
-```{r}
+et d'aller vérifier la version de Python disponible.
+
+#### Python
+
+On se place maintenant dans le terminal Ubuntu. Comme précédemment
+mentionné Python est directement disponible sous Linux, ce qui se
+vérifie de la manière suivante :
+
+```{bash}
 #| echo: true
 #| eval: false
-deactivate
+which python
+python --version
 ```
 
+Nous allons par la suite utiliser deux fonctionnalités de python :
+l'installation de package via **pip** ("**p**ython **i**nstall
+**p**ackage") et la création d'environnements virtuels via virtualenv.
+Ces deux fonctionnalités sont normalement directement disponibles, si ce
+n'est pas le cas l'installation se fait via
 
-## Utiliser un environnement  de développement agréable pour un utilisateur de R
+```{bash}
+#| echo: true
+#| eval: false
+sudo apt-get update
+sudo apt install python3-pip
+pip install virtualenv  
+```
+
+Il est parfois nécessaire de créer un alias python pour python3 et pip
+pour pip3:
+
+```{bash}
+#| echo: true
+#| eval: false
+source ~/.bashrc
+alias python=python3
+alias pip=pip3
+```
+
+Alternativement on peut créer un lien symbolique entre pip3 et pip :
+
+```{bash}
+#| echo: true
+#| eval: false
+sudo ln -s /usr/bin/python3 /usr/bin/python
+sudo ln -s /usr/bin/pip3 /usr/bin/pip
+```
+
+Une fois la vérification de python et des fonctionnalités pip et
+virtualenv faite, on peut interagir avec python (créer des
+environnements, coder, tester, etc.) via le terminal de l'éditeur de
+code VSC, et nous n'aurons plus besoin ni de l'invite de commande
+Windows, ni du terminal WSL.
+
+### Utilisation de VSC
+
+Préalable : installer VSCode (sous Windows) !
+
+#### Choisir un environnement distant
+
+A l'ouverture de VSC, la première étape consiste à préciser que l'on
+souhaite travailler dans le sous-environnement Linux via WSL (où se
+trouve python...).
+
+Pour cela, il faut - configurer VSC en installant le module d'extension
+"WSL" de VSC (via l'icone d'installation d'extension) - ouvrir un
+environnement distant via l'icone "Open a Remote Window" en bas de la
+fenêtre VSC, et choisir "Connect to WSL". Le sous-environnement de
+travail est maintenant "WSL:Ubuntu"
+
+Une fois dans cet environnement, il est conseillé d'installer le module
+d'extension "Python".
+
+#### Ouvrir un terminal
+
+Une fois l'environnement de travail défini, on peut ouvrir un terminal.
+Le terminal qui s'ouvre dans VSC est l'équivalent d'un terminal WSL. On
+peut donc executer
+
+```{bash}
+#| echo: true
+#| eval: false
+which python
+python --version
+```
+
+et vérifier que l'on obtient la même version que précédemment.
+
+### Création d'un environnement python
+
+Dans le terminal WSL ouvert dans VSC, on peut maintenant créer un
+environnement python via la commande
+
+```{bash}
+#| echo: true
+#| eval: false
+python -m venv Chemin/NomEnv  
+```
+
+ce qui crée un répertoire "NomEnv" au Chemin indiqué (si besoin, pour
+supprimer l'env : `rm -rf NomEnv`).
+
+Cet environnement peut être activé comme suit :
+
+```{bash}
+#| echo: true
+#| eval: false
+source Chemin/NomEnv/bin/activate
+```
+
+ou alternativement
+
+```{bash}
+#| echo: true
+#| eval: false
+. Chemin/NomEnv/bin/activate
+```
+
+**Note** L'activation de l'environnement se traduit par un changement
+dans le prompteur, qui mentionne maintenant "(NomEnv)" devant le nom
+d'utilisateur de la session.
+
+L'environnement va définir la version de Python ainsi que les
+packages/modules que l'on souhaite utiliser pour le projet. Par défaut
+la version de python de l'environnement nouvellement créé est la version
+de python utilisée pour créer l'environnement (ce que l'on peut vérifier
+avec `python --version`). Il reste donc à installer les packages
+nécessaires au projet, ce qui se fait avec pip. Un exemple avec le
+package numpy:
+
+```{bash}
+#| echo: true
+#| eval: false
+pip install numpy
+```
+
+Il est possible de lister à tout moment les packages déjà inclus dans un
+projet avec l'instruction `pip list` Une fois l'environnement configuré,
+on "sort" de l'environnement avec l'instruction `deactivate`.
+
+### Programmer, exécuter... dans un environnement python
+
+L'environnement NomEnv étant maintenant disponible, on peut se placer
+dedans pour travailler et écrire nos premières lignes de code. Il suffit
+pour cela d'ouvrir/créer un fichier python (toujours dans VSC).
+
+#### Execution en ligne de commande
+
+Tout est prêt mais l'exécution du code ligne à ligne n'est pas
+directement accessible sur python. Pour y avoir accès il suffit
+d'installer le package ipython dans l'environnement python (cf
+paragraphe précédent) d'une part, et d'installer l'extension "iPython
+for VS Code" dans VSC. Une fois ces deux étapes réalisées, l'exécution
+de la commande `iPython` dans le terminal à l'exécution en ligne.
+
+**REMARQUE** *(fonctionne sur toutes les distributions en théorie, mais
+uniquement testé sur MacOS)***:** Afin de retrouver la fonctionnalité
+d'exécution d'une ligne de code avec `shift + enter` dans la console de
+R studio, il est nécéssaire de modifier le fichier `settings.json` de
+VSC (en mode WSL). Pour cela, taper `ctrl + shift + P` et rechercher
+`Open User Settings (JSON)`. Rajouter à la suite des options existantes:
+
+``` json
+"python.terminal.launchArgs": [
+     "-m",
+    "IPython",
+    "--no-autoindent"
+],
+```
+
+## Utiliser un environnement de développement agréable pour un utilisateur de R
 
 ## Avec Visual Studio Code
+
 ipython
 
 ### Avec Positron
 
-Le nouvel IDE Positron (disponible en version beta) semble avoir des avantages intéressants pour les gens qui aiment Rstudio mais veulent faire du python. Notamment, il est possible 
+Le nouvel IDE Positron (disponible en version beta) semble avoir des
+avantages intéressants pour les gens qui aiment Rstudio mais veulent
+faire du python. Notamment, il est possible
 
-   - de choisir facilement son environnement (menu déroulant en haut à droite) et 
-  
-   - d'utiliser la commande Ctr+entr pour éxécuter un code Python ligne à ligne comme on le fera pour un code R dans Rstudio. 
+-   de choisir facilement son environnement (menu déroulant en haut à
+    droite) et
 
+-   d'utiliser la commande Ctr+entr pour éxécuter un code Python ligne à
+    ligne comme on le fera pour un code R dans Rstudio.
