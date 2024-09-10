@@ -1,0 +1,38 @@
+---
+title: "Suggestions from expert to beginner professors in statistics"
+author: Lucia Clarotto
+output: html_document
+---
+
+## The idea behind this document
+
+This document is a list of suggestions from expert to beginner professors in statistics, including how to create quiz and exams in R Markdown and shiny apps, how to make students use R on their notebooks without installing it and where to find good datasets (especially in ecology and life sciences).
+
+## The use of `learnr` for quiz
+
+The R package `learnr` allows to create a shiny app with quiz, questions with corrections included. A good tutorial is available on the website of [Finist'R 2020](https://stateofther.github.io/finistR2020/teach_learnr_gradethis.html) or on the [`learnr` webpage](https://rstudio.github.io/learnr/articles/learnr.html).
+
+[Here](https://luciaclar8.shinyapps.io/enseignement_restit/#section-the-idea-behind-this-document) you can find another short example, created by myself.
+
+## Datasets available online
+
+Here is a list of sites that can be used to download datasets for student projects. 
+
+* [Zenodo: datasets in ecology, environment, ...](https://zenodo.org/)
+Mainly data papers in ecology.
+
+* [ecologie.data.gouv](https://ecologie.data.gouv.fr/)
+Datasets in ecology. Interesting features : quality of metadata, good short description of datasets, examples of use in past projects, chat with questions/answers between users.
+
+* [defis.data.gouv](https://defis.data.gouv.fr)
+Sets of datasets already used by universities for data competitions. Multiple fields (energy, climate, social studies, ...). Interesting features : complete description of the objective, difficulty of the objective (beginner, confirmed, expert), multiple datasets in each competition.
+
+## Problems with installation of R on student notebooks?
+
+If installing R is difficult for any possible reason, a solution is to use R and Rstudio on the INRAE platform **Migale**. In this case, R and Rstudio are run on the server of Migale and no installation on the local notebook is needed. 
+
+Note that creating an account is free.
+
+At this webpage you can find the corresponding FAQ.
+https://documents.migale.inrae.fr/posts/documentation/faq/
+
