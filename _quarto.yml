@@ -11,8 +11,10 @@ website:
       - text: "Instructions"
         href: instructions.qmd 
     right: 
-      - text: "Graphiques avec Julia"
-        href: plotting_with_julia-1.qmd
+      - text: Julia
+      	menu:
+         - text: Graphiques avec Julia
+	   href: plotting_with_julia-1.qmd
       - text: Algorithme
         menu:
         - text: Initiation à Nimble
@@ -33,23 +35,29 @@ website:
             href: pkg.qmd
       - text: Réseaux de Neurones
         menu:
-        - text: Graph Neural Networks for bipartite graphs with pytorch_geometric
+        - text: GNN pour graphes bipartis avec pytorch_geometric
           href: Bipartite_GNN.qmd
       - text: Déploiement
         menu:
         - text: Déploiement Shiny
           href: shiny-deployment.qmd
-      - text: "High performance computing"
+      - text: HPC
         menu:
-        - text: "futureverse"
+        - text: futureverse
           href: futureverse.qmd
         - text: C++ depuis Python
           href: c_python.qmd
         - text: C++ depuis JAX
           href: c_jax.qmd
         aria-label: GitHub
+      - text: Enseignement
+        menu:
+        - text: Conseils enseignement stats
+          href: enseignement_restit_short.Rmd
       - text: Web scrapping
-        href: 01_extract_env_data.qmd
+        menu:
+        - text: Web scrapping
+          href: 01_extract_env_data.qmd
       - text: Reproductibilité
         menu:
         - text: "Document paramétré en quarto"
