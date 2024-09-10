@@ -48,8 +48,10 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
+
 # Ignore _site files
 _site/
+.quarto/
 *_files/
 
 # Ignore divers files
@@ -59,5 +61,5 @@ local_extract_env_data*.R
 local_extract_env_data*.qmd
 
 
-_site
-/.quarto/
+
+

@@ -8,8 +8,7 @@ jobs:
   build:
     name: Build website with rmarkdown and Julia
     runs-on: ubuntu-latest
-    container: stateofther/r-finistr2024:0.1
-
+    container: stateofther/r-finistr2024:0.2
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -22,9 +21,10 @@ jobs:
           julia -e 'using Pkg; Pkg.add(["DataFrames", "DataFramesMeta", "RDatasets", "CairoMakie", "Gadfly", "Compose", "AlgebraOfGraphics"])'
       - name: Additional R packages
         run: |
-          Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm', 'simulator'))"          
+          Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
           Rscript -e "install.packages(c('simulator', 'simpr', 'SimEngine', 'DT', 'withr', 'bench'))"
           Rscript -e "install.packages(c('future', 'furrr', 'purrr', 'cli', 'RhpcBLASctl'))"
+          Rscript -e "install.packages('rix', repos = c('https://b-rodrigues.r-universe.dev', 'https://cloud.r-project.org'))"
       - name: Additional Python packages
         run: |
           pip install torch torch_geometric 
