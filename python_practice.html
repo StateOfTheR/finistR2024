@@ -260,11 +260,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#installation-python-et-problèmes-potentiels" id="toc-installation-python-et-problèmes-potentiels" class="nav-link active" data-scroll-target="#installation-python-et-problèmes-potentiels">Installation python et problèmes potentiels</a></li>
-  <li><a href="#cérer-un-environnement-avec-conda-sous-linux" id="toc-cérer-un-environnement-avec-conda-sous-linux" class="nav-link" data-scroll-target="#cérer-un-environnement-avec-conda-sous-linux">Cérer un environnement avec conda sous Linux</a>
+  <li><a href="#créer-un-environnement-avec-conda-sous-linux" id="toc-créer-un-environnement-avec-conda-sous-linux" class="nav-link" data-scroll-target="#créer-un-environnement-avec-conda-sous-linux">Créer un environnement avec conda sous Linux</a>
   <ul class="collapse">
   <li><a href="#autres-commandes" id="toc-autres-commandes" class="nav-link" data-scroll-target="#autres-commandes">Autres commandes</a></li>
   </ul></li>
-  <li><a href="#créer-un-environnement-avec-virtual-env-sous-windows" id="toc-créer-un-environnement-avec-virtual-env-sous-windows" class="nav-link" data-scroll-target="#créer-un-environnement-avec-virtual-env-sous-windows">Créer un environnement avec virtual env sous Windows</a></li>
+  <li><a href="#installation-et-création-denvironnement-avec-windows" id="toc-installation-et-création-denvironnement-avec-windows" class="nav-link" data-scroll-target="#installation-et-création-denvironnement-avec-windows">Installation et création d’environnement avec Windows</a>
+  <ul class="collapse">
+  <li><a href="#installation-de-python" id="toc-installation-de-python" class="nav-link" data-scroll-target="#installation-de-python">Installation de Python</a></li>
+  <li><a href="#utilisation-de-vsc" id="toc-utilisation-de-vsc" class="nav-link" data-scroll-target="#utilisation-de-vsc">Utilisation de VSC</a></li>
+  <li><a href="#création-dun-environnement-python" id="toc-création-dun-environnement-python" class="nav-link" data-scroll-target="#création-dun-environnement-python">Création d’un environnement python</a></li>
+  <li><a href="#programmer-exécuter-dans-un-environnement-python" id="toc-programmer-exécuter-dans-un-environnement-python" class="nav-link" data-scroll-target="#programmer-exécuter-dans-un-environnement-python">Programmer, exécuter… dans un environnement python</a></li>
+  </ul></li>
   <li><a href="#utiliser-un-environnement-de-développement-agréable-pour-un-utilisateur-de-r" id="toc-utiliser-un-environnement-de-développement-agréable-pour-un-utilisateur-de-r" class="nav-link" data-scroll-target="#utiliser-un-environnement-de-développement-agréable-pour-un-utilisateur-de-r">Utiliser un environnement de développement agréable pour un utilisateur de R</a></li>
   <li><a href="#avec-visual-studio-code" id="toc-avec-visual-studio-code" class="nav-link" data-scroll-target="#avec-visual-studio-code">Avec Visual Studio Code</a>
   <ul class="collapse">
@@ -314,8 +320,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>On fait de même pour <code>pip</code> qui est un des installateurs de modules/ packages.</p>
 <p><code>sudo ln -sf /usr/bin/pip3 /usr/bin/pip</code></p>
 </section>
-<section id="cérer-un-environnement-avec-conda-sous-linux" class="level2">
-<h2 class="anchored" data-anchor-id="cérer-un-environnement-avec-conda-sous-linux">Cérer un environnement avec conda sous Linux</h2>
+<section id="créer-un-environnement-avec-conda-sous-linux" class="level2">
+<h2 class="anchored" data-anchor-id="créer-un-environnement-avec-conda-sous-linux">Créer un environnement avec conda sous Linux</h2>
 <p>Cette partie suppose que la commande <code>conda</code> est disponible (installée avec anaconda ou miniconda)</p>
 <p>La liste des environnement disponible est donnée par</p>
 <p><code>conda env list</code></p>
@@ -353,80 +359,120 @@ numpy==2.1.0</code></pre>
 <p>La liste des commandes conda est disponible dans la <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html">cheatsheet conda</a></p>
 </section>
 </section>
-<section id="créer-un-environnement-avec-virtual-env-sous-windows" class="level2">
-<h2 class="anchored" data-anchor-id="créer-un-environnement-avec-virtual-env-sous-windows">Créer un environnement avec virtual env sous Windows</h2>
-<p>Sur un terminal PowerShell de Windows, installer WSL (Windows subsystem for linux) :</p>
+<section id="installation-et-création-denvironnement-avec-windows" class="level2">
+<h2 class="anchored" data-anchor-id="installation-et-création-denvironnement-avec-windows">Installation et création d’environnement avec Windows</h2>
+<p>Nous présentons ici 3 étapes importantes pour l’utilisation de Python sous Windows</p>
+<ul>
+<li><p>l’installation d’une version de Python,</p></li>
+<li><p>l’utilisation d’un éditeur de code</p></li>
+<li><p>la création et l’utilisation d’un environnement Python pour programmer.</p></li>
+</ul>
+<p>Différentes approches existent pour réaliser chacune de ces tâches, nous présentons ici une approche pour chaque.</p>
+<section id="installation-de-python" class="level3">
+<h3 class="anchored" data-anchor-id="installation-de-python">Installation de Python</h3>
+<p><strong>Stratégie</strong> Python est nativement disponible sous Linux. Une possibilité pour utiliser Python sous Windows est donc d’installer un sous-environnement Linux via WSL2 (Windows subsystem for linux), et d’utiliser la version de Python qui vient avec.</p>
+<section id="installer-wsl2" class="level4">
+<h4 class="anchored" data-anchor-id="installer-wsl2">Installer WSL2</h4>
+<p>L’installation de WSL2 se fait via la commande (terminal PowerShell) :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="sc">--</span>install</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">wsl</span> <span class="at">--install</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Après redémarrage, pour savoir quelle version de linux est installée :</p>
+<p>Après redémarrage, on peut vérifier quelle version de linux est installée :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="sc">-</span>l <span class="sc">-</span>v</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">wsl</span> <span class="at">-l</span> <span class="at">-v</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Il faut ensuite créer un alias python pour python3 :</p>
+<p>A noter qu’il est possible de préciser l’installation Linux que l’on veut installer :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>source <span class="sc">~</span><span class="er">/</span>.bashrc</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>alias python<span class="ot">=</span>python3alias python<span class="ot">=</span>python3</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">wsl</span> <span class="at">--instal</span> <span class="at">-d</span> <span class="op">&lt;</span>Distribution<span class="op">&gt;</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Puis installer pip :</p>
+<p>Dans l’exemple qui suit nous avons utilisé Ubuntu. Il est maintenant possible de lancer un terminal Linux avec la commande</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sudo apt<span class="sc">-</span>get update</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sudo apt install python3<span class="sc">-</span>pip</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">start</span> ubuntu.exe</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Créer un alias pip pour pip3 :</p>
+<p>et d’aller vérifier la version de Python disponible.</p>
+</section>
+<section id="python" class="level4">
+<h4 class="anchored" data-anchor-id="python">Python</h4>
+<p>On se place maintenant dans le terminal Ubuntu. Comme précédemment mentionné Python est directement disponible sous Linux, ce qui se vérifie de la manière suivante :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>source <span class="sc">~</span><span class="er">/</span>.bashrc</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>alias pip<span class="ot">=</span>pip3</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span> python</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">--version</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Ou créer un lien symbolique entre pip3 et pip :</p>
+<p>Nous allons par la suite utiliser deux fonctionnalités de python : l’installation de package via <strong>pip</strong> (“<strong>p</strong>ython <strong>i</strong>nstall <strong>p</strong>ackage”) et la création d’environnements virtuels via virtualenv. Ces deux fonctionnalités sont normalement directement disponibles, si ce n’est pas le cas l’installation se fait via</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sudo ln <span class="sc">-</span>s <span class="sc">/</span>usr<span class="sc">/</span>bin<span class="sc">/</span>pip3 <span class="sc">/</span>usr<span class="sc">/</span>bin<span class="sc">/</span>pip</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install python3-pip</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install virtualenv  </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Pour vérifier la version de pip qui est installée :</p>
+<p>Il est parfois nécessaire de créer un alias python pour python3 et pip pour pip3:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pip <span class="sc">--</span>version</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ~/.bashrc</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> python=python3</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> pip=pip3</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Installer virtualenv :</p>
+<p>Alternativement on peut créer un lien symbolique entre pip3 et pip :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pip install virtualenv</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ln <span class="at">-s</span> /usr/bin/python3 /usr/bin/python</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ln <span class="at">-s</span> /usr/bin/pip3 /usr/bin/pip</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Et si c’est demandé :</p>
+<p>Une fois la vérification de python et des fonctionnalités pip et virtualenv faite, on peut interagir avec python (créer des environnements, coder, tester, etc.) via le terminal de l’éditeur de code VSC, et nous n’aurons plus besoin ni de l’invite de commande Windows, ni du terminal WSL.</p>
+</section>
+</section>
+<section id="utilisation-de-vsc" class="level3">
+<h3 class="anchored" data-anchor-id="utilisation-de-vsc">Utilisation de VSC</h3>
+<p>Préalable : installer VSCode (sous Windows) !</p>
+<section id="choisir-un-environnement-distant" class="level4">
+<h4 class="anchored" data-anchor-id="choisir-un-environnement-distant">Choisir un environnement distant</h4>
+<p>A l’ouverture de VSC, la première étape consiste à préciser que l’on souhaite travailler dans le sous-environnement Linux via WSL (où se trouve python…).</p>
+<p>Pour cela, il faut - configurer VSC en installant le module d’extension “WSL” de VSC (via l’icone d’installation d’extension) - ouvrir un environnement distant via l’icone “Open a Remote Window” en bas de la fenêtre VSC, et choisir “Connect to WSL”. Le sous-environnement de travail est maintenant “WSL:Ubuntu”</p>
+<p>Une fois dans cet environnement, il est conseillé d’installer le module d’extension “Python”.</p>
+</section>
+<section id="ouvrir-un-terminal" class="level4">
+<h4 class="anchored" data-anchor-id="ouvrir-un-terminal">Ouvrir un terminal</h4>
+<p>Une fois l’environnement de travail défini, on peut ouvrir un terminal. Le terminal qui s’ouvre dans VSC est l’équivalent d’un terminal WSL. On peut donc executer</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sudo apt install python3<span class="fl">.10</span><span class="sc">-</span>venv </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span> python</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">--version</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>On peut ensuite créer un environnement python dans le dossier que l’on souhaite, par exemple ici l’environnement finistrEnv :</p>
+<p>et vérifier que l’on obtient la même version que précédemment.</p>
+</section>
+</section>
+<section id="création-dun-environnement-python" class="level3">
+<h3 class="anchored" data-anchor-id="création-dun-environnement-python">Création d’un environnement python</h3>
+<p>Dans le terminal WSL ouvert dans VSC, on peut maintenant créer un environnement python via la commande</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>python <span class="sc">-</span>m venv chemin<span class="sc">/</span>finistrEnv  </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv Chemin/NomEnv  </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>(si besoin, pour supprimer l’env : rm -rf finistrEnv)</p>
-<p>Enfin, pour activer l’environnement python ‘finistrEnv’ :</p>
+<p>ce qui crée un répertoire “NomEnv” au Chemin indiqué (si besoin, pour supprimer l’env : <code>rm -rf NomEnv</code>).</p>
+<p>Cet environnement peut être activé comme suit :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>source chemin<span class="sc">/</span>finistrEnv<span class="sc">/</span>bin<span class="sc">/</span>activate</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> Chemin/NomEnv/bin/activate</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>ou alternativement</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>. chemin<span class="sc">/</span>finistrEnv<span class="sc">/</span>bin<span class="sc">/</span>activate</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">.</span> Chemin/NomEnv/bin/activate</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Pour trouver les packages python : pypi</p>
+<p><strong>Note</strong> L’activation de l’environnement se traduit par un changement dans le prompteur, qui mentionne maintenant “(NomEnv)” devant le nom d’utilisateur de la session.</p>
+<p>L’environnement va définir la version de Python ainsi que les packages/modules que l’on souhaite utiliser pour le projet. Par défaut la version de python de l’environnement nouvellement créé est la version de python utilisée pour créer l’environnement (ce que l’on peut vérifier avec <code>python --version</code>). Il reste donc à installer les packages nécessaires au projet, ce qui se fait avec pip. Un exemple avec le package numpy:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>pypi nom<span class="sc">-</span>du<span class="sc">-</span>package</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install numpy</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>On peut ensuite créer un script.py dans ubuntu :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>touch toto.py</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>pwd</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Puis l’ouvrir dans vscode, préalablement installé dans Windows.</p>
-<p>Il faut ensuite dans vscode, préciser le chemin de l’environnement python (situé dans linux).</p>
-<p>En supplément :</p>
-<p>Pour ouvrir l’émulateur linux, à partir d’un terminal windows :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>start ubuntu.exe</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Pour désactiver l’environnement Python activé précédemment :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>deactivate</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p>Il est possible de lister à tout moment les packages déjà inclus dans un projet avec l’instruction <code>pip list</code> Une fois l’environnement configuré, on “sort” de l’environnement avec l’instruction <code>deactivate</code>.</p>
+</section>
+<section id="programmer-exécuter-dans-un-environnement-python" class="level3">
+<h3 class="anchored" data-anchor-id="programmer-exécuter-dans-un-environnement-python">Programmer, exécuter… dans un environnement python</h3>
+<p>L’environnement NomEnv étant maintenant disponible, on peut se placer dedans pour travailler et écrire nos premières lignes de code. Il suffit pour cela d’ouvrir/créer un fichier python (toujours dans VSC).</p>
+<section id="execution-en-ligne-de-commande" class="level4">
+<h4 class="anchored" data-anchor-id="execution-en-ligne-de-commande">Execution en ligne de commande</h4>
+<p>Tout est prêt mais l’exécution du code ligne à ligne n’est pas directement accessible sur python. Pour y avoir accès il suffit d’installer le package ipython dans l’environnement python (cf paragraphe précédent) d’une part, et d’installer l’extension “iPython for VS Code” dans VSC. Une fois ces deux étapes réalisées, l’exécution de la commande <code>iPython</code> dans le terminal à l’exécution en ligne.</p>
+<p><strong>REMARQUE</strong> <em>(fonctionne sur toutes les distributions en théorie, mais uniquement testé sur MacOS)</em><strong>:</strong> Afin de retrouver la fonctionnalité d’exécution d’une ligne de code avec <code>shift + enter</code> dans la console de R studio, il est nécéssaire de modifier le fichier <code>settings.json</code> de VSC (en mode WSL). Pour cela, taper <code>ctrl + shift + P</code> et rechercher <code>Open User Settings (JSON)</code>. Rajouter à la suite des options existantes:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="er">"python.terminal.launchArgs":</span> <span class="ot">[</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>     <span class="st">"-m"</span><span class="ot">,</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"IPython"</span><span class="ot">,</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"--no-autoindent"</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span><span class="er">,</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
 </section>
 <section id="utiliser-un-environnement-de-développement-agréable-pour-un-utilisateur-de-r" class="level2">
 <h2 class="anchored" data-anchor-id="utiliser-un-environnement-de-développement-agréable-pour-un-utilisateur-de-r">Utiliser un environnement de développement agréable pour un utilisateur de R</h2>
