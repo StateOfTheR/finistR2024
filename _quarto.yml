@@ -12,7 +12,7 @@ website:
         href: instructions.qmd 
     right: 
       - text: Julia
-        menu:
+      	menu:
          - text: Graphiques avec Julia
 	   href: plotting_with_julia-1.qmd
       - text: Algorithme
