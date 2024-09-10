@@ -1,18 +1,14 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.4.555">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Sophie Donnet">
-<meta name="author" content="Marie-Pierre Etienne">
-<meta name="author" content="Tristan Mary-Huard">
-<meta name="author" content="Francois Victor">
-<meta name="author" content="Emily Walker">
+<meta name="author" content="Armand Favrot, Cédric Midoux, Pierre Neuvial">
 
-<title>Finist’R 2024 - Bien démarrer avec Python</title>
+<title>Finist’R 2024 - rig: an easy way to switch from an R version to another</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -92,17 +88,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   ],
   "show-item-context": false,
   "language": {
-    "search-no-results-text": "Pas de résultats",
-    "search-matching-documents-text": "documents trouvés",
-    "search-copy-link-title": "Copier le lien vers la recherche",
-    "search-hide-matches-text": "Cacher les correspondances additionnelles",
-    "search-more-match-text": "correspondance de plus dans ce document",
-    "search-more-matches-text": "correspondances de plus dans ce document",
-    "search-clear-button-title": "Effacer",
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
     "search-text-placeholder": "",
-    "search-detached-cancel-button-title": "Annuler",
-    "search-submit-button-title": "Envoyer",
-    "search-label": "Recherche"
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -120,8 +116,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <span class="navbar-title">Finist’R 2024</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Recherche"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Basculer la navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -255,30 +251,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Sur cette page</h2>
-   
-  <ul>
-  <li><a href="#installation-python-et-problèmes-potentiels" id="toc-installation-python-et-problèmes-potentiels" class="nav-link active" data-scroll-target="#installation-python-et-problèmes-potentiels">Installation python et problèmes potentiels</a></li>
-  <li><a href="#cérer-un-environnement-avec-conda-sous-linux" id="toc-cérer-un-environnement-avec-conda-sous-linux" class="nav-link" data-scroll-target="#cérer-un-environnement-avec-conda-sous-linux">Cérer un environnement avec conda sous Linux</a>
-  <ul class="collapse">
-  <li><a href="#autres-commandes" id="toc-autres-commandes" class="nav-link" data-scroll-target="#autres-commandes">Autres commandes</a></li>
-  </ul></li>
-  <li><a href="#créer-un-environnement-avec-virtual-env-sous-windows" id="toc-créer-un-environnement-avec-virtual-env-sous-windows" class="nav-link" data-scroll-target="#créer-un-environnement-avec-virtual-env-sous-windows">Créer un environnement avec virtual env sous Windows</a></li>
-  <li><a href="#utiliser-un-environnement-de-développement-agréable-pour-un-utilisateur-de-r" id="toc-utiliser-un-environnement-de-développement-agréable-pour-un-utilisateur-de-r" class="nav-link" data-scroll-target="#utiliser-un-environnement-de-développement-agréable-pour-un-utilisateur-de-r">Utiliser un environnement de développement agréable pour un utilisateur de R</a></li>
-  <li><a href="#avec-visual-studio-code" id="toc-avec-visual-studio-code" class="nav-link" data-scroll-target="#avec-visual-studio-code">Avec Visual Studio Code</a>
-  <ul class="collapse">
-  <li><a href="#avec-positron" id="toc-avec-positron" class="nav-link" data-scroll-target="#avec-positron">Avec Positron</a></li>
-  </ul></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Bien démarrer avec Python</h1>
+<h1 class="title">rig: an easy way to switch from an R version to another</h1>
 </div>
 
 
@@ -286,13 +266,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-title-meta">
 
     <div>
-    <div class="quarto-title-meta-heading">Auteur·rice·s</div>
+    <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Sophie Donnet </p>
-             <p>Marie-Pierre Etienne </p>
-             <p>Tristan Mary-Huard </p>
-             <p>Francois Victor </p>
-             <p>Emily Walker </p>
+             <p>Armand Favrot, Cédric Midoux, Pierre Neuvial </p>
           </div>
   </div>
     
@@ -305,146 +281,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Lorsque l’on utilise Python, une bonne pratique consiste à créer un environnement spécifique par projet. L’environnement contient la version de Python que l’on souhaite utiliser ainsi que les packages/modules utiles au projet. Cette façon de faire permet de faire coexister différentes versions de python ou de packages au sein du même ordinateur. Cette pratique n’est pas spécifique à Python, on pourrait imaginer créer des environnements pour utiliser des versions différentes de R. Si le programme ou la librairie n’est pas installée dans l’environnement mais est disponible dans l’installation globale de la machine, c’est cette version globale qui sera utilisée. Il faut donc bien vérifier ce qui est dispo dans l’environnement et globalement.</p>
-<p>Nous avons exploré deux manières de gérer les environnements soit avec <code>conda</code> soit avec <code>virtual env</code>. Nous avons testé sous Linux et sous Windows.</p>
-<section id="installation-python-et-problèmes-potentiels" class="level2">
-<h2 class="anchored" data-anchor-id="installation-python-et-problèmes-potentiels">Installation python et problèmes potentiels</h2>
-<p>On crée un lien symbolique pour que <code>python 3</code> soit le <code>python</code> par défaut en utilisant les instructions suivantes:</p>
-<p><code>sudo ln -sf /usr/bin/python3 /usr/bin/python</code></p>
-<p>On fait de même pour <code>pip</code> qui est un des installateurs de modules/ packages.</p>
-<p><code>sudo ln -sf /usr/bin/pip3 /usr/bin/pip</code></p>
-</section>
-<section id="cérer-un-environnement-avec-conda-sous-linux" class="level2">
-<h2 class="anchored" data-anchor-id="cérer-un-environnement-avec-conda-sous-linux">Cérer un environnement avec conda sous Linux</h2>
-<p>Cette partie suppose que la commande <code>conda</code> est disponible (installée avec anaconda ou miniconda)</p>
-<p>La liste des environnement disponible est donnée par</p>
-<p><code>conda env list</code></p>
-<p>Vous devez avoir au moins l’environnement de <code>base</code> dans cette liste. Vous avez aussi ainsi accès à l’adresse où vous trouverez vos environnements.</p>
-<p>On souhaite <strong>créer un nouvel environnement nommé finistr contenant uniquement python et pip</strong>.</p>
-<p>Il suffit de lancer la commande <code>conda create --name finistr python=3.11 pip</code></p>
-<p>En listant les environnements disponibles, vous devez voir l’environnement finistr créé.</p>
-<p><code>conda env list</code></p>
-<p>Il est très important d’installer <code>pip</code> en meme temps, sinon c’est le pip global du systeme qui est utilisé et toutes les commades <code>pip install</code> lancées depuis l’environnement feront en fait des installations globales et non locales à l’environnement (plus de détails <a href="https://datumorphism.leima.is/til/programming/python/python-anaconda-install-requirements/">ici</a> )</p>
-<p>Pour utiliser cette installation, il faut activer l’environnement</p>
-<p><code>conda activate finistr</code></p>
-<p>On peut maintenant installer les packages de son choix avec des commandes type <code>conda install</code> ou <code>pip install</code></p>
-<p>Par exemple <code>pip install numpy</code></p>
-<p>Pour avoir la liste des packages installés dans l’environnemnet courant <code>conda list</code></p>
-<p>On quitte l’environnement avec la commande <code>conda deactivate</code>. Quand vous reviendrez à votre environnement (<code>conda activate</code>) vous aurez ces packages installés.</p>
-<p>Il est possible de fournir une liste de packages à installer dans l’environnement sous forme d’un fichier txt.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>conda create <span class="sc">--</span>name finistrbis python<span class="ot">=</span><span class="fl">3.11</span> pip </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>conda activate finistrbis</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pip install <span class="sc">-</span>r requirements.txt</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Le fichier <code>requirement.txt</code> a la forme suivante</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>jupyter==1.0.0
-numpy==2.1.0</code></pre>
-</div>
-</div>
-<section id="autres-commandes" class="level3">
-<h3 class="anchored" data-anchor-id="autres-commandes">Autres commandes</h3>
-<p>Il est possible de supprimer un environnement avec la commande</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>conda remove <span class="sc">--</span>name finistrbis <span class="sc">--</span>all</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>La liste des commandes conda est disponible dans la <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html">cheatsheet conda</a></p>
-</section>
-</section>
-<section id="créer-un-environnement-avec-virtual-env-sous-windows" class="level2">
-<h2 class="anchored" data-anchor-id="créer-un-environnement-avec-virtual-env-sous-windows">Créer un environnement avec virtual env sous Windows</h2>
-<p>Sur un terminal PowerShell de Windows, installer WSL (Windows subsystem for linux) :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="sc">--</span>install</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Après redémarrage, pour savoir quelle version de linux est installée :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="sc">-</span>l <span class="sc">-</span>v</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Il faut ensuite créer un alias python pour python3 :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>source <span class="sc">~</span><span class="er">/</span>.bashrc</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>alias python<span class="ot">=</span>python3alias python<span class="ot">=</span>python3</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Puis installer pip :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sudo apt<span class="sc">-</span>get update</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sudo apt install python3<span class="sc">-</span>pip</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Créer un alias pip pour pip3 :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>source <span class="sc">~</span><span class="er">/</span>.bashrc</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>alias pip<span class="ot">=</span>pip3</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Ou créer un lien symbolique entre pip3 et pip :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sudo ln <span class="sc">-</span>s <span class="sc">/</span>usr<span class="sc">/</span>bin<span class="sc">/</span>pip3 <span class="sc">/</span>usr<span class="sc">/</span>bin<span class="sc">/</span>pip</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Pour vérifier la version de pip qui est installée :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pip <span class="sc">--</span>version</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Installer virtualenv :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pip install virtualenv</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Et si c’est demandé :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sudo apt install python3<span class="fl">.10</span><span class="sc">-</span>venv </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>On peut ensuite créer un environnement python dans le dossier que l’on souhaite, par exemple ici l’environnement finistrEnv :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>python <span class="sc">-</span>m venv chemin<span class="sc">/</span>finistrEnv  </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>(si besoin, pour supprimer l’env : rm -rf finistrEnv)</p>
-<p>Enfin, pour activer l’environnement python ‘finistrEnv’ :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>source chemin<span class="sc">/</span>finistrEnv<span class="sc">/</span>bin<span class="sc">/</span>activate</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>ou alternativement</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>. chemin<span class="sc">/</span>finistrEnv<span class="sc">/</span>bin<span class="sc">/</span>activate</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Pour trouver les packages python : pypi</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>pypi nom<span class="sc">-</span>du<span class="sc">-</span>package</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>On peut ensuite créer un script.py dans ubuntu :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>touch toto.py</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>pwd</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Puis l’ouvrir dans vscode, préalablement installé dans Windows.</p>
-<p>Il faut ensuite dans vscode, préciser le chemin de l’environnement python (situé dans linux).</p>
-<p>En supplément :</p>
-<p>Pour ouvrir l’émulateur linux, à partir d’un terminal windows :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>start ubuntu.exe</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Pour désactiver l’environnement Python activé précédemment :</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>deactivate</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="utiliser-un-environnement-de-développement-agréable-pour-un-utilisateur-de-r" class="level2">
-<h2 class="anchored" data-anchor-id="utiliser-un-environnement-de-développement-agréable-pour-un-utilisateur-de-r">Utiliser un environnement de développement agréable pour un utilisateur de R</h2>
-</section>
-<section id="avec-visual-studio-code" class="level2">
-<h2 class="anchored" data-anchor-id="avec-visual-studio-code">Avec Visual Studio Code</h2>
-<p>ipython</p>
-<section id="avec-positron" class="level3">
-<h3 class="anchored" data-anchor-id="avec-positron">Avec Positron</h3>
-<p>Le nouvel IDE Positron (disponible en version beta) semble avoir des avantages intéressants pour les gens qui aiment Rstudio mais veulent faire du python. Notamment, il est possible</p>
-<ul>
-<li><p>de choisir facilement son environnement (menu déroulant en haut à droite) et</p></li>
-<li><p>d’utiliser la commande Ctr+entr pour éxécuter un code Python ligne à ligne comme on le fera pour un code R dans Rstudio.</p></li>
-</ul>
+<p><code>rig</code> is an R Installation manager that allows you to easily switch between different R versions.</p>
+<p>To install it, follow the instructions on the <a href="https://github.com/r-lib/rig">GitHub page</a>.</p>
+<p>On ubuntu, rig will “work” with R versions installed/stored at <code>/opt/R/</code>. It will not detect the R versions installed via <code>apt</code>. If you never tried to solve this question of switching between R versions, you will need to reinstall the R versions you’re interested in using rig.</p>
+<p>To do this, use the <code>add</code> command. For example, to install R version 4.2.2:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> rig add 4.2.2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After installing additional versions, you can check all the versions available on your computer using the <code>list</code> command:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> rig list</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> name   version  aliases</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">------------------------------------------</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">4.2.2</span>           </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">4.3.3</span>           </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> 4.4.1           release</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The ’*’ indicates the default version.</p>
+<p>Then to access the desired R version in RStudio, use the rstudio command:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> rig rstudio 4.2.2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here is a command list you can use:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> add        <span class="at">--</span> install a new R version [alias: install]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> available  <span class="at">--</span> List R versions available to install.</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> default    <span class="at">--</span> print or set default R version [alias: switch]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> library    <span class="at">--</span> manage package libraries [alias: lib] <span class="er">(</span><span class="ex">experimental</span><span class="kw">)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> list       <span class="at">--</span> list installed R versions [alias: ls]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> resolve    <span class="at">--</span> resolve a symbolic R version</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> rm         <span class="at">--</span> remove R versions [aliases: del, delete, remove]</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> rstudio    <span class="at">--</span> start RStudio with the specified R version</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> run        <span class="at">--</span> Run R, an R script or an R project</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> sysreqs    <span class="at">--</span> manage R-related system libraries and tools <span class="er">(</span><span class="ex">experimental</span><span class="kw">)</span> <span class="kw">(</span><span class="ex">macOS</span><span class="kw">)</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> system     <span class="at">--</span> manage current installations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>For more information, check the GitHub page.</p>
 
 
-</section>
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -501,12 +367,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // flash "checked"
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copié");
+    button.setAttribute("title", "Copied!");
     let tooltip;
     if (window.bootstrap) {
       button.setAttribute("data-bs-toggle", "tooltip");
       button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copié");
+      button.setAttribute("data-bs-title", "Copied!");
       tooltip = new bootstrap.Tooltip(button, 
         { trigger: "manual", 
           customClass: "code-copy-button-tooltip",

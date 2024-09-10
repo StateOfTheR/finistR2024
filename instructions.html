@@ -168,6 +168,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="dropdown-text">Pre-commit avec R</span></a>
   </li>  
         <li>
+    <a class="dropdown-item" href="./rig.html">
+ <span class="dropdown-text">rig - The R Installation Manager</span></a>
+  </li>  
+        <li>
     <a class="dropdown-item" href="./packaging_and_testing.html">
  <span class="dropdown-text">Python packaging</span></a>
   </li>  
@@ -230,6 +234,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="./quarto_parametre.html">
  <span class="dropdown-text">Document paramétré en quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./reproducibility.html">
+ <span class="dropdown-text">Reproducibility with renv, docker, and rix</span></a>
   </li>  
     </ul>
   </li>
@@ -413,6 +421,7 @@ jobs:
           Rscript -e "install.packages(c('tictoc', 'nimble', 'ggmcmc', 'compareMCMCs', 'nimbleHMC', 'mvtnorm'))"
           Rscript -e "install.packages(c('simulator', 'simpr', 'SimEngine', 'DT', 'withr', 'bench'))"
           Rscript -e "install.packages(c('future', 'furrr', 'purrr', 'cli', 'RhpcBLASctl'))"
+          Rscript -e "install.packages('rix', repos = c('https://b-rodrigues.r-universe.dev', 'https://cloud.r-project.org'))"
       - name: Additional Python packages
         run: |
           pip install torch torch_geometric 
